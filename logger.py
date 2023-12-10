@@ -8,6 +8,7 @@ class TrialLogger:
         self.csv_writer.writerow(["Trial Number", "Trial validity", "Opponent Choice", "Mouse choice", "Reward","opponent Reward"])
 
     def log_trial_data(self, trial_number, trial_validity, opponent_choice, mouse_choice, mouse_reward,opponent_reward):
+
         self.csv_writer.writerow([trial_number, trial_validity, opponent_choice, mouse_choice, mouse_reward,opponent_reward])
 
     def finalize_logging(self):

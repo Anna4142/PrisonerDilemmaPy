@@ -19,7 +19,7 @@ from RewardManager import RewardManager
 import tkinter as tk
 from logger import TrialLogger
 from OpponentType import OpponentType
-
+from DataAnalysisScript import DataAnalyzer
 
 # from ArduinoDigitalSim import ArduinoDigital  ##Anushka-new class
 class ExperimentManager:
@@ -35,9 +35,10 @@ class ExperimentManager:
 
         self.numcompletedtrial = 0
         self.num_trial = 0
-
+        self.data_path='C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/abcdef.csv'###change to whatever.csv
         self.stateManager = StateManager()
-        self.trial_logger = TrialLogger
+        self.trial_logger = TrialLogger(self.data_path)
+        self.data_analyzer = DataAnalyzer(self.data_path)
         # Initialize Arduino board
         self.initialize_arduino()
 
@@ -48,13 +49,6 @@ class ExperimentManager:
         self.punishment_time = 0.004
         self.center_reward_time = 1
 
-        # Initialize CSV file and video capture
-        # self.initialize_csv_logging()
-        # self.initialize_video_capture()
-
-        ##
-        ### VARIABLES FOR LOG FILE INITIALLY INITIALIZED TO FALSE
-        self.data_file_loc = 'path_to_csv_file.csv'
         self.cc_var = False
         self.cd_var = False
         self.dc_var = False
@@ -71,8 +65,7 @@ class ExperimentManager:
         self.reward_manager = RewardManager(self.board, [7, 8, 9, 10, 11, 12])
 
         self.sound_manager = SoundManager()
-        self.sound_manager.load_sound('beep',
-                                      'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/sounds/beep.wav')
+        self.sound_manager.load_sound('beep','C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/sounds/beep.wav')
 
     def initialize_arduino(self):
         comport = "COM11"
@@ -193,7 +186,7 @@ class ExperimentManager:
             # Increment the trial number counter
             self.numcompletedtrial += 1
             print("Trial Completed. Number of completed trials: ", self.numcompletedtrial)
-            # self.trial_logger.log_trial_data(self.numcompletedtrial, "Completed Trial", self.opponent_choice, self.mouse_choice, self.mouse_reward, self.opponent_reward)
+            self.trial_logger.log_trial_data(self.numcompletedtrial, "Completed Trial", self.opponent_choice, self.mouse_choice, self.mouse_reward, self.opponent_reward)
 
         elif state == States.TrialAbort:
             # Log that the trial has been aborted
@@ -202,7 +195,7 @@ class ExperimentManager:
             self.mouse_choice = "N/A",
             self.mouse_reward = "-",
             self.opponent_reward = "-"
-            # self.trial_logger.log_trial_data(self.numcompletedtrial, "Return Abort", self.opponent_choice, self.mouse_choice,self.mouse_reward, self.opponent_reward)
+            self.trial_logger.log_trial_data(self.numcompletedtrial, "Return Abort", self.opponent_choice, self.mouse_choice,self.mouse_reward, self.opponent_reward)
 
         elif state == States.DecisionAbort:
             # Handle DecisionAbort state
@@ -211,10 +204,14 @@ class ExperimentManager:
             self.mouse_choice = "N/A",
             self.mouse_reward = "-",
             self.opponent_reward = "-"
-            # self.trial_logger.log_trial_data(self.numcompletedtrial, "Decision Abort", self.opponent_choice, self.mouse_choice,self.mouse_reward, self.opponent_reward)
+            self.trial_logger.log_trial_data(self.numcompletedtrial, "Decision Abort", self.opponent_choice, self.mouse_choice,self.mouse_reward, self.opponent_reward)
 
         elif state == States.End:
             # Stop recording, finalize logs, show end message, etc.
+            self.trial_logger.finalize_logging()
+            analysis_results = self.data_analyzer.analyze_data()
+
+            print(analysis_results)
             ExperimentCompleted = True
 
         return ExperimentCompleted
@@ -274,9 +271,7 @@ class ExperimentManager:
                     # Retrieve location for the real mouse from its queue and get the simulated mouse's location
                     mouselocation = mouse1.get_mouse_location(zone_activations)
 
-                    opponent_choice = mouse2sim.get_mouse_location(Locations.Unknown,
-                                                                   currentstate)  # Assuming the method can be called without actual location
-
+                    opponent_choice = mouse2sim.get_mouse_location(Locations.Unknown, currentstate)
                 else:
                     # Retrieve locations from simulated mice methods
 

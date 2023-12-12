@@ -17,7 +17,7 @@ class DataAnalyzer:
         analysis_results = {
             "Mean Reward": reward_mean,
             "Number of Completed Trials": completed_trials_count,
-            "Mean Reward by Opponent Choice": mean_reward_by_opponent_choice.to_dict()
+            "Mean Reward by Opponent ": mean_reward_by_opponent_choice.to_dict()
         }
 
         return analysis_results

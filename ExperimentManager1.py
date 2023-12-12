@@ -35,7 +35,7 @@ class ExperimentManager:
 
         self.numcompletedtrial = 0
         self.num_trial = 0
-        self.data_path='C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/abcdef.csv'###change to whatever.csv
+        self.data_path='C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/abcdefg.csv'###change to whatever.csv
         self.stateManager = StateManager()
         self.trial_logger = TrialLogger(self.data_path)
         self.data_analyzer = DataAnalyzer(self.data_path)
@@ -47,6 +47,12 @@ class ExperimentManager:
         self.sucker_time = 0
         self.temptation_time = 0.09
         self.punishment_time = 0.004
+        self.center_reward_time = 1
+
+        self.reward_time = 2
+        self.sucker_time = 0
+        self.temptation_time = 0.9
+        self.punishment_time = 0.4
         self.center_reward_time = 1
 
         self.cc_var = False
@@ -106,8 +112,8 @@ class ExperimentManager:
             # Actions for M1CM2C state
             self.mouse_choice = "C"
             self.opponent_choice = "C"
-            self.mouse_reward = "12ml"
-            self.opponent_reward = "12ml"
+            self.mouse_reward = "12"
+            self.opponent_reward = "12"
             self.cc_cnt += 1
             self.reward_manager.deliver_reward('cc', 1, self.reward_time)
             self.reward_manager.deliver_reward('cc', 2, self.reward_time)
@@ -125,8 +131,8 @@ class ExperimentManager:
             # Actions for M1CDM2D state
             self.mouse_choice = "C"
             self.opponent_choice = "D"
-            self.mouse_reward = "0ml"
-            self.opponent_reward = "15ml"
+            self.mouse_reward = "0"
+            self.opponent_reward = "15"
             self.cd_cnt += 1
             self.reward_manager.deliver_reward('cd', 1, self.reward_time)
             self.reward_manager.deliver_reward('cd', 2, self.punishment_time)
@@ -144,8 +150,8 @@ class ExperimentManager:
             # Actions for M1DCM2C state
             self.mouse_choice = "D"
             self.opponent_choice = "C"
-            self.mouse_reward = "15ml"
-            self.opponent_reward = "0ml"
+            self.mouse_reward = "15"
+            self.opponent_reward = "0"
             self.dc_cnt += 1
 
             self.reward_manager.deliver_reward('dc', 1, self.punishment_time)
@@ -164,8 +170,8 @@ class ExperimentManager:
             # Actions for M1DDM2D state
             self.mouse_choice = "D"
             self.opponent_choice = "D"
-            self.mouse_reward = "15ml"
-            self.opponent_reward = "15ml"
+            self.mouse_reward = "15"
+            self.opponent_reward = "15"
             self.dd_cnt += 1
             self.reward_manager.deliver_reward('dd', 1, self.punishment_time)
             self.reward_manager.deliver_reward('dd', 2, self.punishment_time)

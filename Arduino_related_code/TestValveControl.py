@@ -1,6 +1,6 @@
 # Assuming you have a class or module ArduinoDigital with the relevant methods
-from ArduinoDigital import ArduinoDigital
-from ValveControl import ValveControl
+from Arduino_related_code.ArduinoDigital import ArduinoDigital
+from Arduino_related_code.ValveControl import ValveControl
 import time
 
 # Initialize the ArduinoDigital object

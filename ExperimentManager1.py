@@ -1,25 +1,21 @@
-import time
-import time
-from Sound_manager import SoundManager
+from Sound_manager_code.Sound_manager import SoundManager
 from vimba import *
-from VideoAnalyser1 import Video_Analyzer
+from Video_analyser_code.VideoAnalyser1 import Video_Analyzer
 # from VideoAnalyzer import Video_Analyzer
 
-from MouseMonitor1 import MouseMonitor
+from modelling_opponent.MouseMonitor1 import MouseMonitor
 # from VideoAnalyzerStub import Video_Analyzer
-from MouseMonitor1 import Locations
-from logger import TrialLogger
-from simulated_mouse import Simulated_mouse
-from ArduinoDigital import ArduinoDigital
-from StateManager import StateManager
-from StateManager import States
-from StateManager import Events
-import experimentgui
-from RewardManager import RewardManager
+from modelling_opponent.MouseMonitor1 import Locations
+from modelling_opponent.simulated_mouse import Simulated_mouse
+from Arduino_related_code.ArduinoDigital import ArduinoDigital
+from State_manager_code.StateManager import StateManager
+from State_manager_code.StateManager import States
+from State_manager_code.StateManager import Events
+from Reward_manager.RewardManager import RewardManager
 import tkinter as tk
-from logger import TrialLogger
-from OpponentType import OpponentType
-from DataAnalysisScript import DataAnalyzer
+from Data_analysis.logger import TrialLogger
+from modelling_opponent.OpponentType import OpponentType
+from Data_analysis.DataAnalysisScript import DataAnalyzer
 
 # from ArduinoDigitalSim import ArduinoDigital  ##Anushka-new class
 class ExperimentManager:
@@ -35,7 +31,7 @@ class ExperimentManager:
 
         self.numcompletedtrial = 0
         self.num_trial = 0
-        self.data_path='C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/abcdefg.csv'###change to whatever.csv
+        self.data_path='C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/abcd00g.csv'###change to whatever.csv
         self.stateManager = StateManager()
         self.trial_logger = TrialLogger(self.data_path)
         self.data_analyzer = DataAnalyzer(self.data_path)
@@ -267,7 +263,7 @@ class ExperimentManager:
 
             else:
                 zone_activations = self.videoAnalyser.process_single_frame()
-                print("zone activations", zone_activations)
+                #print("zone activations", zone_activations)
 
                 if opponent_type == OpponentType.MOUSE_MOUSE:
                     # Retrieve locations from both queues for real mice

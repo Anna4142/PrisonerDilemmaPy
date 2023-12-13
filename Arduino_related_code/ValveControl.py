@@ -1,5 +1,6 @@
 import time
-from ArduinoDigital import ArduinoDigital
+
+
 class ValveControl:
     def __init__(self, channel, arduino):
         self.channel = channel

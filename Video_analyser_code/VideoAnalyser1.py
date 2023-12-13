@@ -111,11 +111,11 @@ class Video_Analyzer:
 
         for idx, region_key in enumerate(self.regions):
             (y1, x1), (y2, x2) = self.regions[region_key]
-            print(f"{region_key} coordinates: {(y1, x1)}, {(y2, x2)}")
+            #print(f"{region_key} coordinates: {(y1, x1)}, {(y2, x2)}")
             region_pixels = frame[y1:y2, x1:x2]
             sum_of_pixels = np.sum(frame[y1:y2, x1:x2])
             self.pixel_sums[region_key] = sum_of_pixels  # Update the class attribute
-            print(f"{region_key}: Sum of pixels = {sum_of_pixels}, Region shape = {region_pixels.shape}")
+            #print(f"{region_key}: Sum of pixels = {sum_of_pixels}, Region shape = {region_pixels.shape}")
 
             if sum_of_pixels <= self.thresholds[region_key]:
                 zone_activation[idx] = 1

@@ -1,8 +1,7 @@
 
-from ArduinoDigital import ArduinoDigital
-from ValveControl import ValveControl
+from Arduino_related_code.ArduinoDigital import ArduinoDigital
 import time
-from RewardManager import RewardManager
+from Reward_manager.RewardManager import RewardManager
 def test_reward_manager():
     # Assuming you have an Arduino instance ready
     arduino_instance = ArduinoDigital("COM11")  # Replace with your actual ArduinoDigital instance

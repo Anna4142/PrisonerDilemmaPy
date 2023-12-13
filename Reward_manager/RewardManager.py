@@ -1,4 +1,4 @@
-from ValveControl import ValveControl
+from Arduino_related_code.ValveControl import ValveControl
 import threading
 import time
 class RewardManager:

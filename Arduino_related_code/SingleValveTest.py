@@ -1,4 +1,4 @@
-from ArduinoDigital import ArduinoDigital
+from Arduino_related_code.ArduinoDigital import ArduinoDigital
 import time
 
 # Replace 'COM3' with the appropriate port name your Arduino is connected to.

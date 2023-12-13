@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
-from OpponentType import OpponentType
+from modelling_opponent.OpponentType import OpponentType
 
 class ExperimentGUI:
     def __init__(self):
@@ -105,7 +105,7 @@ class ExperimentGUI:
 
                 # Define strategy options
                 strategies = ["Unconditional Cooperator", "Unconditional Defector", "Random", "Tit for Tat",
-                              "Probability p Cooperator"]
+                              "Probability p Cooperator","q learner"]
                 for strategy in strategies:
                     radiobutton = tk.Radiobutton(
                         self.window, text=strategy, variable=strategy_var, value=strategy,

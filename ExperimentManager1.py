@@ -1,43 +1,43 @@
-import time
-import time
-from Sound_manager import SoundManager
-from vimba import *
-from VideoAnalyser1 import Video_Analyzer
+# Micky: I suggest to return to the original file name. the '1' suffix is confusing
+
+from VideoAnalyzerSim import VideoAnalyzer
+#from VideoAnalyser1 import Video_Analyzer
 # from VideoAnalyzer import Video_Analyzer
+# from VideoAnalyzerStub import Video_Analyzer
+
+#from ArduinoDigital import ArduinoDigital
+from ArduinoDigitalSim import ArduinoDigital
 
 from MouseMonitor1 import MouseMonitor
-# from VideoAnalyzerStub import Video_Analyzer
 from MouseMonitor1 import Locations
-from logger import TrialLogger
+from SoundManager import *
 from simulated_mouse import Simulated_mouse
-from ArduinoDigital import ArduinoDigital
 from StateManager import StateManager
 from StateManager import States
 from StateManager import Events
-import experimentgui
 from RewardManager import RewardManager
-import tkinter as tk
 from logger import TrialLogger
 from OpponentType import OpponentType
 
 
-# from ArduinoDigitalSim import ArduinoDigital  ##Anushka-new class
 class ExperimentManager:
     def __init__(self):
         # Initialize other components here
-        self.root = tk.Tk()  # Create a new Tkinter root window if not provided
+        #self.root = tk.Tk()  # Create a new Tkinter root window if not provided   #Micky: The video Analyzer stub should create its own TK root
         # self.videoAnalyser = Video_Analyzer(self.root)
-        with Vimba.get_instance() as vimba:
+        #with Vimba.get_instance() as vimba:
             # Create Video_Analyzer instance with the active Vimba instance
-            self.videoAnalyser = Video_Analyzer(vimba)
+            #self.videoAnalyser = Video_Analyzer(vimba)                             #Micky: The video analyzer should create its own vimb instance
 
-        # self.videoAnalyser = Video_Analyzer()  # or VideoAnalyzer, ensure correct class name
-
+        self.videoAnalyser = VideoAnalyzer()         # Micky: The real and sim classes should be defined to have identical _init__() function
+                                                     #        this way changing the import staemnt will be enough to swhich bwteen real
+                                                     #        and sim HW
+        
         self.numcompletedtrial = 0
         self.num_trial = 0
 
         self.stateManager = StateManager()
-        self.trial_logger = TrialLogger
+        self.trial_logger = TrialLogger              # Micky: You are not passing the logfile name. Is that correct?
         # Initialize Arduino board
         self.initialize_arduino()
 
@@ -48,14 +48,14 @@ class ExperimentManager:
         self.punishment_time = 0.004
         self.center_reward_time = 1
 
-        # Initialize CSV file and video capture
+        # Initialize CSV file and video capture       # Micky: I think it is time to delete these lines. You moved them to the relevant classes
         # self.initialize_csv_logging()
         # self.initialize_video_capture()
 
         ##
         ### VARIABLES FOR LOG FILE INITIALLY INITIALIZED TO FALSE
-        self.data_file_loc = 'path_to_csv_file.csv'
-        self.cc_var = False
+        self.data_file_loc = 'path_to_csv_file.csv'   # Micky: Use relative file name. it will make the SW more portable
+        self.cc_var = False                           # Micky: It seems that you are not doinf anything with these flags. Do you really need them?
         self.cd_var = False
         self.dc_var = False
         self.dd_var = False
@@ -70,16 +70,33 @@ class ExperimentManager:
 
         self.reward_manager = RewardManager(self.board, [7, 8, 9, 10, 11, 12])
 
-        self.sound_manager = SoundManager()
-        self.sound_manager.load_sound('beep',
-                                      'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/sounds/beep.wav')
+        # self.sound_manager = SoundManager()              # Micky: According to theory, if you need only one instance of a class you
+                                                           #        should define it as a static class. it runs more efficently.
+                                                           #        Python has the module constarct which you can use. especially if there
+                                                           #        is no class data to be stored.
+                                                           #        As an example, I changed the soundManager to be a module.
+                                                           #        Also, every module/class should handle its own specific data. defining
+                                                           #        it (like the sound file names) in the upper level manager defeats the purpose
+                                                           #        of hiding the specifics of a module,  internally to the module.
+                                                           #        Take a look at how I did it.
+        #self.sound_manager.load_sound('beep',
+        #                              'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/sounds/beep.wav')
 
     def initialize_arduino(self):
         comport = "COM11"
         self.board = ArduinoDigital(comport)
         # Set all pins to low
-        for pin in [7, 8, 9, 10, 11, 12]:
-            self.board.DigitalLow(pin)
+        for pin in [7, 8, 9, 10, 11, 12]:           # Micky: This is probably what opens your vales. I think it should be changes to high
+            self.board.DigitalLow(pin)              #        Also, there is no real need to initialze the vales here. You do not even want
+                                                    #        to know the list of valves here. Keep the knowldege hidden in the relevant clsses.
+                                                    #        it will make your code more modular and maintainable, and less prone to erros.
+                                                    #        The rewardManager Class should be the only one that has the knowldge of digital channels
+                                                    #        and the valveControl class should take care of initializing the valves - and it does.
+
+                                                    #        Micky: The mouseNsimulated flags are a bad solution (I did it I know :-))
+                                                    #               but Why are ignoring them in teh code? You are delivering rewards to
+                                                    #               a simulated mouse. Let's discuss.
+                                                    #               I will show you a better way next round.
 
     def StateActivity(self, state, mouse1simulated, mouse2simulated):
         ExperimentCompleted = False
@@ -94,7 +111,7 @@ class ExperimentManager:
             print("delivering reward in the center ")
             self.reward_manager.deliver_reward('center', 1, self.punishment_time)
             self.reward_manager.deliver_reward('center', 2, self.punishment_time)
-            """""
+            """""                                  
             if not mouse1simulated:
 
                 self.reward_manager.deliver_reward('dd', 8, self.punishment_time)
@@ -102,8 +119,8 @@ class ExperimentManager:
                 self.reward_manager.deliver_reward('dd', 11, self.punishment_time)
             """
         elif state == States.TrialStarted:
-            self.sound_manager.play_sound('beep')
-
+            #self.sound_manager.play_sound('beep')
+            Play(Sounds.Start)
             if mouse1simulated:
                 mouse1simulated.NewTrial()
             if mouse2simulated:
@@ -187,14 +204,19 @@ class ExperimentManager:
                 self.reward_manager.deliver_reward('dd', 2, self.punishment_time)
             """
         elif state == States.WaitForReturn:
-            self.sound_manager.play_sound('beep')
+            #self.sound_manager.play_sound('beep')            # Micky: Do we need a beep hear?
+            Play(Sounds.Start)
 
         elif state == States.TrialCompleted:
             # Increment the trial number counter
             self.numcompletedtrial += 1
             print("Trial Completed. Number of completed trials: ", self.numcompletedtrial)
             # self.trial_logger.log_trial_data(self.numcompletedtrial, "Completed Trial", self.opponent_choice, self.mouse_choice, self.mouse_reward, self.opponent_reward)
-
+                                                        # Micky: Why are the logger writes, commented out? There is no need to.
+                                                        #        If you really wanted to not log,  change it in one plcae in the logger class. Not
+                                                        #        in so many places here. I assume you did it becuase you do not have the logging directory
+                                                        #        on one of your computers. Use relative (rather then absolute) files names. See example in
+                                                        #        in the SoundManager Class
         elif state == States.TrialAbort:
             # Log that the trial has been aborted
             print("Trial has been aborted.")  # Or use a logging mechanism if available
@@ -255,7 +277,9 @@ class ExperimentManager:
         state_history = []
         while currentstate != States.End:
             # print(f"Current State: {currentstate}")
-            state_history.append(currentstate)
+            state_history.append(currentstate)         # Micky: please rememebr that your main loop is running as fast as your computer can handle.
+                                                       #        This means that your state_history is infinitly large - hense useless. If you need
+                                                       #        a state history, store only the state changes.
             trialevents = 0;
             if self.numcompletedtrial == self.num_trial - 1:
 
@@ -264,9 +288,11 @@ class ExperimentManager:
 
             else:
                 zone_activations = self.videoAnalyser.process_single_frame()
-                print("zone activations", zone_activations)
+                #print("zone activations", zone_activations)    # Micky: This prints every loop cycle. way to fast to be on any use. it floods the
+                                                                #         the consol window and makes it impossible to see the important data. 
 
-                if opponent_type == OpponentType.MOUSE_MOUSE:
+                if opponent_type == OpponentType.MOUSE_MOUSE:   # Micky: This can be improved. There should be no API difference between the
+                                                                # real and the simulated mice
                     # Retrieve locations from both queues for real mice
                     mouselocation = mouse1.get_mouse_location(zone_activations)
                     opponent_choice = mouse2.get_mouse_location(zone_activations)
@@ -283,8 +309,8 @@ class ExperimentManager:
                     mouselocation = mouse1sim.get_mouse_location(Locations.Unknown, currentstate)
 
                     opponent_choice = mouse2sim.get_mouse_location(Locations.Unknown, currentstate)
-                    print("mouselocation", mouselocation)
-                    print("opponent_choice", opponent_choice)
+                    #print("mouselocation", mouselocation)                        # Micky: do not print every cycle of the main loop.
+                    #print("opponent_choice", opponent_choice)
                 if mouselocation == Locations.Center:
                     trialevents = trialevents + Events.Mouse1InCenter.value
                 elif mouselocation == Locations.Cooperate:
@@ -304,7 +330,8 @@ class ExperimentManager:
             # print(f"next State: {nextstate}")
             if nextstate != currentstate:
                 currentstate = nextstate
+                print(f"Current State: {nextstate}")           # Micky: A slight change of order and text to improve readability
                 self.StateActivity(currentstate, mouse1sim, mouse2sim)
-                print(f"next State: {nextstate}")
-            if currentstate == States.End:
+
+            if currentstate == States.End:               # Micky: No need to break. Your while loop is using the same condition.
                 break

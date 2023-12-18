@@ -26,5 +26,5 @@ class ValveControl:
                 self.arduino.DigitalHigh(self.channel)  # Set the pin low
                 self.valveopen = False
                 #print("delivered")
-                print(self.valveopen)
+                #print(self.valveopen)
         return self.valveopen

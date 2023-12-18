@@ -1,6 +1,7 @@
 import random
 #from VideoAnalyzerStub import Video_Analyzer
 from State_manager_code.StateManager import States
+"""""
 from locations import Locations
 from models.Learning_agents.qlearner import QLearningAgent
 class Simulated_mouse:
@@ -27,3 +28,4 @@ class Simulated_mouse:
 
 
     def get_mouse_location(self, mouse_location,current_state):
+"""

@@ -1,13 +1,14 @@
-from enum import Enum
-from locations import Locations
+
+from Video_analyser_code.locations import Locations
 
 class MouseMonitor:
     def __init__(self, video,mouse_id):
         self.mouse_id = mouse_id
         self.video_analyser=video
 
-    def get_mouse_location(self, zones_list):
+    def get_mouse_location(self, zones_list,currentstate):
         # Split the zones based on mouse_id
+
         print("ZONES LIST",zones_list)
         mouse_zones = zones_list[(self.mouse_id - 1) * 3 : self.mouse_id * 3]
         print(self.mouse_id)

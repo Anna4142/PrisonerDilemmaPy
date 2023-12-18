@@ -1,6 +1,7 @@
 import random
 from collections import defaultdict
 from Video_analyser_code.locations import Locations
+from State_manager_code.StateManager import States
 class QLearningAgent:
     def __init__(self):
         # Initialize Q-learning parameters with default values (can be set later)
@@ -12,9 +13,11 @@ class QLearningAgent:
         self.action_space = [location for location in Locations if location != Locations.Unknown]
 
 
-        # Initialize the Q-table as a dictionary
-        # The Q-table maps state-action pairs to Q-values (rewards)
-        self.q_table = defaultdict(lambda: defaultdict(lambda: 0))
+        # Initialize the Q-table with all state-action pairs set to 0.0
+        self.q_table = defaultdict(lambda: defaultdict(float))
+        for state in States:
+            for action in Locations:
+                self.q_table[state][action] = 0.0
 
     def set_parameters(self, learning_rate, discount_factor, epsilon, action_space):
         """
@@ -35,7 +38,9 @@ class QLearningAgent:
         else:
             # Exploit: choose the best known action
             max_q_value = max(self.q_table[state].values(), default=0)
+            #print(max_q_value)
             actions_with_max_q = [action for action in self.action_space if self.q_table[state][action] == max_q_value]
+            #print(actions_with_max_q)
             action = random.choice(actions_with_max_q) if actions_with_max_q else random.choice(self.action_space)
 
         # Print the chosen action
@@ -48,9 +53,15 @@ class QLearningAgent:
         """
         print("IN LEARN")
         print(self.q_table)
+        print("next_state",next_state)
         old_value = self.q_table[state][action]
-        next_max = max(self.q_table[next_state].values(), default=0)
-        new_value = (1 - self.learning_rate) * old_value + self.learning_rate * (reward + self.discount_factor * next_max)
+        #next_max = max(self.q_table[next_state].values(), default=0)
+        next_max= max(next_state, key=lambda state: max(self.q_table[state].values(), default=0))
+        #print("next max",next_max)
+        old_value = self.q_table[state][action]
+        new_value = (1 - self.learning_rate) * old_value + self.learning_rate * (
+                    reward + self.discount_factor * self.q_table[next_max][action])
+
         self.q_table[state][action] = new_value
 
     def get_q_table(self):

@@ -60,13 +60,13 @@ class ExperimentGUI:
         self.num_trials_entry.pack(anchor='w', padx=20, pady=5)
 
         # Create and pack a label and entry for trial duration
-        tk.Label(self.window, text="Trial Duration (seconds):").pack(anchor='w', padx=20, pady=5)
+        tk.Label(self.window, text="Decision Time (seconds):").pack(anchor='w', padx=20, pady=5)
         self.trial_duration_var = tk.StringVar()  # StringVar for trial duration
         self.trial_duration_entry = tk.Entry(self.window, textvariable=self.trial_duration_var)
         self.trial_duration_entry.pack(anchor='w', padx=20, pady=5)
 
         # Create and pack a label and entry for decision time
-        tk.Label(self.window, text="Decision Time (seconds):").pack(anchor='w', padx=20, pady=5)
+        tk.Label(self.window, text="Return to center (seconds):").pack(anchor='w', padx=20, pady=5)
         self.decision_time_var = tk.StringVar()  # StringVar for decision time
         self.decision_time_entry = tk.Entry(self.window, textvariable=self.decision_time_var)
         self.decision_time_entry.pack(anchor='w', padx=20, pady=5)

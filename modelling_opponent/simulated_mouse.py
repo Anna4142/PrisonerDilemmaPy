@@ -12,7 +12,7 @@ class Simulated_mouse:
         self.decisionMade = True
         self.rewardReceived = True
         self.q_learning_agent = QLearningAgent()
-        self.state_manager=StateManager
+        self.state_manager=StateManager()
 
     def SetStrategy(self, strategy):
         self.strategy = strategy
@@ -31,7 +31,7 @@ class Simulated_mouse:
         else:
             print("Error: p should be between 0 and 1")
 
-        def update_and_print_q_table(self, current_state, action, reward, next_state):
+    def update_and_print_q_table(self, current_state, action, reward, next_state):
             """Update the Q-table and print it."""
             self.q_learning_agent.learn(current_state, action, reward, next_state)
             print("Updated Q-table:")
@@ -74,7 +74,7 @@ class Simulated_mouse:
                     list_opp = self.q_learning_agent.choose_action(current_state)
                     next_state = self.state_manager.NextState[current_state]
                     reward=0
-                    simulated_mouse.update_q_learning(current_state, list_opp, reward, next_state)
+                    self.update_and_print_q_table(current_state, list_opp, reward, next_state)
 
             elif current_state == States.M1CM2C:
                    pass  # Example: Cooperate

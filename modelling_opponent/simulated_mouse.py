@@ -2,7 +2,7 @@ import random
 #from VideoAnalyzerStub import Video_Analyzer
 from State_manager_code.StateManager import States
 from State_manager_code.StateManager import StateManager
-from locations import Locations
+from Video_analyser_code.locations import Locations
 from models.Learning_agents.qlearner import QLearningAgent
 class Simulated_mouse:
     def __init__(self):

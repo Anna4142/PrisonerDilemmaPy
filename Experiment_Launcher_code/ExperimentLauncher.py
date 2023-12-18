@@ -1,5 +1,5 @@
-from ExperimentManager1 import ExperimentManager
-from experimentgui import ExperimentGUI, OpponentType
+from Experiment_Launcher_code.ExperimentManager import ExperimentManager
+from Experiment_Launcher_code.experimentgui import ExperimentGUI, OpponentType
 
 def main():
     # Create an instance of the ExperimentGUI class
@@ -16,20 +16,10 @@ def main():
         decision_time = settings.get('decision_time')
 
         opponent_type = settings.get('opponent_type')  # This should now be an OpponentType enum value
-
+        opponent_strategy_1 = settings.get('opponent_strategy')
+        opponent_strategy_2 = settings.get('computer_opponent_strategy')
         # Adjust logic based on enum
-        if opponent_type == OpponentType.MOUSE_COMPUTER:
-            opponent_strategy_1 = settings.get('opponent_strategy')
-            opponent_strategy_2 = settings.get('computer_opponent_strategy')
-        elif opponent_type == OpponentType.COMPUTER_COMPUTER:
-            opponent_strategy_1 = settings.get('opponent_strategy')
-            opponent_strategy_2 = settings.get('computer_opponent_strategy')
-        else:
-            # Handle other types or default
-            opponent_strategy_1 = settings.get('opponent_strategy')
-            opponent_strategy_2 = settings.get('computer_opponent_strategy')
 
-        # Modify num_trials as per your requirement
         num_trials += 2
 
         # Initialize and start the experiment

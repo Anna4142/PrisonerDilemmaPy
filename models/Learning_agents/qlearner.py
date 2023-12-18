@@ -1,6 +1,6 @@
 import random
 from collections import defaultdict
-from locations import Locations
+from Video_analyser_code.locations import Locations
 class QLearningAgent:
     def __init__(self):
         # Initialize Q-learning parameters with default values (can be set later)

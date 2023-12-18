@@ -19,8 +19,11 @@ class RewardManager:
             valve = self.valves[valve_index]
             valve.OpenValve(duration)
             while valve.IsValveOpen():
-              #print("valve open")
-              time.sleep(0.001)
+                pass  # TO BE HANDLED -Micky. I added it just to have a working code.should be removed.
+                # print("valve open")                    # Micky: This is a tight loop waiting on the valve the close. it prints this message continiously
+                #        its pointless to run it in a sparate thred. It will just seat here and wait
+                #        for the valve to close. Its better to call it from the main loop of the experiment
+                #        manager. I'll show you how next round.
 
                 # Wait a bit before checking again to avoid overloading the CPU
         else:
@@ -43,5 +46,5 @@ class RewardManager:
         if valve_index is not None:
             thread = threading.Thread(target=self._threaded_deliver, args=(valve_index, reward_time))
             thread.start()
-            thread.join()
+            #thread.join()
 

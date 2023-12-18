@@ -20,4 +20,4 @@ def Play(sound):
     if sound == Sounds.Start:
         winsound.PlaySound("C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/sounds/beep.wav", winsound.SND_FILENAME | winsound.SND_ASYNC)
     elif sound == Sounds.Abort:
-        winsound.PlaySound("C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/sounds/beep.wav", winsound.SND_FILENAME |winsound.SND_ASYNC)
+        winsound.PlaySound("C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/sounds/ping.wav", winsound.SND_FILENAME |winsound.SND_ASYNC)

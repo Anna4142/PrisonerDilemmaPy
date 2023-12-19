@@ -1,7 +1,7 @@
 # Micky: I suggest to return to the original file name. the '1' suffix is confusing
 
 from VideoAnalyzerSim import VideoAnalyzer
-#from VideoAnalyser1 import Video_Analyzer
+# from VideoAnalyser1 import Video_Analyzer
 # from VideoAnalyzer import Video_Analyzer
 # from VideoAnalyzerStub import Video_Analyzer
 

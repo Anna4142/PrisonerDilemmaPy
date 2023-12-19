@@ -99,7 +99,7 @@ class StateManager:
 
     def DetermineState(self, events):
         TransitionEvents = self.TransitionEvent[self.current_state]
-        #print("event",TransitionEvents)                      Micky: This prints apear every main loop. this is mot a good idea.
+
         # Check and Perform Event base transition
         for i, event in enumerate(TransitionEvents):
             if event & events == event:

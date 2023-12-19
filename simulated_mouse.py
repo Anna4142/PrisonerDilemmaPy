@@ -1,8 +1,4 @@
 import random
-#from VideoAnalyzer import Video_Analyzer           # delet these lines, please. They are nor not needed. Still python tries
-                                                    # to import and fails becuase I do not have vimba
-#from MouseMonitor1 import MouseMonitor
-#from VideoAnalyzerStub import Video_Analyzer
 from StateManager import States
 from locations import Locations
 

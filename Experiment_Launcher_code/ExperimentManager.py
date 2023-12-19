@@ -37,7 +37,7 @@ class ExperimentManager:
         #initialize reward manager
         self.reward_manager = RewardManager(self.board, [7, 8, 9, 10, 11, 12])
         #initialize experimenter
-        self.experimenter = Experimenter(self.videoAnalyser)
+        #self.experimenter = Experimenter(self.videoAnalyser)
 
         def initialize_arduino(self):
             comport = "COM11"
@@ -69,8 +69,10 @@ class ExperimentManager:
         if state == States.Start:
             # Initialize variables, set some flags, start recording, etc.
             pass
-        elif state == States.WaitForStart:
-            pass
+
+        #elif state == States.WaitForStart:
+        #   pass
+
 
         elif state == States.CenterReward:
             self.center_var = True
@@ -246,11 +248,13 @@ class ExperimentManager:
             # print(f"Current State: {currentstate}")
             state_history.append(currentstate)   ##what is a better solution .i will probably need the state history for some other silulated mice methods that are based on learning
             trialevents = 0;
+            """""
             if self.experimenter.check_for_start():
                 # If true, trigger the trial start event
                 print("Experimenter has initiated the trial.")
                 trialevents += Events.StartTrial.value
-            elif self.numcompletedtrial == self.num_trial - 1:
+            """
+            if self.numcompletedtrial == self.num_trial - 1:
 
                 trialevents += Events.LastTrial.value
                 # print("TRIAL COMPLETE EVENTS", trialevents)

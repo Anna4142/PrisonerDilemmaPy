@@ -47,4 +47,3 @@ class RewardManager:
             thread = threading.Thread(target=self._threaded_deliver, args=(valve_index, reward_time))
             thread.start()
             #thread.join()
-

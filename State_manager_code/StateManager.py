@@ -62,12 +62,12 @@ class StateManager:
 
         self.TimeOutState = {
             States.Start : None,
-            States.CenterReward : States.TrialStarted,
+            States.CenterReward : States.TrialStarted,   # allow for an unconditional (ignore Reward delivered event) transition
             States.TrialStarted : States.DecisionAbort,
-            States.M1CM2C: States.WaitForReturn,
-            States.M1CM2D: States.WaitForReturn,
-            States.M1DM2C: States.WaitForReturn,
-            States.M1DM2D: States.WaitForReturn,
+            States.M1CM2C: States.WaitForReturn,         # allow for an unconditional (ignore Reward delivered event) transition
+            States.M1CM2D: States.WaitForReturn,         # allow for an unconditional (ignore Reward delivered event) transition
+            States.M1DM2C: States.WaitForReturn,         # allow for an unconditional (ignore Reward delivered event) transition
+            States.M1DM2D: States.WaitForReturn,         # allow for an unconditional (ignore Reward delivered event) transition
             States.WaitForReturn: States.TrialAbort,
             States.TrialCompleted: States.CenterReward,
             States.TrialAbort: None,
@@ -83,7 +83,7 @@ class StateManager:
             States.M1CM2D: 0,
             States.M1DM2C: 0,
             States.M1DM2D: 0,
-            States.WaitForReturn: 10,
+            States.WaitForReturn: 10,    # 10 seconds is a default value. It is replaces by the SetTimeOut functions.
             States.TrialCompleted: 0,
             States.TrialAbort: None,
             States.DecisionAbort: 0,
@@ -99,8 +99,8 @@ class StateManager:
 
     def DetermineState(self, events):
         TransitionEvents = self.TransitionEvent[self.current_state]
-        #print("event",TransitionEvents)  #for debugging
 
+        # Check and Perform Event base transition
         for i, event in enumerate(TransitionEvents):
             if event & events == event:
                 # Transition to the next state based on the event

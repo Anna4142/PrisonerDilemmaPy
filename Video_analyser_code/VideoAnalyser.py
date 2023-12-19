@@ -82,6 +82,7 @@ class Video_Analyzer:
             'm2_c': [(455, 110), (490, 180)],  # Mouse 2 Cooperate Zone (Top Left)
             'm2_cen': [(330, 280), (400, 350)],  # Mouse 2 Center Zone (Center Left)
             'm2_d': [(455, 400), (490, 470)],  # Mouse 2 Defect Zone (Bottom Left)
+            'experimenter_start_zone': [(440, 280), (520, 350)]
         }
         return regions
 
@@ -108,6 +109,7 @@ class Video_Analyzer:
             'm2_c': 35500,  # Threshold for Mouse 2 Cooperate Zone
             'm2_cen': 300000,  # Threshold for Mouse 2 Center Zone
             'm2_d': 140000,  # Threshold for Mouse 2 Defect Zone
+            'experimenter_start_zone': 35500  #Threshold for expermenter start zone
         }
         #{'m1_d': 106569, 'm1_cen': 2632, 'm1_c': 256415, 'm2_d': 112012, 'm2_cen': 505708, 'm2_c': 234711}
         return thresholds
@@ -191,6 +193,9 @@ class Video_Analyzer:
         # Return the latest zone activations
         return self.zone_activations
 
+    def get_exp_zone_activations(self):
+        # Return the latest zone activations
+        return self.exp_zone
 
 #analyzer = VideoAnalyzer()
 #analyzer.stream_and_process()

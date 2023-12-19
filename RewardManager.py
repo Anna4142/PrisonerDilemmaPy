@@ -19,7 +19,12 @@ class RewardManager:
             valve = self.valves[valve_index]
             valve.OpenValve(duration)
             while valve.IsValveOpen():
-              print("valve open")
+                pass    # Micky. I added it just to have a working code.should be removed.
+              # print("valve open")                    # Micky: This is a tight loop waiting on the valve the close. it prints this message continiously
+                                                     #        its pointless to run it in a sparate thred. It will just seat here and wait
+                                                     #        for the valve to close. Its better to call it from the main loop of the experiment
+                                                     #        manager. I'll show you how next round.
+
                 # Wait a bit before checking again to avoid overloading the CPU
         else:
             print(f"Valve index {valve_index} is out of range.")
@@ -40,8 +45,9 @@ class RewardManager:
         valve_index = self._get_valve_index(scenario, mouse_id)
         if valve_index is not None:
             thread = threading.Thread(target=self._threaded_deliver, args=(valve_index, reward_time))
-            thread.start()
-            thread.join()
+            thread.start()                         # Micky: You are not using the threads correctly. The Start() function
+                                                   #        will return after the valve is closed.
+            thread.join()                          # Micky: I think the join() fucntion is not doing anything.
 
 
 # Example usage:

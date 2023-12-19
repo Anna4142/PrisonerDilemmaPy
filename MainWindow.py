@@ -1,5 +1,8 @@
+# Mikcy: The MainWindow file name is a bit of a mis nomenclature. it a left over from the old code where this module actually lanuceched
+#        the main gui window. I know this sounds like a pure nuisance but remember a code is written only once and used (read, maintained, changed)
+#        by generations of programmers. Names are important for understanding. Care to try another name?
 from ExperimentManager1 import ExperimentManager
-from experimentgui import ExperimentGUI, OpponentType
+from experimentgui import ExperimentGUI, OpponentType     # Micky: I do not understand how this works. OpponenType is not defined in experimentGui
 
 def main():
     # Create an instance of the ExperimentGUI class
@@ -17,7 +20,7 @@ def main():
 
         opponent_type = settings.get('opponent_type')  # This should now be an OpponentType enum value
 
-        # Adjust logic based on enum
+        # Adjust logic based on enum                   # Micky: The if structure is redundant. you are doing the exact same thing for all cases.
         if opponent_type == OpponentType.MOUSE_COMPUTER:
             opponent_strategy_1 = settings.get('opponent_strategy')
             opponent_strategy_2 = settings.get('computer_opponent_strategy')
@@ -30,7 +33,7 @@ def main():
             opponent_strategy_2 = settings.get('computer_opponent_strategy')
 
         # Modify num_trials as per your requirement
-        num_trials += 2
+        num_trials += 2                               # Micky: I assume this is solved in the next version.
 
         # Initialize and start the experiment
         expManager = ExperimentManager()

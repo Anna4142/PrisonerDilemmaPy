@@ -1,7 +1,4 @@
 import random
-from VideoAnalyzer import Video_Analyzer
-from MouseMonitor1 import MouseMonitor
-#from VideoAnalyzerStub import Video_Analyzer
 from StateManager import States
 from locations import Locations
 

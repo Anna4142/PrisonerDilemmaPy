@@ -14,13 +14,11 @@ class ValveControl:
         self.starttime = time.time()
         self.duration = duration
         self.arduino.DigitalHigh(self.channel)  # Set the pin high
-        print(self.arduino.DigitalHigh(self.channel))
         self.valveopen = True
 
     def IsValveOpen(self):
         if self.valveopen:
             if time.time() - self.starttime > self.duration:
-                print("delivered")
                 self.arduino.DigitalLow(self.channel)  # Set the pin low
                 self.valveopen = False
         return self.valveopen

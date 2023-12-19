@@ -1,3 +1,10 @@
+# Micky: The label still says trial duration. Shouldn't it be Center Time or something similar?
+# Micky: There is still a need to close the gui window to start the trial, I think it is redundant.
+#        either the OK button on the msgbox or the START should do it
+# Micky: You have some logic issues in the window flow. for example: if the opponent type selection is changed,
+#        the opponent strategy fields and the start experiment button are not enabled/disabled properly
+
+
 import tkinter as tk
 from tkinter import messagebox
 from OpponentType import OpponentType

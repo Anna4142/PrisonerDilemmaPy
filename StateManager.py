@@ -99,7 +99,7 @@ class StateManager:
 
     def DetermineState(self, events):
         TransitionEvents = self.TransitionEvent[self.current_state]
-        print("event",TransitionEvents)
+
         # Check and Perform Event base transition
         for i, event in enumerate(TransitionEvents):
             if event & events == event:

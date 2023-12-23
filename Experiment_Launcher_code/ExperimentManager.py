@@ -1,23 +1,28 @@
-from Sound_manager_code.SoundManager import Play, Sounds
-from Video_analyser_code.VideoAnalyser import Video_Analyzer
+# The first group of import statements control the simulated vs real HW environments
 
-
-from modelling_opponent.MouseMonitor1 import MouseMonitor
+#from Video_analyser_code.VideoAnalyser import Video_Analyzer
 #from Video_analyser_code.VideoAnalyzerStub import Video_Analyzer
-from modelling_opponent.MouseMonitor1 import Locations
+from Video_analyser_code.VideoAnalyzerSim import Video_Analyzer
+
+#from Arduino_related_code.ArduinoDigital import ArduinoDigital
+from ArduinoDigitalSim import ArduinoDigital  
+
+# The following are configuration independent imports
+from Sound_manager_code.SoundManager import Play, Sounds
+from modelling_opponent.MouseMonitor import MouseMonitor
+from modelling_opponent.MouseMonitor import Locations
 from modelling_opponent.simulated_mouse import Simulated_mouse
 #from modelling_opponent.Simulated_learner import Simulated_mouse
-from Arduino_related_code.ArduinoDigital import ArduinoDigital
 from State_manager_code.StateManager import StateManager
 from State_manager_code.StateManager import States
 from State_manager_code.StateManager import Events
 from Reward_manager.RewardManager import RewardManager
-import tkinter as tk
 from Data_analysis.logger import TrialLogger
 from modelling_opponent.OpponentType import OpponentType
 from Data_analysis.DataAnalysisScript import DataAnalyzer
 from Experiment_Launcher_code import Experimenter
-# from ArduinoDigitalSim import ArduinoDigital  ##Anushka-new class
+
+
 class ExperimentManager:
     def __init__(self):
         #initialize video analyser
@@ -28,10 +33,11 @@ class ExperimentManager:
 
         # initialize path to store data
         self.data_path = 'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/abcdefghi.csv'  ###change to whatever.csv
+        #self.data_path = './../../ExperimentLogFiles/abcdefghi.csv'
         # initialize trial logger
         self.trial_logger = TrialLogger(self.data_path)
         #initialize data_analyser
-        self.data_analyzer = DataAnalyzer(self.data_path)
+        #self.data_analyzer = DataAnalyzer(self.data_path)
         # Initialize Arduino board
         self.initialize_arduino()
         #initialize reward manager

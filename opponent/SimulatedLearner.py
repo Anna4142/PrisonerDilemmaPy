@@ -7,6 +7,7 @@ from agentss.qlearner import QLearningAgent
 from agentss.ActorCritic  import ActorCriticAgent
 from agentss.Rienforce  import reinforce_agent
 from agentss.ReinforceAgent import ReinforceAgent
+from agentss.QlearningAgent import DQN_Agent
 
 class Simulated_mouse:
     def __init__(self, data_queue, mouse_id):
@@ -18,6 +19,7 @@ class Simulated_mouse:
             self.decisionMade = True
             self.rewardReceived = True
             self.q_learning_agent = QLearningAgent()
+            self.dqn_agent = DQN_Agent()
             self.actor_critic_agent=ActorCriticAgent()
             self.reinforce_agent=ReinforceAgent()
             self.state_manager=StateManager()
@@ -61,6 +63,7 @@ class Simulated_mouse:
                 self.actor_critic_agent.learn(current_state, action, self.reward, next_state)
 
                 return mouse_location
+
            elif self.strategy == "reinforce":
                 # Convert current state to the appropriate format for NN input
                 formatted_current_state = self.state_manager.get_current_state_as_numpy(current_state)
@@ -109,8 +112,34 @@ class Simulated_mouse:
 
 
 
+           elif self.strategy == "dqn agent":
+               # Convert current state to the appropriate format for NN input
+               formatted_current_state = self.state_manager.get_current_state_as_numpy(current_state)
 
-            #if self.strategy != "q learner":
+               # Choose action based on the current state
+               action = self.dqn_agent.choose_action(formatted_current_state)
+
+               mouse_location = Locations.map_num_to_location(action)
+
+               print("current state", current_state)
+               # Determine the next state and reward
+               next_state = self.state_manager.NextState[current_state]
+               reward_function = self.state_manager.RewardCalculation.get(current_state, lambda _: 0)
+               self.reward = reward_function(action)
+
+               # Remember the experience in the replay buffer
+               self.dqn_agent.remember(formatted_current_state, action, self.reward, next_state)
+
+               # Check if the episode has ended or if the replay buffer is large enough, then update the policy
+               if current_state == States.End:
+                   self.dqn_agent.learn(batch_size=32)  # Ensure this method uses the replay buffer
+
+               # Update current state
+               current_state = next_state
+
+               return mouse_location
+
+           #if self.strategy != "q learner":
            list_opp = [0, 1, 0]  # Default to no decision
 
 

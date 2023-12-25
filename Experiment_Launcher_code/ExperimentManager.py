@@ -19,21 +19,16 @@ from State_manager_code.StateManager import Events
 from Reward_manager.RewardManager import RewardManager
 from Data_analysis.logger import TrialLogger
 from modelling_opponent.OpponentType import OpponentType
-from Data_analysis.DataAnalysisScript import DataAnalyzer
 from Experiment_Launcher_code import Experimenter
 
 
 class ExperimentManager:
     def __init__(self):
-        #initialize video analyser
-        self.videoAnalyser = Video_Analyzer()   ##Changed to accept nothing
-
-        #initialize state manager
+        # initialize software components
+        self.videoAnalyser = Video_Analyzer()
         self.stateManager = StateManager()
-
-        # initialize path to store data
-        self.data_path = 'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/abcdefghi.csv'  ###change to whatever.csv
-        #self.data_path = './../../ExperimentLogFiles/abcdefghi.csv'
+        #self.data_path = 'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/abcdefghi.csv'  ###change to whatever.csv
+        self.data_path = './../../ExperimentLogFiles/abcdefghi.csv'
         # initialize trial logger
         self.trial_logger = TrialLogger(self.data_path)
         #initialize data_analyser
@@ -216,9 +211,7 @@ class ExperimentManager:
 
         return ExperimentCompleted
 
-    def start_streaming_exp(self, num_trial, duration, time_decision, opponent_type, opponent1_strategy,
-                            opponent2_strategy):
-        # OPEN CSV TO LOG DETAILS
+    def start_streaming_exp(self, num_trial, decision_time, return_time, opponent_type, opponent1_strategy, opponent2_strategy):
         self.num_trial = num_trial
         print("opponent ", opponent_type)
         print("opponent strategy ", opponent1_strategy)
@@ -243,7 +236,7 @@ class ExperimentManager:
             mouse2 = Simulated_mouse()
             mouse2.SetStrategy(opponent2_strategy)
             mouse2sim = mouse2
-        self.stateManager.SetTimeOut(duration, time_decision)
+        self.stateManager.SetTimeOut(decision_time, return_time)
 
         currentstate = None
         mouse1location = None
@@ -276,7 +269,7 @@ class ExperimentManager:
                     opponent_choice = mouse2.get_mouse_location(zone_activations, currentstate)
                 elif opponent_type == OpponentType.MOUSE_COMPUTER:
                     # Retrieve location for the real mouse from its queue and get the simulated mouse's location
-                    mouselocation = mouse1.get_mouse_location(zone_activations)
+                    mouselocation = mouse1.get_mouse_location(zone_activations, currentstate)
 
                     opponent_choice = mouse2sim.get_mouse_location(Locations.Unknown, currentstate)
                 else:

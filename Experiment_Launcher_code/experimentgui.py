@@ -6,27 +6,51 @@ class ExperimentGUI:
     def __init__(self):
         self.window = tk.Tk()
         self.window.title("Prisoner's Dilemma Experiment")
-        self.num_trials_entry = tk.StringVar(value=None)
-        self.trial_duration_entry = tk.StringVar(value=None)
-        self.decision_time_entry = tk.StringVar(value=None)
-        self.selected_opp = tk.StringVar(value=None)
-        # Initialize variables
-        self.selected_opp = tk.StringVar(value=None)
-        self.strategy_option_widgets = []  # Initialize an empty list to keep track of strategy option widgets
-        self.selected_opponent_type = None
-        # Setup the GUI components
+        self.window.geometry("500x630")
 
+        # create window layout
+        self.system_panel = tk.Frame(self.window, width = 490, height = 60, relief = tk.RAISED, borderwidth = 2)
+        tk.Label(self.system_panel, text = "System Parameters").place(x = 210, y = 2)
+        self.experiment_panel = tk.Frame(self.window, width=490, height=245, relief=tk.RAISED, borderwidth=2)
+        tk.Label(self.experiment_panel, text ="Experiment Parameters").place(x = 200, y = 2)
+        self.first_opponent_panel = tk.Frame(self.window, width=245, height=250, relief=tk.RAISED, borderwidth=2)
+        tk.Label(self.first_opponent_panel, text ="First Computer Opponent Strategy").place(x = 20, y = 2)
+        self.second_opponent_panel = tk.Frame(self.window, width=245, height=250, relief=tk.RAISED, borderwidth=2)
+        tk.Label(self.second_opponent_panel, text ="Second Computer Opponent Strategy").place(x = 20, y = 2)
+        self.system_panel.place(x = 5, y = 5)
+        self.experiment_panel.place(x = 5, y = 70)
+        self.first_opponent_panel.place(x = 5, y = 320)
+        self.second_opponent_panel.place(x = 250, y = 320)
+
+        # Initialize entry variables
+        self.experiment_name = tk.StringVar(value = "Experiment 1")
+        self.comport_name = tk.StringVar(value = "COM11")
+        self.num_trials_var = tk.StringVar(value = "4")
+        self.return_time_var = tk.StringVar(value = "30")
+        self.decision_time_var = tk.StringVar(value = "30")
+        self.selected_opp = tk.StringVar(value = None)
+        self.first_opponent_type = tk.StringVar(value = None)
+        self.second_opponent_type = tk.StringVar(value = None)
+        self.first_opponent_prob = tk.StringVar(value = None)
+        self.second_opponent_prob = tk.StringVar(value = None)
 
     def setup_gui(self):
-        # Opponent options
-
         # Entry fields for trials, duration, etc.
+        self.populate_system_parameters_panel()
         self.create_input_fields()
         self.create_opp_options()
+        self.create_strategy_option(self.first_opponent_panel, self.first_opponent_type, self.first_opponent_prob)
+        self.create_strategy_option(self.second_opponent_panel, self.second_opponent_type, self.second_opponent_prob)
+
         # Create a button to start the experiment and disable it initially
-        self.start_button = tk.Button(self.window, text="Start Experiment", command=self.start_experiment, state='disabled')
-        self.start_button.pack(pady=20)
+        self.start_button = tk.Button(self.window, text="Start Experiment", command=self.start_experiment)
+        self.start_button.place(x = 205, y = 590)
         self.window.mainloop()
+
+    def populate_system_parameters_panel(self):
+        tk.Label(self.system_panel, text="COM port name:").place(x = 30, y = 30)
+        comport_name_entry = tk.Entry(self.system_panel, textvariable = self.comport_name)
+        comport_name_entry.place(x = 200, y = 30)
 
     def get_opponent_type(self,opponent_type_str):
         mapping = {
@@ -35,110 +59,53 @@ class ExperimentGUI:
             "computer_computer": OpponentType.COMPUTER_COMPUTER
         }
         return mapping.get(opponent_type_str, None)
+
     def create_opp_options(self):
         # Create opponent selection radio buttons
-        tk.Label(self.window, text="Select the opponent:").pack(anchor='w', padx=20, pady=10)
-        self.selected_opp.set("none")
-        opp_options = [
-            ("Mouse and Mouse", "mouse_mouse"),
-            ("Mouse and Computer", "mouse_computer"),
-            ("Computer and Computer", "computer_computer")
-        ]
+        tk.Label(self.experiment_panel, text="Select the opponent:").place(x = 30, y = 150)
+        self.selected_opp.set("mouse_computer")
+        opp_options = [ ("Mouse and Mouse", "mouse_mouse"),
+                        ("Mouse and Computer", "mouse_computer"),
+                        ("Computer and Computer", "computer_computer")]
 
+        buttonoffset = 0
         for text, mode in opp_options:
-            radiobutton = tk.Radiobutton(
-                self.window, text=text, variable=self.selected_opp, value=mode,
-                command=self.update_strategy_options
-            )
-            radiobutton.pack(anchor='w', padx=20, pady=5)
+            radiobutton = tk.Radiobutton(self.experiment_panel, text=text, variable=self.selected_opp, value=mode)
+            radiobutton.place(x = 200, y = 150 + buttonoffset * 30)
+            buttonoffset += 1
 
     def create_input_fields(self):
-        # Create and pack a label and entry for number of trials
-        tk.Label(self.window, text="Number of Trials:").pack(anchor='w', padx=20, pady=5)
-        self.num_trials_var = tk.StringVar()  # StringVar for number of trials
-        self.num_trials_entry = tk.Entry(self.window, textvariable=self.num_trials_var)
-        self.num_trials_entry.pack(anchor='w', padx=20, pady=5)
+        tk.Label(self.experiment_panel, text="Experiment Name:").place(x = 30, y = 30)
+        experiment_name_entry = tk.Entry(self.experiment_panel, textvariable = self.experiment_name)
+        experiment_name_entry.place(x = 200, y = 30)
 
-        # Create and pack a label and entry for trial duration
-        tk.Label(self.window, text="Decision Time (seconds):").pack(anchor='w', padx=20, pady=5)
-        self.trial_duration_var = tk.StringVar()  # StringVar for trial duration
-        self.trial_duration_entry = tk.Entry(self.window, textvariable=self.trial_duration_var)
-        self.trial_duration_entry.pack(anchor='w', padx=20, pady=5)
+        tk.Label(self.experiment_panel, text="Number of Trials:").place(x = 30, y = 60)
+        self.num_trials_entry = tk.Entry(self.experiment_panel, textvariable=self.num_trials_var)
+        self.num_trials_entry.place(x = 200, y = 60)
 
-        # Create and pack a label and entry for decision time
-        tk.Label(self.window, text="Return to center (seconds):").pack(anchor='w', padx=20, pady=5)
-        self.decision_time_var = tk.StringVar()  # StringVar for decision time
-        self.decision_time_entry = tk.Entry(self.window, textvariable=self.decision_time_var)
-        self.decision_time_entry.pack(anchor='w', padx=20, pady=5)
+        tk.Label(self.experiment_panel, text="Decision Time (seconds):").place(x = 30, y = 90)
+        self.decision_time_entry = tk.Entry(self.experiment_panel, textvariable=self.return_time_var)
+        self.decision_time_entry.place(x = 200, y = 90)
 
-    def update_strategy_options(self):
-        # Remove previous strategy options if they exist
-        self.destroy_strategy_options()
+        tk.Label(self.experiment_panel, text="Return to center (seconds):").place(x = 30, y = 120)
+        self.decision_time_entry = tk.Entry(self.experiment_panel, textvariable=self.decision_time_var)
+        self.decision_time_entry.place(x = 200, y = 120)
 
-        # Based on the opponent selected, either show the start button or create strategy options
-        if self.selected_opp.get() == "mouse_mouse":
-            # No strategy options needed for mouse vs. mouse, enable start button
-            self.start_button['state'] = 'normal'
-        elif self.selected_opp.get() == "mouse_computer" or self.selected_opp.get() == "computer_computer":
-            # Create strategy options for the computer opponent(s)
-            # For mouse_computer, create strategy options for the computer
-            # For computer_computer, create strategy options for both computers
-            self.create_strategy_options()
+    def create_strategy_option(self, panel, opvar, probvar):
+        # Define strategy options
+        strategies = ["Unconditional Cooperator", "Unconditional Defector", "Random", "Tit for Tat",
+                      "Probability p Cooperator","q learner"]
+        opvar.set("Unconditional Cooperator")
+        buttonoffset = 0
+        for strategy in strategies:
+            radiobutton = tk.Radiobutton(panel, text = strategy, variable = opvar, value = strategy)
+            radiobutton.place(x = 50, y = 30 + buttonoffset * 30)
+            buttonoffset += 1
 
-    def create_strategy_options(self):
-        # Check if it's a single computer or two computers
-        if self.selected_opp.get() == "mouse_computer":
-            # Create strategy options for the computer
-            self.create_strategy_option("Computer's Strategy:", "strategy1")
-        elif self.selected_opp.get() == "computer_computer":
-            # Create strategy options for both computers
-            self.create_strategy_option("Computer 1's Strategy:", "strategy1")
-            self.create_strategy_option("Computer 2's Strategy:", "strategy2")
-
-    def create_strategy_option(self, label_text, var_prefix):
-                # Create label for strategy selection
-                tk.Label(self.window, text=label_text).pack(anchor='w', padx=20, pady=10)
-
-                # Define a StringVar for strategy option and initialize it with a value that doesn't match any radio button values
-                strategy_var = tk.StringVar(value='none')
-                setattr(self, var_prefix + '_strategy_var', strategy_var)
-
-                # Define strategy options
-                strategies = ["Unconditional Cooperator", "Unconditional Defector", "Random", "Tit for Tat",
-                              "Probability p Cooperator","q learner"]
-                for strategy in strategies:
-                    radiobutton = tk.Radiobutton(
-                        self.window, text=strategy, variable=strategy_var, value=strategy,
-                        command=lambda s=strategy: self.on_strategy_selected(var_prefix, s)
-                    )
-                    radiobutton.pack(anchor='w', padx=20, pady=5)
-
-    def on_strategy_selected(self, var_prefix, strategy):##Added function to set strategy-ANUSHKA
-        attribute_name = f'{var_prefix}_selected_strategy'
-        setattr(self, attribute_name, strategy)
-        #print(f"Set {attribute_name} to {strategy}")  # Debugging print
-        self.enable_start_button(var_prefix)
-
-    def get_selected_strategy(self, var_prefix):
-        attribute_name = f'{var_prefix}_selected_strategy'
-        selected_strategy = getattr(self, attribute_name, None)
-        #print(f"Retrieving {attribute_name}: {selected_strategy}")  # Debugging print
-        return selected_strategy
-
-    def enable_start_button(self, var_prefix):
-        strategy_var = getattr(self, var_prefix + '_strategy_var')
-        if strategy_var and strategy_var.get() != 'none':
-            self.start_button['state'] = 'normal'
-        else:
-            self.start_button['state'] = 'disabled'
-
-    def destroy_strategy_options(self):
-        # Destroy or hide previous strategy option widgets
-        for widget in self.strategy_option_widgets:
-            widget.destroy()
-        self.strategy_option_widgets = []  # Reset the list after destroying the widgets
-
-
+        tk.Label(panel, text="Probability: ").place(x = 5, y = 210)
+        probvar.set("0.1")
+        probability_entry = tk.Entry(panel, textvariable = probvar)
+        probability_entry.place(x = 80, y = 210)
 
     def start_experiment(self):
         # Validate the input values
@@ -146,23 +113,19 @@ class ExperimentGUI:
             messagebox.showerror("Invalid Input", "Please check your inputs.")
             return
 
-        # Retrieve the selected strategies, if applicable
-        #
-
         # Display a confirmation or start the experiment
         messagebox.showinfo("Experiment Starting", "The experiment is now starting with the provided settings.")
-
-
+        self.window.destroy()
 
     def validate_inputs(self):
         # Retrieve the field values
         num_trials_str = self.num_trials_var.get()
-        trial_duration_str = self.trial_duration_var.get()
+        trial_duration_str = self.return_time_var.get()
         decision_time_str = self.decision_time_var.get()
 
-        strategy1 = self.get_selected_strategy('strategy1')
-        strategy2 = self.get_selected_strategy('strategy2') if self.selected_opp.get() == "computer_computer" else None
-        opponent_type=self.selected_opp.get()
+        strategy1 = self.first_opponent_type.get()
+        strategy2 = self.first_opponent_type.get()
+
         if not num_trials_str or not trial_duration_str or not decision_time_str:
             messagebox.showerror("Invalid Input", "One or more fields are empty. Please fill out all fields.")
             return False
@@ -178,11 +141,6 @@ class ExperimentGUI:
                 messagebox.showerror("Invalid Input", "Values must be greater than zero.")
                 return False
 
-            # Check if decision_time is less than or equal to trial_duration
-            if decision_time > trial_duration:
-                messagebox.showerror("Invalid Input", "Decision time must be less than or equal to trial duration.")
-                return False
-
             return True
 
         except ValueError:
@@ -190,8 +148,6 @@ class ExperimentGUI:
             return False
 
     def on_start_clicked(self):
-
-
         # Retrieve settings when the button is clicked
         settings = self.get_settings()
         if settings:
@@ -205,8 +161,6 @@ class ExperimentGUI:
 
 
     def get_settings(self):
-
-        ##Anushka- validation checks
         if not self.validate_inputs():
             # If validation fails, show an error message and then close the window
             messagebox.showerror("Invalid Input",
@@ -216,20 +170,25 @@ class ExperimentGUI:
         try:
             # Retrieve the values from StringVars
             num_trials = int(self.num_trials_var.get())
-            trial_duration = int(self.trial_duration_var.get())
+            return_time = int(self.return_time_var.get())
             decision_time = int(self.decision_time_var.get())
             opponent_type=self.selected_opp.get()
 
-            opponent_strategy = self.get_selected_strategy('strategy1')##ANUSHKA-Changed input to be able to get opponent strategy........what about computer strategy?
-            computer_opponent_strategy=self.get_selected_strategy('strategy2')
+            first_opponent_strategy = self.first_opponent_type.get()
+            second_opponent_strategy = self.second_opponent_type.get()
+
             settings = {
+                'experiment_name' : self.experiment_name.get(),
+                'comport_name' : self.comport_name.get(),
                 'num_trials': num_trials,
-                'trial_duration': trial_duration,
+                'return_time': return_time,
                 'decision_time': decision_time,
 
                 'opponent_type': self.get_opponent_type(opponent_type),
-                'opponent_strategy': opponent_strategy,
-                'computer_opponent_strategy' : computer_opponent_strategy,
+                'opponent1_strategy': first_opponent_strategy,
+                'opponent2_strategy': second_opponent_strategy,
+                'opponent1_probability' : self.first_opponent_prob.get(),
+                'opponent2_probability' : self.second_opponent_prob.get()
             }
 
             #print(settings)
@@ -239,3 +198,4 @@ class ExperimentGUI:
             # Handle the case where the input is not a valid integer
             messagebox.showerror("Invalid Input", "Please enter valid numbers for trials, duration, and decision time.")
             return None
+

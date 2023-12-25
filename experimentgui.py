@@ -101,7 +101,7 @@ class ExperimentGUI:
                 # Define strategy options
 
                 #strategies = ["reinforce","actor critic","q learner","Unconditional Cooperator", "Unconditional Defector", "Random", "Tit for Tat","Probability p Cooperator"]
-                strategies = ["dqn agent","reinforce", "actor critic", "q learner", "Unconditional Cooperator",
+                strategies = ["actor-critic agent","dqn agent","reinforce", "actor critic", "q learner", "Unconditional Cooperator",
                               "Unconditional Defector"]
                 for strategy in strategies:
                     radiobutton = tk.Radiobutton(

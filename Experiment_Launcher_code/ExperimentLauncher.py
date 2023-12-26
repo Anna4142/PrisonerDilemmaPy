@@ -25,7 +25,8 @@ def main():
         # Initialize and start the experiment
         expManager = ExperimentManager()
         print("Experiment manager now running")
-        expManager.start_streaming_exp(num_trials, decision_time, return_time, opponent_type, opponent1_strategy, opponent2_strategy)
+        expManager.start_streaming_exp(experiment_name, num_trials, decision_time, return_time, opponent_type,
+                                       opponent1_strategy, opponent2_strategy)
         del expManager
     else:
         print("No valid settings were provided.")

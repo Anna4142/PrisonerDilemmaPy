@@ -27,10 +27,7 @@ class ExperimentManager:
         # initialize software components
         self.videoAnalyser = Video_Analyzer()
         self.stateManager = StateManager()
-        #self.data_path = 'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/abcdefghi.csv'  ###change to whatever.csv
-        self.data_path = './../../ExperimentLogFiles/abcdefghi.csv'
-        # initialize trial logger
-        self.trial_logger = TrialLogger(self.data_path)
+        self.trial_logger = TrialLogger()
         #initialize data_analyser
         #self.data_analyzer = DataAnalyzer(self.data_path)
         # Initialize Arduino board
@@ -211,7 +208,8 @@ class ExperimentManager:
 
         return ExperimentCompleted
 
-    def start_streaming_exp(self, num_trial, decision_time, return_time, opponent_type, opponent1_strategy, opponent2_strategy):
+    def start_streaming_exp(self, experiment_name, num_trial, decision_time, return_time, opponent_type, opponent1_strategy, opponent2_strategy):
+        self.trial_logger.start_logging(experiment_name)
         self.num_trial = num_trial
         print("opponent ", opponent_type)
         print("opponent strategy ", opponent1_strategy)

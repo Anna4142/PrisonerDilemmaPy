@@ -1,6 +1,7 @@
 from Video_analyser_code.locations import Locations
+from PrisonerABC import Prisoner
 
-class MouseMonitor:
+class MouseMonitor(Prisoner):
     def __init__(self, video, mouse_id):
         self.mouse_id = mouse_id
         self.video_analyser = video
@@ -19,7 +20,11 @@ class MouseMonitor:
             location = Locations.Defect
         return location
 
+    def NewTrial(self):
+        pass
 
+    def DeliverReward(self, reward):
+        pass
 
 
 

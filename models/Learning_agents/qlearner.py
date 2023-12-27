@@ -2,6 +2,7 @@ import random
 from collections import defaultdict
 from Video_analyser_code.locations import Locations
 from State_manager_code.StateManager import States
+import pandas as pd
 class QLearningAgent:
     def __init__(self):
         # Initialize Q-learning parameters with default values (can be set later)
@@ -32,6 +33,7 @@ class QLearningAgent:
         """
         Choose an action based on the current state using the epsilon-greedy policy.
         """
+        print("choosing action")
         if random.random() < self.epsilon:
             # Explore: choose a random action
             action = random.choice(self.action_space)
@@ -44,17 +46,17 @@ class QLearningAgent:
             action = random.choice(actions_with_max_q) if actions_with_max_q else random.choice(self.action_space)
 
         # Print the chosen action
-        print(f"Chosen action for state {state}: {action}")
+        #print(f"Chosen action for state {state}: {action}")
         return action
 
     def learn(self, state, action, reward, next_state):
         """
         Update the Q-table based on the action taken, the reward received, and the next state.
         """
-        print("IN LEARN")
-        print(self.q_table)
-        print("next_state",next_state)
-        old_value = self.q_table[state][action]
+        #print("IN LEARN")
+        #print(self.q_table)
+        #print("next_state",next_state)
+        #old_value = self.q_table[state][action]
         #next_max = max(self.q_table[next_state].values(), default=0)
         next_max= max(next_state, key=lambda state: max(self.q_table[state].values(), default=0))
         #print("next max",next_max)
@@ -68,7 +70,15 @@ class QLearningAgent:
         """
         Returns the current Q-table. Useful for debugging or analysis.
         """
-        print(self.q_table)
+        #print(self.q_table)
+        data = []
+        for state, actions in self.q_table.items():
+            for action, value in actions.items():
+                data.append({"State": state, "Action": action, "Q-Value": value})
+
+        # Create the DataFrame
+        df = pd.DataFrame(data)
+        print(df)
         return dict(self.q_table)
 """""
 The __init__ method sets up the Q-learning agent with default parameters and initializes an empty Q-table.

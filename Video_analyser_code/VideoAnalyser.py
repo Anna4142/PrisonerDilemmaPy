@@ -20,7 +20,7 @@ class Video_Analyzer:
         self.frame_counter = 0
         self.trial_start_time = time.time()  # Initialize start time
         self.trial_end_time = None  # Initialize end time
-
+        self.exp_zone=0
         with Vimba.get_instance() as vimba:
 
             cams = vimba.get_all_cameras()
@@ -82,7 +82,7 @@ class Video_Analyzer:
             'm2_c': [(455, 110), (490, 180)],  # Mouse 2 Cooperate Zone (Top Left)
             'm2_cen': [(330, 280), (400, 350)],  # Mouse 2 Center Zone (Center Left)
             'm2_d': [(455, 400), (490, 470)],  # Mouse 2 Defect Zone (Bottom Left)
-            'experimenter_start_zone': [(440, 280), (520, 350)]
+            'experimenter_start_zone': [(460, 280), (540, 350)]
         }
         return regions
 
@@ -109,13 +109,13 @@ class Video_Analyzer:
             'm2_c': 35500,  # Threshold for Mouse 2 Cooperate Zone
             'm2_cen': 300000,  # Threshold for Mouse 2 Center Zone
             'm2_d': 140000,  # Threshold for Mouse 2 Defect Zone
-            'experimenter_start_zone': 35500  #Threshold for expermenter start zone
+            'experimenter_start_zone': 350000  #Threshold for expermenter start zone
         }
         #{'m1_d': 106569, 'm1_cen': 2632, 'm1_c': 256415, 'm2_d': 112012, 'm2_cen': 505708, 'm2_c': 234711}
         return thresholds
 
     def check_zones(self, frame):
-        zone_activation = [0] * 6  # [0, 0, 0, 0, 0, 0]
+        zone_activation = [0] * 7  # [0, 0, 0, 0, 0, 0]
 
         for idx, region_key in enumerate(self.regions):
             (y1, x1), (y2, x2) = self.regions[region_key]
@@ -123,7 +123,7 @@ class Video_Analyzer:
             region_pixels = frame[y1:y2, x1:x2]
             sum_of_pixels = np.sum(frame[y1:y2, x1:x2])
             self.pixel_sums[region_key] = sum_of_pixels  # Update the class attribute
-            #print(f"{region_key}: Sum of pixels = {sum_of_pixels}, Region shape = {region_pixels.shape}")
+            print(f"{region_key}: Sum of pixels = {sum_of_pixels}, Region shape = {region_pixels.shape}")
 
             if sum_of_pixels <= self.thresholds[region_key]:
                 zone_activation[idx] = 1
@@ -166,6 +166,7 @@ class Video_Analyzer:
                 # Resize the frame
                 frame = cv2.resize(frame, (960, 700))
                 self.zone_activations = self.check_zones(frame)
+                self.exp_zone = self.zone_activations[-1] if self.zone_activations else None
 
                 # Print sum of pixels for each zone
 
@@ -195,6 +196,7 @@ class Video_Analyzer:
 
     def get_exp_zone_activations(self):
         # Return the latest zone activations
+        print("EXP ZONE",self.exp_zone)
         return self.exp_zone
 
 #analyzer = VideoAnalyzer()

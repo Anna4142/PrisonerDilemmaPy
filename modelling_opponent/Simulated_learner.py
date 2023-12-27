@@ -34,7 +34,8 @@ class Simulated_mouse:
     def update_and_print_q_table(self, current_state, action, reward, next_state):
             """Update the Q-table and print it."""
             self.q_learning_agent.learn(current_state, action, reward, next_state)
-            print("Updated Q-table:")
+            print("ACTION CHOSEN",action)
+            #print("Updated Q-table:")
             print(self.q_learning_agent.get_q_table())  # Assuming there's a method to get the Q-table
 
     def calculate_reward(self, current_state, action):
@@ -81,18 +82,22 @@ class Simulated_mouse:
         # Return the calculated reward
         return reward
 
-    def get_mouse_location(self, current_state):
+    def get_mouse_location(self, mouse_location,current_state):
             # Default action
             list_opp = Locations.Unknown
+            print(current_state)
+            if not mouse_location:  # If the mouse_location isn't provided, get it from the MouseMonitor
+                mouse_location = self.mouse_monitor.get_mouse_location()
 
             if self.strategy == "q learner" and self.q_learning_agent is not None:
 
                 list_opp = self.q_learning_agent.choose_action(current_state)
+                #print("list opp",list_opp)
                 next_state = self.state_manager.NextState[current_state]
-                print("next state",next_state)
+                #print("next state",next_state)
                 # Calculate the reward based on the action and state
                 reward = self.calculate_reward(current_state, list_opp)
-                print("reward",reward)
+                #print("REWARD",reward)
                 # Update the Q-table
                 self.update_and_print_q_table(current_state, list_opp, reward, next_state)
             else:

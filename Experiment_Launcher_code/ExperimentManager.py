@@ -5,8 +5,8 @@ from Video_analyser_code.VideoAnalyser import Video_Analyzer
 from modelling_opponent.MouseMonitor1 import MouseMonitor
 #from Video_analyser_code.VideoAnalyzerStub import Video_Analyzer
 from modelling_opponent.MouseMonitor1 import Locations
-from modelling_opponent.simulated_mouse import Simulated_mouse
-#from modelling_opponent.Simulated_learner import Simulated_mouse
+#from modelling_opponent.simulated_mouse import Simulated_mouse
+from modelling_opponent.Simulated_learner import Simulated_mouse
 from Arduino_related_code.ArduinoDigital import ArduinoDigital
 from State_manager_code.StateManager import StateManager
 from State_manager_code.StateManager import States
@@ -16,7 +16,7 @@ import tkinter as tk
 from Data_analysis.logger import TrialLogger
 from modelling_opponent.OpponentType import OpponentType
 from Data_analysis.DataAnalysisScript import DataAnalyzer
-from Experiment_Launcher_code import Experimenter
+from Experiment_Launcher_code.Experimenter import Experimenter
 # from ArduinoDigitalSim import ArduinoDigital  ##Anushka-new class
 class ExperimentManager:
     def __init__(self):
@@ -25,7 +25,7 @@ class ExperimentManager:
 
         #initialize state manager
         self.stateManager = StateManager()
-
+        self.experimenter = Experimenter(self.videoAnalyser)
         # initialize path to store data
         self.data_path = 'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/abcdefghi.csv'  ###change to whatever.csv
         # initialize trial logger
@@ -70,8 +70,8 @@ class ExperimentManager:
             # Initialize variables, set some flags, start recording, etc.
             pass
 
-        #elif state == States.WaitForStart:
-        #   pass
+        elif state == States.WaitForStart:
+           pass
 
 
         elif state == States.CenterReward:
@@ -102,8 +102,8 @@ class ExperimentManager:
             self.mouse_reward = "12"
             self.opponent_reward = "12"
             self.cc_cnt += 1
-            self.reward_manager.deliver_reward('cc', 1, self.reward_time)
-            self.reward_manager.deliver_reward('cc', 2, self.reward_time)
+            #self.reward_manager.deliver_reward('cc', 1, self.reward_time)
+            #self.reward_manager.deliver_reward('cc', 2, self.reward_time)
             """""
             if mouse1simulated:
                 mouse1simulated.setRewardReceived()
@@ -121,8 +121,8 @@ class ExperimentManager:
             self.mouse_reward = "0"
             self.opponent_reward = "15"
             self.cd_cnt += 1
-            self.reward_manager.deliver_reward('cd', 1, self.reward_time)
-            self.reward_manager.deliver_reward('cd', 2, self.punishment_time)
+            #self.reward_manager.deliver_reward('cd', 1, self.reward_time)
+            #self.reward_manager.deliver_reward('cd', 2, self.punishment_time)
             """""
             if mouse1simulated:
                 mouse1simulated.setRewardReceived()
@@ -141,8 +141,8 @@ class ExperimentManager:
             self.opponent_reward = "0"
             self.dc_cnt += 1
 
-            self.reward_manager.deliver_reward('dc', 1, self.punishment_time)
-            self.reward_manager.deliver_reward('dc', 2, self.reward_time)
+            #self.reward_manager.deliver_reward('dc', 1, self.punishment_time)
+            #self.reward_manager.deliver_reward('dc', 2, self.reward_time)
             """""
             if mouse1simulated:
                 mouse1simulated.setRewardReceived()
@@ -160,8 +160,8 @@ class ExperimentManager:
             self.mouse_reward = "15"
             self.opponent_reward = "15"
             self.dd_cnt += 1
-            self.reward_manager.deliver_reward('dd', 1, self.punishment_time)
-            self.reward_manager.deliver_reward('dd', 2, self.punishment_time)
+            #self.reward_manager.deliver_reward('dd', 1, self.punishment_time)
+            #self.reward_manager.deliver_reward('dd', 2, self.punishment_time)
             """""
             if mouse1simulated:
                 mouse1simulated.setRewardReceived()
@@ -237,24 +237,25 @@ class ExperimentManager:
             mouse2 = Simulated_mouse()
             mouse2.SetStrategy(opponent2_strategy)
             mouse2sim = mouse2
-        self.stateManager.SetTimeOut(duration, time_decision)
+        self.stateManager.SetTimeOuts(duration, time_decision)
 
-        currentstate = None
+        currentstate = States.WaitForStart
         mouse1location = None
         mouse2location = None
 
         state_history = []
         while currentstate != States.End:
-            # print(f"Current State: {currentstate}")
-            state_history.append(currentstate)   ##what is a better solution .i will probably need the state history for some other silulated mice methods that are based on learning
+            print(f"Current State: {currentstate}")
+
             trialevents = 0;
-            """""
-            if self.experimenter.check_for_start():
+
+            if currentstate==States.WaitForStart and self.experimenter.check_for_start():
                 # If true, trigger the trial start event
-                print("Experimenter has initiated the trial.")
-                trialevents += Events.StartTrial.value
-            """
-            if self.numcompletedtrial == self.num_trial - 1:
+
+                    print("Experimenter has initiated the trial.")
+                    trialevents += Events.StartTrial.value
+
+            elif self.numcompletedtrial == self.num_trial - 1:
 
                 trialevents += Events.LastTrial.value
                 # print("TRIAL COMPLETE EVENTS", trialevents)
@@ -263,22 +264,22 @@ class ExperimentManager:
                 zone_activations = self.videoAnalyser.process_single_frame()
                 #print("zone activations", zone_activations)  ##just for debugging purposes
 
-                if opponent_type == OpponentType.MOUSE_MOUSE:   # Micky: This can be improved. There should be no API difference between the
-                                                                # real and the simulated mice##YET TO RESOLVE SHOULD I PASS THE CURRENT LOCATION ALSO TO THE REAL MICE AS A PARAMETER THATS UNTOUCHED
+                if opponent_type == OpponentType.MOUSE_MOUSE:
+
                     # Retrieve locations from both queues for real mice
                     mouselocation = mouse1.get_mouse_location(zone_activations, currentstate)
                     opponent_choice = mouse2.get_mouse_location(zone_activations, currentstate)
                 elif opponent_type == OpponentType.MOUSE_COMPUTER:
                     # Retrieve location for the real mouse from its queue and get the simulated mouse's location
-                    mouselocation = mouse1.get_mouse_location(zone_activations)
+                    mouselocation = mouse1.get_mouse_location(zone_activations,currentstate)
 
-                    opponent_choice = mouse2sim.get_mouse_location(Locations.Unknown, currentstate)
+                    opponent_choice = mouse2sim.get_mouse_location(Locations.Center, currentstate)
                 else:
                     # Retrieve locations from simulated mice methods
 
-                    mouselocation = mouse1sim.get_mouse_location(Locations.Unknown, currentstate)
+                    mouselocation = mouse1sim.get_mouse_location(Locations.Center, currentstate)
 
-                    opponent_choice = mouse2sim.get_mouse_location(Locations.Unknown, currentstate)
+                    opponent_choice = mouse2sim.get_mouse_location(Locations.Center, currentstate)
                     #print("mouselocation", mouselocation) ##just for debugging purposes
                     #print("opponent_choice", opponent_choice) ##just for debugging purposes
                 if mouselocation == Locations.Center:

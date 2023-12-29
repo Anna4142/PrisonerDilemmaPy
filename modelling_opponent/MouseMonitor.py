@@ -1,12 +1,12 @@
 from Video_analyser_code.locations import Locations
-from PrisonerABC import Prisoner
+from modelling_opponent.PrisonerABC import Prisoner
 
 class MouseMonitor(Prisoner):
     def __init__(self, video, mouse_id):
         self.mouse_id = mouse_id
         self.video_analyser = video
 
-    def get_mouse_location(self, zones_list, current_state):
+    def getDecision(self, zones_list):
         # Split the zones based on mouse_id
         mouse_zones = zones_list[(self.mouse_id - 1) * 3 : self.mouse_id * 3]
 
@@ -23,7 +23,7 @@ class MouseMonitor(Prisoner):
     def NewTrial(self):
         pass
 
-    def DeliverReward(self, reward):
+    def DeliverReward(self, reward_time):
         pass
 
 

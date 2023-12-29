@@ -11,5 +11,5 @@ class Prisoner (ABC):
         pass
 
     @abstractmethod
-    def DeliverReward(self, reward_time):
+    def DeliverReward(self, opponent_decision, reward_time):
         pass

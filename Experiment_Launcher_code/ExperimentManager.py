@@ -251,11 +251,11 @@ class ExperimentManager:
                 if opponent_type == OpponentType.MOUSE_MOUSE:   # Micky: This can be improved. There should be no API difference between the
                                                                 # real and the simulated mice##YET TO RESOLVE SHOULD I PASS THE CURRENT LOCATION ALSO TO THE REAL MICE AS A PARAMETER THATS UNTOUCHED
                     # Retrieve locations from both queues for real mice
-                    mouselocation = mouse1.get_mouse_location(zone_activations, currentstate)
-                    opponent_choice = mouse2.get_mouse_location(zone_activations, currentstate)
+                    mouselocation = mouse1.getDecision(zone_activations)
+                    opponent_choice = mouse2.getDecision(zone_activations)
                 elif opponent_type == OpponentType.MOUSE_COMPUTER:
                     # Retrieve location for the real mouse from its queue and get the simulated mouse's location
-                    mouselocation = mouse1.get_mouse_location(zone_activations, currentstate)
+                    mouselocation = mouse1.getDecision(zone_activations, currentstate)
 
                     opponent_choice = mouse2sim.get_mouse_location(Locations.Unknown, currentstate)
                 else:

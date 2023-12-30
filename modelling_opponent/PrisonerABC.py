@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 class Prisoner (ABC):
 
     @abstractmethod
-    def get_mouse_location(self, zones_list, current_state):
+    def getDecision(self, zones_list):
         pass
 
     @abstractmethod
@@ -11,5 +11,5 @@ class Prisoner (ABC):
         pass
 
     @abstractmethod
-    def DeliverReward(self, reward):
+    def DeliverReward(self, opponent_decision, reward_time):
         pass

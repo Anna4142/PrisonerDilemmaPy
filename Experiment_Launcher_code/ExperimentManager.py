@@ -5,7 +5,7 @@
 from Video_analyser_code.VideoAnalyzerSim import Video_Analyzer
 
 #from Arduino_related_code.ArduinoDigital import ArduinoDigital
-from ArduinoDigitalSim import ArduinoDigital  
+from Arduino_related_code.ArduinoDigitalSim import ArduinoDigital
 
 # The following are configuration independent imports
 from Sound_manager_code.SoundManager import Play, Sounds
@@ -37,46 +37,36 @@ class ExperimentManager:
         #initialize experimenter
         #self.experimenter = Experimenter(self.videoAnalyser)
 
-        def initialize_arduino(self):
-            comport = "COM11"
-            self.board = ArduinoDigital(comport)
-
         # Set default reward and punishment times
         self.reward_time = 0.2
         self.sucker_time = 0
         self.temptation_time = 0.09
         self.punishment_time = 0.004
         self.center_reward_time = 1
+
+        # initialize experiment control variables
         self.numcompletedtrial = 0
-        self.num_trial = 0
-        # set variables
         self.cc_cnt = 0
         self.cd_cnt = 0
         self.dc_cnt = 0
         self.dd_cnt = 0
         self.center_cnt = 0
 
-
     def initialize_arduino(self):
         comport = "COM11"
         self.board = ArduinoDigital(comport)
 
     def StateActivity(self, state, mouse1simulated, mouse2simulated):
-        ExperimentCompleted = False
-
         if state == States.Start:
-            # Initialize variables, set some flags, start recording, etc.
             pass
 
         #elif state == States.WaitForStart:
-        #   pass
-
+        #    pass
 
         elif state == States.CenterReward:
-            self.center_var = True
             self.center_cnt += 1
             print("delivering reward in the center ")
-            self.reward_manager.deliver_reward('center', 1, self.punishment_time)   ##i wanted to test the reward system without the mice so im using the simulated mice for now
+            self.reward_manager.deliver_reward('center', 1, self.punishment_time)
             self.reward_manager.deliver_reward('center', 2, self.punishment_time)
             """""
             if not mouse1simulated:
@@ -85,9 +75,9 @@ class ExperimentManager:
             if not mouse2simulated:
                 self.reward_manager.deliver_reward('dd', 11, self.punishment_time)
             """
+
         elif state == States.TrialStarted:
             Play(Sounds.Start)
-
             if mouse1simulated:
                 mouse1simulated.NewTrial()
             if mouse2simulated:
@@ -112,6 +102,7 @@ class ExperimentManager:
             else:
                 self.reward_manager.deliver_reward('cc', 2, self.reward_time)
             """
+
         elif state == States.M1CM2D:
             # Actions for M1CDM2D state
             self.mouse_choice = "C"
@@ -131,6 +122,7 @@ class ExperimentManager:
             else:
                 self.reward_manager.deliver_reward('cd', 2, self.punishment_time)
             """
+
         elif state == States.M1DM2C:
             # Actions for M1DCM2C state
             self.mouse_choice = "D"
@@ -151,6 +143,7 @@ class ExperimentManager:
             else:
                 self.reward_manager.deliver_reward('dc', 2, self.reward_time)
             """
+
         elif state == States.M1DM2D:
             # Actions for M1DDM2D state
             self.mouse_choice = "D"
@@ -170,9 +163,9 @@ class ExperimentManager:
             else:
                 self.reward_manager.deliver_reward('dd', 2, self.punishment_time)
             """
+
         elif state == States.WaitForReturn:
             Play(Sounds.Abort)
-
 
         elif state == States.TrialCompleted:
             # Increment the trial number counter
@@ -181,8 +174,10 @@ class ExperimentManager:
             self.trial_logger.log_trial_data(self.numcompletedtrial, "Completed Trial", self.opponent_choice, self.mouse_choice, self.mouse_reward, self.opponent_reward)
 
         elif state == States.TrialAbort:
+            # Increment the trial number counter
+            #self.numcompletedtrial += 1
             # Log that the trial has been aborted
-            print("Trial has been aborted.")  # Or use a logging mechanism if available
+            print("Trial has been aborted.")
             self.opponent_choice = "N/A",
             self.mouse_choice = "N/A",
             self.mouse_reward = "-",
@@ -190,6 +185,8 @@ class ExperimentManager:
             self.trial_logger.log_trial_data(self.numcompletedtrial, "Return Abort", self.opponent_choice, self.mouse_choice,self.mouse_reward, self.opponent_reward)
 
         elif state == States.DecisionAbort:
+            # Increment the trial number counter
+            #self.numcompletedtrial += 1
             # Handle DecisionAbort state
             print("IN DECISION ABORT")
             self.opponent_choice = "N/A",
@@ -202,11 +199,7 @@ class ExperimentManager:
             # Stop recording, finalize logs, show end message, etc.
             self.trial_logger.finalize_logging()
             analysis_results = self.data_analyzer.analyze_data()
-
             print(analysis_results)
-            ExperimentCompleted = True
-
-        return ExperimentCompleted
 
     def start_streaming_exp(self, experiment_name, num_trial, decision_time, return_time, opponent_type, opponent1_strategy, opponent2_strategy):
         self.trial_logger.start_logging(experiment_name)
@@ -227,13 +220,13 @@ class ExperimentManager:
             mouse2.SetStrategy(opponent1_strategy)
             mouse2sim = mouse2
         else:
-
             mouse1 = Simulated_mouse()
             mouse1.SetStrategy(opponent1_strategy)
             mouse1sim = mouse1
             mouse2 = Simulated_mouse()
             mouse2.SetStrategy(opponent2_strategy)
             mouse2sim = mouse2
+
         self.stateManager.SetTimeOut(decision_time, return_time)
 
         currentstate = None
@@ -242,8 +235,6 @@ class ExperimentManager:
 
         state_history = []
         while currentstate != States.End:
-            # print(f"Current State: {currentstate}")
-            state_history.append(currentstate)   ##what is a better solution .i will probably need the state history for some other silulated mice methods that are based on learning
             trialevents = 0;
             """""
             if self.experimenter.check_for_start():
@@ -251,11 +242,8 @@ class ExperimentManager:
                 print("Experimenter has initiated the trial.")
                 trialevents += Events.StartTrial.value
             """
-            if self.numcompletedtrial == self.num_trial - 1:
-
+            if self.numcompletedtrial == self.num_trial:
                 trialevents += Events.LastTrial.value
-                # print("TRIAL COMPLETE EVENTS", trialevents)
-
             else:
                 zone_activations = self.videoAnalyser.process_single_frame()
                 #print("zone activations", zone_activations)  ##just for debugging purposes
@@ -297,6 +285,7 @@ class ExperimentManager:
             # print(f"next State: {nextstate}")
             if nextstate != currentstate:
                 currentstate = nextstate
-                print(f"Current State: {nextstate}")  # Micky: A slight change of order and text to improve readability
+                print(f"Current State: {nextstate}")
+                state_history.append(currentstate)
                 self.StateActivity(currentstate, mouse1sim, mouse2sim)
 

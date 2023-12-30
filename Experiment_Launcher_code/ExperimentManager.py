@@ -5,7 +5,7 @@
 from Video_analyser_code.VideoAnalyzerSim import Video_Analyzer
 
 #from Arduino_related_code.ArduinoDigital import ArduinoDigital
-from ArduinoDigitalSim import ArduinoDigital  
+from Arduino_related_code.ArduinoDigitalSim import ArduinoDigital
 
 # The following are configuration independent imports
 from Sound_manager_code.SoundManager import Play, Sounds
@@ -27,10 +27,7 @@ class ExperimentManager:
         # initialize software components
         self.videoAnalyser = Video_Analyzer()
         self.stateManager = StateManager()
-        #self.data_path = 'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/abcdefghi.csv'  ###change to whatever.csv
-        self.data_path = './../../ExperimentLogFiles/abcdefghi.csv'
-        # initialize trial logger
-        self.trial_logger = TrialLogger(self.data_path)
+        self.trial_logger = TrialLogger()
         #initialize data_analyser
         #self.data_analyzer = DataAnalyzer(self.data_path)
         # Initialize Arduino board
@@ -211,7 +208,8 @@ class ExperimentManager:
 
         return ExperimentCompleted
 
-    def start_streaming_exp(self, num_trial, decision_time, return_time, opponent_type, opponent1_strategy, opponent2_strategy):
+    def start_streaming_exp(self, experiment_name, num_trial, decision_time, return_time, opponent_type, opponent1_strategy, opponent2_strategy):
+        self.trial_logger.start_logging(experiment_name)
         self.num_trial = num_trial
         print("opponent ", opponent_type)
         print("opponent strategy ", opponent1_strategy)
@@ -265,11 +263,11 @@ class ExperimentManager:
                 if opponent_type == OpponentType.MOUSE_MOUSE:   # Micky: This can be improved. There should be no API difference between the
                                                                 # real and the simulated mice##YET TO RESOLVE SHOULD I PASS THE CURRENT LOCATION ALSO TO THE REAL MICE AS A PARAMETER THATS UNTOUCHED
                     # Retrieve locations from both queues for real mice
-                    mouselocation = mouse1.get_mouse_location(zone_activations, currentstate)
-                    opponent_choice = mouse2.get_mouse_location(zone_activations, currentstate)
+                    mouselocation = mouse1.getDecision(zone_activations)
+                    opponent_choice = mouse2.getDecision(zone_activations)
                 elif opponent_type == OpponentType.MOUSE_COMPUTER:
                     # Retrieve location for the real mouse from its queue and get the simulated mouse's location
-                    mouselocation = mouse1.get_mouse_location(zone_activations, currentstate)
+                    mouselocation = mouse1.getDecision(zone_activations, currentstate)
 
                     opponent_choice = mouse2sim.get_mouse_location(Locations.Unknown, currentstate)
                 else:

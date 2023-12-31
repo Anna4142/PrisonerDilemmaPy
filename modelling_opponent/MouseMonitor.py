@@ -6,7 +6,7 @@ class MouseMonitor(Prisoner):
         self.mouse_id = mouse_id
         self.video_analyser = video
 
-    def getDecision(self, zones_list):
+    def getDecision(self, zones_list,state):
         # Split the zones based on mouse_id
         mouse_zones = zones_list[(self.mouse_id - 1) * 3 : self.mouse_id * 3]
 

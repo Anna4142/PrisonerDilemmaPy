@@ -8,7 +8,7 @@ class TrialLogger:
     def start_logging(self, filename):
         current_datetime = datetime.now()
         datetime_string = current_datetime.strftime("%Y%m%d-%H%M%S")
-        filepath = "./../../ExperimentLogFiles/" + filename + datetime_string + ".csv"
+        filepath = "C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS" + filename + datetime_string + ".csv"
         self.csv_file = open(filepath, 'w', newline='')
         self.csv_writer = csv.writer(self.csv_file)
         self.csv_writer.writerow(["Trial Number", "Trial validity", "Opponent Choice", "Mouse choice", "Reward","opponent Reward"])

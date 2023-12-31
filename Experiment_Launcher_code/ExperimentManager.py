@@ -1,8 +1,8 @@
 # The first group of import statements control the simulated vs real HW environments
 
-#from Video_analyser_code.VideoAnalyser import Video_Analyzer
+from Video_analyser_code.VideoAnalyser import Video_Analyzer
 #from Video_analyser_code.VideoAnalyzerStub import Video_Analyzer
-from Video_analyser_code.VideoAnalyzerSim import Video_Analyzer
+#from Video_analyser_code.VideoAnalyzerSim import Video_Analyzer
 
 #from Arduino_related_code.ArduinoDigital import ArduinoDigital
 from Arduino_related_code.ArduinoDigitalSim import ArduinoDigital
@@ -227,7 +227,7 @@ class ExperimentManager:
             mouse2.SetStrategy(opponent2_strategy)
             mouse2sim = mouse2
 
-        self.stateManager.SetTimeOut(decision_time, return_time)
+        self.stateManager.SetTimeOuts(decision_time, return_time)
 
         currentstate = None
         mouse1location = None

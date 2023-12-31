@@ -185,10 +185,6 @@ class Video_Analyzer:
         # Return the latest zone activations
         return self.zone_activations
 
-    def get_exp_zone_activations(self):
-        # Return the latest zone activations
-        print("EXP ZONE",self.exp_zone)
-        return self.exp_zone
 
 #analyzer = VideoAnalyzer()
 #analyzer.stream_and_process()

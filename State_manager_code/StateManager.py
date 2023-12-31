@@ -2,19 +2,19 @@ import time
 from enum import Enum
 
 class States(Enum):
-    WaitForStart        = 1
-    Start               = 2
-    CenterReward        = 3
-    TrialStarted        = 4
-    M1CM2C              = 5
-    M1CM2D              = 6
-    M1DM2C              = 7
-    M1DM2D              = 8
-    WaitForReturn       = 9
-    TrialCompleted      = 10
-    TrialAbort          = 11
-    DecisionAbort       = 12
-    End                 = 13
+
+    Start               = 1
+    CenterReward        = 2
+    TrialStarted        = 3
+    M1CM2C              = 4
+    M1CM2D              = 5
+    M1DM2C              = 6
+    M1DM2D              = 7
+    WaitForReturn       = 8
+    TrialCompleted      = 9
+    TrialAbort          = 10
+    DecisionAbort       = 11
+    End                 = 12
 
 class Events(Enum):
     StartTrial        = 1
@@ -31,7 +31,7 @@ class Events(Enum):
 class StateManager:
     def __init__(self):
         self.NextState = {
-            States.WaitForStart : [States.Start],
+
             States.Start : [States.CenterReward],
             States.CenterReward : [States.TrialStarted],
             States.TrialStarted : [States.M1CM2C, States.M1CM2D, States.M1DM2C, States.M1DM2D],
@@ -48,7 +48,7 @@ class StateManager:
 
         self.TransitionEvent = {
 
-            States.WaitForStart: [Events.StartTrial.value],#move ur hand to the center of the maze after you are done putting the mice
+
             States.Start : [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value],
             States.CenterReward : [0],
             States.TrialStarted : [Events.Mouse1Cooporated.value + Events.Mouse2Cooporated.value,
@@ -67,7 +67,7 @@ class StateManager:
         }
 
         self.TimeOutState = {
-            States.WaitForStart :None,
+
             States.Start : None,
             States.CenterReward : None,
             States.TrialStarted : States.DecisionAbort,
@@ -87,7 +87,7 @@ class StateManager:
         self.return_time = 0
 
         self.TransitionTimeOut = {
-            States.WaitForStart :None,
+
             States.Start: None,
             States.CenterReward: None,
             States.TrialStarted: self.decision_time,

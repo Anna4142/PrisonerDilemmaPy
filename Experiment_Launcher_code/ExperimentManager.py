@@ -13,10 +13,11 @@ from State_manager_code.StateManager import States
 from State_manager_code.StateManager import Events
 from Reward_manager.RewardManager import RewardManager
 import tkinter as tk
+from Sound_manager_code.SoundManager import *
 from Data_analysis.logger import TrialLogger
 from modelling_opponent.OpponentType import OpponentType
 from Data_analysis.DataAnalysisScript import DataAnalyzer
-from Experiment_Launcher_code.Experimenter import Experimenter
+#from Experiment_Launcher_code.Experimenter import Experimenter
 # from ArduinoDigitalSim import ArduinoDigital  ##Anushka-new class
 class ExperimentManager:
     def __init__(self):
@@ -25,7 +26,7 @@ class ExperimentManager:
 
         #initialize state manager
         self.stateManager = StateManager()
-        self.experimenter = Experimenter(self.videoAnalyser)
+        #self.experimenter = Experimenter(self.videoAnalyser)
         # initialize path to store data
         self.data_path = 'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/abcdefghi.csv'  ###change to whatever.csv
         # initialize trial logger
@@ -70,8 +71,6 @@ class ExperimentManager:
             # Initialize variables, set some flags, start recording, etc.
             pass
 
-        elif state == States.WaitForStart:
-           pass
 
 
         elif state == States.CenterReward:
@@ -90,6 +89,7 @@ class ExperimentManager:
         elif state == States.TrialStarted:
             Play(Sounds.Start)
 
+
             if mouse1simulated:
                 mouse1simulated.NewTrial()
             if mouse2simulated:
@@ -102,8 +102,8 @@ class ExperimentManager:
             self.mouse_reward = "12"
             self.opponent_reward = "12"
             self.cc_cnt += 1
-            #self.reward_manager.deliver_reward('cc', 1, self.reward_time)
-            #self.reward_manager.deliver_reward('cc', 2, self.reward_time)
+            self.reward_manager.deliver_reward('cc', 1, self.reward_time)
+            self.reward_manager.deliver_reward('cc', 2, self.reward_time)
             """""
             if mouse1simulated:
                 mouse1simulated.setRewardReceived()
@@ -121,8 +121,8 @@ class ExperimentManager:
             self.mouse_reward = "0"
             self.opponent_reward = "15"
             self.cd_cnt += 1
-            #self.reward_manager.deliver_reward('cd', 1, self.reward_time)
-            #self.reward_manager.deliver_reward('cd', 2, self.punishment_time)
+            self.reward_manager.deliver_reward('cd', 1, self.reward_time)
+            self.reward_manager.deliver_reward('cd', 2, self.punishment_time)
             """""
             if mouse1simulated:
                 mouse1simulated.setRewardReceived()
@@ -141,8 +141,8 @@ class ExperimentManager:
             self.opponent_reward = "0"
             self.dc_cnt += 1
 
-            #self.reward_manager.deliver_reward('dc', 1, self.punishment_time)
-            #self.reward_manager.deliver_reward('dc', 2, self.reward_time)
+            self.reward_manager.deliver_reward('dc', 1, self.punishment_time)
+            self.reward_manager.deliver_reward('dc', 2, self.reward_time)
             """""
             if mouse1simulated:
                 mouse1simulated.setRewardReceived()
@@ -160,8 +160,8 @@ class ExperimentManager:
             self.mouse_reward = "15"
             self.opponent_reward = "15"
             self.dd_cnt += 1
-            #self.reward_manager.deliver_reward('dd', 1, self.punishment_time)
-            #self.reward_manager.deliver_reward('dd', 2, self.punishment_time)
+            self.reward_manager.deliver_reward('dd', 1, self.punishment_time)
+            self.reward_manager.deliver_reward('dd', 2, self.punishment_time)
             """""
             if mouse1simulated:
                 mouse1simulated.setRewardReceived()
@@ -173,7 +173,9 @@ class ExperimentManager:
                 self.reward_manager.deliver_reward('dd', 2, self.punishment_time)
             """
         elif state == States.WaitForReturn:
-            Play(Sounds.Abort)
+            #Play(Sounds.Start)
+            pass
+
 
 
         elif state == States.TrialCompleted:
@@ -239,7 +241,7 @@ class ExperimentManager:
             mouse2sim = mouse2
         self.stateManager.SetTimeOuts(duration, time_decision)
 
-        currentstate = States.WaitForStart
+        currentstate = States.Start
         mouse1location = None
         mouse2location = None
 
@@ -249,13 +251,13 @@ class ExperimentManager:
 
             trialevents = 0;
 
-            if currentstate==States.WaitForStart and self.experimenter.check_for_start():
+            #if currentstate==States.WaitForStart and self.experimenter.check_for_start():
                 # If true, trigger the trial start event
 
-                    print("Experimenter has initiated the trial.")
-                    trialevents += Events.StartTrial.value
+                   # print("Experimenter has initiated the trial.")
+                   #  trialevents += Events.StartTrial.value
 
-            elif self.numcompletedtrial == self.num_trial - 1:
+            if self.numcompletedtrial == self.num_trial - 1:
 
                 trialevents += Events.LastTrial.value
                 # print("TRIAL COMPLETE EVENTS", trialevents)

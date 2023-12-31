@@ -106,7 +106,7 @@ class ExperimentManager:
             mouse2.DeliverReward(Locations.Defect, self.punishment_time)
 
         elif state == States.WaitForReturn:
-            Play(Sounds.Abort)
+            pass
 
         elif state == States.TrialCompleted:
             # Increment the trial number counter
@@ -115,6 +115,7 @@ class ExperimentManager:
             self.trial_logger.log_trial_data(self.numcompletedtrial, "Completed Trial", self.opponent_choice, self.mouse_choice, self.mouse_reward, self.opponent_reward)
 
         elif state == States.TrialAbort:
+            Play(Sounds.Abort)
             # Increment the trial number counter
             #self.numcompletedtrial += 1
             # Log that the trial has been aborted
@@ -126,6 +127,7 @@ class ExperimentManager:
             self.trial_logger.log_trial_data(self.numcompletedtrial, "Return Abort", self.opponent_choice, self.mouse_choice,self.mouse_reward, self.opponent_reward)
 
         elif state == States.DecisionAbort:
+            Play(Sounds.Abort)
             # Increment the trial number counter
             #self.numcompletedtrial += 1
             # Handle DecisionAbort state
@@ -163,7 +165,7 @@ class ExperimentManager:
         currentstate = None
         state_history = []
         while currentstate != States.End:
-            trialevents = 0;
+            trialevents = 0
             """""
             if self.experimenter.check_for_start():
                 # If true, trigger the trial start event
@@ -172,7 +174,6 @@ class ExperimentManager:
             """
             if self.numcompletedtrial == self.num_trial:
                 trialevents += Events.LastTrial.value
-
 
             if self.reward_manager.is_reward_delivered():
                 trialevents += Events.RewardDelivered.value

@@ -3,7 +3,7 @@ import random
 from State_manager_code.StateManager import States
 from State_manager_code.StateManager import StateManager
 from Video_analyser_code.locations import Locations
-from models.Learning_agents.qlearner import QLearningAgent
+#from models.Learning_agents.qlearner import QLearningAgent
 class Simulated_mouse:
     def __init__(self):
         self.strategy = "Unconditional Cooperator"
@@ -11,7 +11,7 @@ class Simulated_mouse:
         self.p = 0.5  # Default value for probability
         self.decisionMade = True
         self.rewardReceived = True
-        self.q_learning_agent = QLearningAgent()
+        #self.q_learning_agent = QLearningAgent()
         self.state_manager=StateManager()
 
     def SetStrategy(self, strategy):

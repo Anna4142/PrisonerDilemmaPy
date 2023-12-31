@@ -236,20 +236,15 @@ class ExperimentManager:
         state_history = []
         while currentstate != States.End:
             trialevents = 0;
-            """""
-            if self.experimenter.check_for_start():
-                # If true, trigger the trial start event
-                print("Experimenter has initiated the trial.")
-                trialevents += Events.StartTrial.value
-            """
+
             if self.numcompletedtrial == self.num_trial:
                 trialevents += Events.LastTrial.value
             else:
                 zone_activations = self.videoAnalyser.process_single_frame()
-                #print("zone activations", zone_activations)  ##just for debugging purposes
 
-                if opponent_type == OpponentType.MOUSE_MOUSE:   # Micky: This can be improved. There should be no API difference between the
-                                                                # real and the simulated mice##YET TO RESOLVE SHOULD I PASS THE CURRENT LOCATION ALSO TO THE REAL MICE AS A PARAMETER THATS UNTOUCHED
+
+                if opponent_type == OpponentType.MOUSE_MOUSE:
+
                     # Retrieve locations from both queues for real mice
                     mouselocation = mouse1.getDecision(zone_activations)
                     opponent_choice = mouse2.getDecision(zone_activations)
@@ -259,13 +254,12 @@ class ExperimentManager:
 
                     opponent_choice = mouse2sim.get_mouse_location(Locations.Unknown, currentstate)
                 else:
-                    # Retrieve locations from simulated mice methods
+
 
                     mouselocation = mouse1sim.get_mouse_location(Locations.Unknown, currentstate)
 
                     opponent_choice = mouse2sim.get_mouse_location(Locations.Unknown, currentstate)
-                    #print("mouselocation", mouselocation) ##just for debugging purposes
-                    #print("opponent_choice", opponent_choice) ##just for debugging purposes
+
                 if mouselocation == Locations.Center:
                     trialevents = trialevents + Events.Mouse1InCenter.value
                 elif mouselocation == Locations.Cooperate:

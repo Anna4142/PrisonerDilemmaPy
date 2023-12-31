@@ -1,30 +1,17 @@
-# The first group of import statements control the simulated vs real HW environments
-
-#from Video_analyser_code.VideoAnalyser import Video_Analyzer
-#from Video_analyser_code.VideoAnalyzerStub import Video_Analyzer
-from Video_analyser_code.VideoAnalyzerSim import Video_Analyzer
-
-# The following are configuration independent imports
 from Sound_manager_code.SoundManager import Play, Sounds
-from modelling_opponent.MouseMonitor import MouseMonitor
 from modelling_opponent.MouseMonitor import Locations
-from modelling_opponent.FixedStrategyPrisoner import FixedStrategyPrisoner
-#from modelling_opponent.Simulated_learner import Simulated_mouse
 from State_manager_code.StateManager import StateManager
 from State_manager_code.StateManager import States
 from State_manager_code.StateManager import Events
-from Reward_manager.RewardManager import RewardManager
 from Data_analysis.logger import TrialLogger
-from modelling_opponent.OpponentType import OpponentType
 from Experiment_Launcher_code import Experimenter
-from Reward_manager.RewardManager import RewardManager
 
 
 class ExperimentManager:
-    def __init__(self, comport):
+    def __init__(self, video_analyzer, reward_manager):
         # initialize software components
-        self.reward_manager = RewardManager(comport)
-        self.videoAnalyser = Video_Analyzer()
+        self.reward_manager = reward_manager
+        self.videoAnalyser = video_analyzer
         self.stateManager = StateManager()
         self.trial_logger = TrialLogger()
         #initialize data_analyser
@@ -141,26 +128,14 @@ class ExperimentManager:
         elif state == States.End:
             # Stop recording, finalize logs, show end message, etc.
             self.trial_logger.finalize_logging()
-            analysis_results = self.data_analyzer.analyze_data()
-            print(analysis_results)
+            #analysis_results = self.data_analyzer.analyze_data()
+            #print(analysis_results)
 
-    def start_streaming_exp(self, experiment_name, num_trial, decision_time, return_time, opponent_type, opponent1_strategy, opponent2_strategy):
-        self.trial_logger.start_logging(experiment_name)
-        self.num_trial = num_trial
-        print("opponent ", opponent_type)
-        print("opponent strategy ", opponent1_strategy)
+    def start_streaming_exp(self, experiment_parameters, mouse1, mouse2):
+        self.trial_logger.start_logging(experiment_parameters.get("experiment_name"))
+        self.num_trial = experiment_parameters.get("num_trials")
 
-        if opponent_type == OpponentType.MOUSE_MOUSE:
-            mouse1 = MouseMonitor(1, self.videoAnalyser, self.reward_manager)
-            mouse2 = MouseMonitor(2, self.videoAnalyser, self.reward_manager)
-        elif opponent_type == OpponentType.MOUSE_COMPUTER:
-            mouse1 = MouseMonitor(1, self.videoAnalyser, self.reward_manager)
-            mouse2 = FixedStrategyPrisoner(opponent1_strategy, probability=0.8)
-        else:
-            mouse1 = FixedStrategyPrisoner(opponent1_strategy, probability=0.8)
-            mouse2 = FixedStrategyPrisoner(opponent2_strategy, probability=0.8)
-
-        self.stateManager.SetTimeOut(decision_time, return_time)
+        self.stateManager.SetTimeOut(experiment_parameters.get("decision_time"), experiment_parameters.get("return_time"))
 
         currentstate = None
         state_history = []

@@ -1,3 +1,12 @@
+# use video analyzer import to select simulated of read mice
+from Video_analyser_code.VideoAnalyser import Video_Analyzer
+#from Video_analyser_code.VideoAnalyzerStub import Video_Analyzer
+#from Video_analyser_code.VideoAnalyzerSim import Video_Analyzer
+
+from modelling_opponent.MouseMonitor import MouseMonitor
+from modelling_opponent.FixedStrategyPrisoner import FixedStrategyPrisoner
+from modelling_opponent.Simulated_learner import Simulated_mouse
+from Reward_manager.RewardManager import RewardManager
 from Experiment_Launcher_code.ExperimentManager import ExperimentManager
 from Experiment_Launcher_code.experimentgui import ExperimentGUI, OpponentType
 
@@ -6,27 +15,34 @@ def main():
     experiment_gui = ExperimentGUI()
     experiment_gui.setup_gui()
 
-    # After the GUI is closed, get the settings using the get_settings method
-    settings = experiment_gui.on_start_clicked()
+    # After the GUI is closed, get the settings using the appropriate methods
+    if experiment_gui.is_data_valid():
+        comport_name = experiment_gui.get_com_port()
+        experiment_parameters = experiment_gui.get_experiment_parameters()
+        opponent_configuration = experiment_gui.get_opponent_configuration()
 
-    if settings:
-        # Extract the necessary parameters from the settings
-        experiment_name = settings.get('experiment_name')
-        comport_name = settings.get('comport_name')
-        num_trials = settings.get('num_trials')
-        return_time = settings.get('return_time')
-        decision_time = settings.get('decision_time')
-        opponent_type = settings.get('opponent_type')
-        opponent1_strategy = settings.get('opponent1_strategy')
-        opponent2_strategy = settings.get('opponent2_strategy')
-        opponent1_probability = settings.get('opponent1_probability')
-        opponent2_probability = settings.get('opponent2_probability')
+        # Instantiate software components
+        video_analyzer = Video_Analyzer()
+        reward_manager = RewardManager(comport_name)
+
+        if opponent_configuration.get("opponent1_type") == OpponentType.MOUSE:
+            first_opponent = MouseMonitor(1, video_analyzer, reward_manager)
+        elif opponent_configuration.get("opponent1_type") == OpponentType.FIXED_STRATEGY:
+            first_opponent = FixedStrategyPrisoner(opponent_configuration.get("opponent1_strategy"), opponent_configuration.get("opponent1_probability"))
+        else:
+            first_opponent = Simulated_mouse()
+
+        if opponent_configuration.get("opponent2_type") == OpponentType.MOUSE:
+            second_opponent = MouseMonitor(2, video_analyzer, reward_manager)
+        elif opponent_configuration.get("opponent2_type") == OpponentType.FIXED_STRATEGY:
+            second_opponent = FixedStrategyPrisoner(opponent_configuration.get("opponent2_strategy"), opponent_configuration.get("opponent2_probability"))
+        else:
+            second_opponent = Simulated_mouse()
 
         # Initialize and start the experiment
-        expManager = ExperimentManager(comport_name)
+        expManager = ExperimentManager(video_analyzer, reward_manager)
         print("Experiment manager now running")
-        expManager.start_streaming_exp(experiment_name, num_trials, decision_time, return_time, opponent_type,
-                                       opponent1_strategy, opponent2_strategy)
+        expManager.start_streaming_exp(experiment_parameters, first_opponent, second_opponent)
         del expManager
     else:
         print("No valid settings were provided.")

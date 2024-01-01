@@ -15,7 +15,7 @@ class Video_Analyzer:
         with Vimba.get_instance() as vimba:
 
             self.vimba = vimba
-        self.video_file_loc = 'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/event_based_conditiong/video/1472/1_1_24.avi'
+        self.video_file_loc = 'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/2_1_24.avi'
 
         self.video_writer = VideoWriter(output_file=self.video_file_loc)
         self.regions = self.define_regions()
@@ -82,17 +82,32 @@ class Video_Analyzer:
     def define_regions(self):
         # Define the regions of interest (ROI) for each mouse and their specific zones
         regions = {
-            'm1_c': [(455, 120), (490, 190)],  # Mouse 2 Cooperate Zone (Top Left)
-            'm1_cen': [(330, 280), (400, 350)],  # Mouse 2 Center Zone (Center Left)
-            'm1_d': [(455, 420), (490, 490)],  # Mouse 2 Defect Zone (Bottom Left)
-            'm2_c': [(510, 120), (545, 190)],  # Mouse 1 Cooperate Zone (Top Right)
-            'm2_cen': [(610, 280), (680, 350)],  # Mouse 1 Center Zone (Center Right)
-            'm2_d': [(510, 420), (545, 490)],  # Adjusted Mouse 1 Defect Zone (Bottom Right)
+            'm1_c': [(465, 110), (500, 240)],  # Mouse 2 Cooperate Zone (Top Left)
+            'm1_cen': [(330, 260), (400, 330)],  # Mouse 2 Center Zone (Center Left)
+            'm1_d': [(455, 370), (490, 490)],  # Mouse 2 Defect Zone (Bottom Left)
+            'm2_c': [(525, 110), (565, 235)],  # Mouse 1 Cooperate Zone (Top Right)
+            'm2_cen': [(610, 260), (680, 330)],  # Mouse 1 Center Zone (Center Right)
+            'm2_d': [(515, 370), (550, 490)],  # Adjusted Mouse 1 Defect Zone (Bottom Right)
         }
         return regions
 
+    def find_contours(self, frame):
+        # Define the region (x1, y1, x2, y2)
+        x1, y1, x2, y2 = 300, 90, 700, 510
 
+        # Crop the frame to the region of interest
+        roi_frame = frame[y1:y2, x1:x2]
 
+        # Apply thresholding on the cropped frame
+        ret, thresh = cv2.threshold(roi_frame, 20, 255, cv2.THRESH_BINARY_INV)
+
+        # Find contours in the thresholded image
+        contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+        # Adjust the contour coordinates to be relative to the original frame
+        adjusted_contours = [contour + (x1, y1) for contour in contours]
+
+        return adjusted_contours
     def define_thresholds(self):
         # Define the thresholds for each region
         self.thresholds = {
@@ -107,8 +122,8 @@ class Video_Analyzer:
         }
 
         return self.thresholds
-
-    def check_zones(self, frame):
+    """""
+    def check_zones(self, frame):  #####    THRESHOLD BASED APPROACH
         zone_activation = [0] * 6 # [0, 0, 0, 0, 0, 0]
 
         for idx, region_key in enumerate(self.regions):
@@ -124,6 +139,47 @@ class Video_Analyzer:
                 zone_activation[idx] = 1
         #print("zone activation",zone_activation)
         return zone_activation
+    """""
+
+    def check_zones(self, frame, mouse_contours):
+        zone_activation = [0] * len(self.regions)
+
+        for idx, region_key in enumerate(self.regions):
+            (y1, x1), (y2, x2) = self.regions[region_key]
+            region_rect = (x1, y1, x2 - x1, y2 - y1)
+
+            for contour in mouse_contours:
+                if self.is_contour_in_region(contour, region_rect):
+                    zone_activation[idx] = 1
+                    break  # No need to check other contours if one is already found in the region
+                else:
+                    # Debugging print statement for when there's no intersection
+                    #print(f"No intersection for contour in region {region_key}")
+                    pass
+
+
+        return zone_activation
+
+    def is_contour_in_region(self, contour, region_rect):
+        x, y, w, h = cv2.boundingRect(contour)  # Get bounding box of the contour
+        contour_rect = (x, y, w, h)
+
+        intersects = self.do_rectangles_intersect(region_rect, contour_rect)
+
+        # Debugging print statement
+        print(f"Contour Rect: {contour_rect}, Region Rect: {region_rect}, Intersects: {intersects}")
+
+        return intersects
+
+    def do_rectangles_intersect(self, rect1, rect2):
+        # Determine if two rectangles intersect
+        x1, y1, w1, h1 = rect1
+        x2, y2, w2, h2 = rect2
+
+        if (x1 < x2 + w2 and x1 + w1 > x2 and
+                y1 < y2 + h2 and y1 + h1 > y2):
+            return True
+        return False
 
     def format_time(self,seconds):
         # Helper function to format seconds into H:M:S format
@@ -131,12 +187,22 @@ class Video_Analyzer:
         h, m = divmod(m, 60)
         return "{:02d}:{:02d}:{:02d}".format(int(h), int(m), int(s))
 
+    def draw_rectangle_with_lines(self,frame, top_left, bottom_right, color, thickness):
+        # Unpack the top left and bottom right coordinates
+        x1, y1 = top_left
+        x2, y2 = bottom_right
+
+        # Draw four lines to form a rectangle
+        cv2.line(frame, (x1, y1), (x2, y1), color, thickness)  # Top edge
+        cv2.line(frame, (x1, y2), (x2, y2), color, thickness)  # Bottom edge
+        cv2.line(frame, (x1, y1), (x1, y2), color, thickness)  # Left edge
+        cv2.line(frame, (x2, y1), (x2, y2), color, thickness)  # Right edge
+
     def draw_regions(self, frame, pixel_sums):
         for region_key in self.regions:
             top_left, bottom_right = self.regions[region_key]
 
-            # Draw the rectangle
-            cv2.rectangle(frame, top_left, bottom_right, (0, 255, 0), 2)  # Green rectangle
+            self.draw_rectangle_with_lines(frame, top_left, bottom_right, (255, 255, 255),2)
 
             # Prepare text for region name and sum of pixels
             region_name = region_key
@@ -161,14 +227,15 @@ class Video_Analyzer:
 
                 # Resize the frame
                 frame = cv2.resize(frame, (960, 700))
-                self.zone_activations = self.check_zones(frame)
+                frame = self.draw_regions(frame, self.pixel_sums)
+                #self.zone_activations = self.check_zones(frame)  ##FOR THRESHOLD BASED APPROACH
+                contours = self.find_contours(frame)
+                print("mo of contours detected", len(contours))
+                cv2.drawContours(frame, contours, -1, (0, 0, 0), 5)
+                self.zone_activations = self.check_zones(frame,contours)
                 self.exp_zone = self.zone_activations[-1] if self.zone_activations else None
 
-                # Print sum of pixels for each zone
 
-                #for region_key, sum_of_pixels in pixel_sums.items():
-                  #  print(f"Zone {region_key} sum: {sum_of_pixels}")
-                # Calculate elapsed time since trial start
                 time_since_trial_start = time.time() - self.trial_start_time
 
                 # Format and display trial information and elapsed time
@@ -176,9 +243,10 @@ class Video_Analyzer:
                 cv2.putText(frame, f"Since Start: {self.format_time(time_since_trial_start)}", (10, 70),
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
                 #cv2.putText(frame, f"Frame: {self.frame_counter}", (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-                frame = self.draw_regions(frame, self.pixel_sums)
+
                 #print(self.pixel_sums)
-                # Display the frame
+
+
                 cv2.imshow('Frame', frame)
                 cv2.waitKey(1)
 

@@ -4,6 +4,8 @@ import time
 import cv2
 import numpy as np
 import tkinter as tk
+from Video_analyser_code.VideoWriter import VideoWriter
+
 
 class Video_Analyzer:
     def __init__(self):
@@ -13,7 +15,9 @@ class Video_Analyzer:
         with Vimba.get_instance() as vimba:
 
             self.vimba = vimba
-        self.video_file_loc = 'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/event_based_conditiong/video/1472/28_09_23_01_down.avi'
+        self.video_file_loc = 'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/event_based_conditiong/video/1472/1_1_24.avi'
+
+        self.video_writer = VideoWriter(output_file=self.video_file_loc)
         self.regions = self.define_regions()
         self.thresholds = self.define_thresholds()
         self.pixel_sums = {}
@@ -21,6 +25,8 @@ class Video_Analyzer:
         self.trial_start_time = time.time()  # Initialize start time
         self.trial_end_time = None  # Initialize end time
         self.exp_zone=0
+
+
         with Vimba.get_instance() as vimba:
 
             cams = vimba.get_all_cameras()
@@ -54,6 +60,7 @@ class Video_Analyzer:
                     cam.set_pixel_format(opencv_formats[0])
                     cam.AcquisitionMode = 'Continuous'
                     cam.ExposureTime.set(7000)
+
 
 
     """""
@@ -151,6 +158,7 @@ class Video_Analyzer:
         with self.vimba:
             with self.cam:
                 frame = self.cam.get_frame().as_opencv_image()
+                self.video_writer.write_frame(frame)
                 # Increment and display the frame number
                 self.frame_counter += 1
 
@@ -184,7 +192,6 @@ class Video_Analyzer:
     def get_zone_activations(self):
         # Return the latest zone activations
         return self.zone_activations
-
-
-#analyzer = VideoAnalyzer()
-#analyzer.stream_and_process()
+    def close_resources(self):
+        # Close the video writer and any other resources
+        self.video_writer.close()

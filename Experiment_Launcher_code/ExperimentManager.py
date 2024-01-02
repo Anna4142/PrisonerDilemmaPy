@@ -4,9 +4,6 @@
 #from Video_analyser_code.VideoAnalyzerStub import Video_Analyzer
 from Video_analyser_code.VideoAnalyzerSim import Video_Analyzer
 
-#from Arduino_related_code.ArduinoDigital import ArduinoDigital
-from Arduino_related_code.ArduinoDigitalSim import ArduinoDigital
-
 # The following are configuration independent imports
 from Sound_manager_code.SoundManager import Play, Sounds
 from modelling_opponent.MouseMonitor import MouseMonitor
@@ -20,20 +17,18 @@ from Reward_manager.RewardManager import RewardManager
 from Data_analysis.logger import TrialLogger
 from modelling_opponent.OpponentType import OpponentType
 from Experiment_Launcher_code import Experimenter
+from Reward_manager.RewardManager import RewardManager
 
 
 class ExperimentManager:
-    def __init__(self):
+    def __init__(self, comport):
         # initialize software components
+        self.reward_manager = RewardManager(comport)
         self.videoAnalyser = Video_Analyzer()
         self.stateManager = StateManager()
         self.trial_logger = TrialLogger()
         #initialize data_analyser
         #self.data_analyzer = DataAnalyzer(self.data_path)
-        # Initialize Arduino board
-        self.initialize_arduino()
-        #initialize reward manager
-        self.reward_manager = RewardManager(self.board, [7, 8, 9, 10, 11, 12])
         #initialize experimenter
         #self.experimenter = Experimenter(self.videoAnalyser)
 
@@ -52,10 +47,6 @@ class ExperimentManager:
         self.dd_cnt = 0
         self.center_cnt = 0
 
-    def initialize_arduino(self):
-        comport = "COM11"
-        self.board = ArduinoDigital(comport)
-
     def StateActivity(self, state, mouse1simulated, mouse2simulated):
         if state == States.Start:
             pass
@@ -66,8 +57,8 @@ class ExperimentManager:
         elif state == States.CenterReward:
             self.center_cnt += 1
             print("delivering reward in the center ")
-            self.reward_manager.deliver_reward('center', 1, self.punishment_time)
-            self.reward_manager.deliver_reward('center', 2, self.punishment_time)
+            self.reward_manager.deliver_reward(1, Locations.Center, self.center_reward_time)
+            self.reward_manager.deliver_reward(2, Locations.Center, self.center_reward_time)
             """""
             if not mouse1simulated:
 
@@ -90,8 +81,8 @@ class ExperimentManager:
             self.mouse_reward = "12"
             self.opponent_reward = "12"
             self.cc_cnt += 1
-            self.reward_manager.deliver_reward('cc', 1, self.reward_time)
-            self.reward_manager.deliver_reward('cc', 2, self.reward_time)
+            self.reward_manager.deliver_reward(1, Locations.Cooperate, self.reward_time)
+            self.reward_manager.deliver_reward(2, Locations.Cooperate, self.reward_time)
             """""
             if mouse1simulated:
                 mouse1simulated.setRewardReceived()
@@ -110,8 +101,8 @@ class ExperimentManager:
             self.mouse_reward = "0"
             self.opponent_reward = "15"
             self.cd_cnt += 1
-            self.reward_manager.deliver_reward('cd', 1, self.reward_time)
-            self.reward_manager.deliver_reward('cd', 2, self.punishment_time)
+            self.reward_manager.deliver_reward(1, Locations.Cooperate, self.sucker_time)
+            self.reward_manager.deliver_reward(2, Locations.Defect, self.temptation_time)
             """""
             if mouse1simulated:
                 mouse1simulated.setRewardReceived()
@@ -131,8 +122,8 @@ class ExperimentManager:
             self.opponent_reward = "0"
             self.dc_cnt += 1
 
-            self.reward_manager.deliver_reward('dc', 1, self.punishment_time)
-            self.reward_manager.deliver_reward('dc', 2, self.reward_time)
+            self.reward_manager.deliver_reward(1, Locations.Defect, self.temptation_time)
+            self.reward_manager.deliver_reward(2, Locations.Cooperate, self.sucker_time)
             """""
             if mouse1simulated:
                 mouse1simulated.setRewardReceived()
@@ -151,8 +142,8 @@ class ExperimentManager:
             self.mouse_reward = "15"
             self.opponent_reward = "15"
             self.dd_cnt += 1
-            self.reward_manager.deliver_reward('dd', 1, self.punishment_time)
-            self.reward_manager.deliver_reward('dd', 2, self.punishment_time)
+            self.reward_manager.deliver_reward(1, Locations.Defect, self.punishment_time)
+            self.reward_manager.deliver_reward(2, Locations.Defect, self.punishment_time)
             """""
             if mouse1simulated:
                 mouse1simulated.setRewardReceived()
@@ -245,6 +236,7 @@ class ExperimentManager:
             if self.numcompletedtrial == self.num_trial:
                 trialevents += Events.LastTrial.value
             else:
+                self.reward_manager.is_reward_delivered()
                 zone_activations = self.videoAnalyser.process_single_frame()
                 #print("zone activations", zone_activations)  ##just for debugging purposes
 

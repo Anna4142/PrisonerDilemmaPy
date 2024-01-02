@@ -17,15 +17,15 @@ class States(Enum):
     End                 = 12
 
 class Events(Enum):
-    StartTrial        = 1
-    Mouse1InCenter    = 2
-    Mouse2InCenter    = 4
-    Mouse1Cooporated  = 8
-    Mouse2Cooporated  = 16
-    Mouse1Defected    = 32
-    Mouse2Defected    = 64
-    LastTrial         = 128
-    RewardDelivered   = 256
+
+    Mouse1InCenter    = 1
+    Mouse2InCenter    = 2
+    Mouse1Cooporated  = 4
+    Mouse2Cooporated  = 8
+    Mouse1Defected    = 16
+    Mouse2Defected    = 32
+    LastTrial         = 64
+    RewardDelivered   = 128
 
 
 class StateManager:

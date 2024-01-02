@@ -4,8 +4,8 @@ from Video_analyser_code.VideoAnalyser import Video_Analyzer
 #from Video_analyser_code.VideoAnalyzerStub import Video_Analyzer
 #from Video_analyser_code.VideoAnalyzerSim import Video_Analyzer
 
-#from Arduino_related_code.ArduinoDigital import ArduinoDigital
-from Arduino_related_code.ArduinoDigitalSim import ArduinoDigital
+from Arduino_related_code.ArduinoDigital import ArduinoDigital
+#from Arduino_related_code.ArduinoDigitalSim import ArduinoDigital
 
 # The following are configuration independent imports
 from Sound_manager_code.SoundManager import Play, Sounds
@@ -28,21 +28,21 @@ class ExperimentManager:
         self.videoAnalyser = Video_Analyzer()
         self.stateManager = StateManager()
         self.trial_logger = TrialLogger()
+        self.stateHistories = {}
         #initialize data_analyser
         #self.data_analyzer = DataAnalyzer(self.data_path)
         # Initialize Arduino board
         self.initialize_arduino()
         #initialize reward manager
         self.reward_manager = RewardManager(self.board, [7, 8, 9, 10, 11, 12])
-        #initialize experimenter
-        #self.experimenter = Experimenter(self.videoAnalyser)
+        self.opponent_type = ""  ##for the logger
 
         # Set default reward and punishment times
         self.reward_time = 0.2
         self.sucker_time = 0
         self.temptation_time = 0.09
         self.punishment_time = 0.004
-        self.center_reward_time = 1
+        self.center_reward_time = 0.05
 
         # initialize experiment control variables
         self.numcompletedtrial = 0
@@ -58,6 +58,7 @@ class ExperimentManager:
 
     def StateActivity(self, state, mouse1simulated, mouse2simulated):
         if state == States.Start:
+            Play(Sounds.Start)
             pass
 
         #elif state == States.WaitForStart:
@@ -77,7 +78,7 @@ class ExperimentManager:
             """
 
         elif state == States.TrialStarted:
-            Play(Sounds.Start)
+
             if mouse1simulated:
                 mouse1simulated.NewTrial()
             if mouse2simulated:
@@ -207,11 +208,13 @@ class ExperimentManager:
         print("opponent ", opponent_type)
         print("opponent strategy ", opponent1_strategy)
 
+
         if opponent_type == OpponentType.MOUSE_MOUSE:
             mouse1 = MouseMonitor(self.videoAnalyser, 1)
             mouse1sim = None
             mouse2 = MouseMonitor(self.videoAnalyser, 2)
             mouse2sim = None
+            self.opponent_type ="MOUSE_MOUSE"  ##for the logger
         elif opponent_type == OpponentType.MOUSE_COMPUTER:
 
             mouse1 = MouseMonitor(self.videoAnalyser, 1)
@@ -219,6 +222,7 @@ class ExperimentManager:
             mouse2 = Simulated_mouse()
             mouse2.SetStrategy(opponent1_strategy)
             mouse2sim = mouse2
+            self.opponent_type = "MOUSE_COMPUTER"  ##for the logger
         else:
             mouse1 = Simulated_mouse()
             mouse1.SetStrategy(opponent1_strategy)
@@ -226,6 +230,7 @@ class ExperimentManager:
             mouse2 = Simulated_mouse()
             mouse2.SetStrategy(opponent2_strategy)
             mouse2sim = mouse2
+            self.opponent_type = "COMPUTER_COMPUTER" ##for the logger
 
         self.stateManager.SetTimeOuts(decision_time, return_time)
 
@@ -234,9 +239,13 @@ class ExperimentManager:
         mouse2location = None
 
         state_history = []
+
         while currentstate != States.End:
             trialevents = 0;
-
+            print("current state",currentstate)
+            if self.numcompletedtrial not in self.stateHistories:
+                self.stateHistories[self.numcompletedtrial] = []
+            self.stateHistories[self.numcompletedtrial].append(currentstate)
             if self.numcompletedtrial == self.num_trial:
                 trialevents += Events.LastTrial.value
             else:

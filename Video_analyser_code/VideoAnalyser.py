@@ -88,9 +88,6 @@ class Video_Analyzer:
             'm2_c': [(510, 120), (545, 190)],  # Mouse 1 Cooperate Zone (Top Right)
             'm2_cen': [(610, 280), (680, 350)],  # Mouse 1 Center Zone (Center Right)
             'm2_d': [(510, 420), (545, 490)],  # Adjusted Mouse 1 Defect Zone (Bottom Right)
-
-
-            #'experimenter_start_zone': [(460, 280), (540, 350)]
         }
         return regions
 
@@ -99,16 +96,16 @@ class Video_Analyzer:
     def define_thresholds(self):
         # Define the thresholds for each region
         self.thresholds = {
-            'm1_c': 52000,  # Threshold for Mouse 2 Cooperate Zone
-            'm1_cen': 290000,  # Threshold for Mouse 2 Center Zone
-            'm1_d': 120000,  # Threshold for Mouse 2 Defect Zone
+            'm1_c': 39800,  # Threshold for Mouse 2 Cooperate Zone
+            'm1_cen': 300000,  # Threshold for Mouse 2 Center Zone
+            'm1_d': 130000,  # Threshold for Mouse 2 Defect Zone
             'm2_c': 39500,  # Threshold for Mouse 1 Cooperate Zone
             'm2_cen': 117000,  # Threshold for Mouse 1 Center Zone
             'm2_d': 98941,  # Threshold for Mouse 1 Defect Zone
 
-            #'experimenter_start_zone': 350000  #Threshold for expermenter start zone
+
         }
-        #{'m1_d': 106569, 'm1_cen': 2632, 'm1_c': 256415, 'm2_d': 112012, 'm2_cen': 505708, 'm2_c': 234711}
+
         return self.thresholds
 
     def check_zones(self, frame):
@@ -120,7 +117,7 @@ class Video_Analyzer:
             region_pixels = frame[y1:y2, x1:x2]
             sum_of_pixels = np.sum(frame[y1:y2, x1:x2])
             self.pixel_sums[region_key] = sum_of_pixels  # Update the class attribute
-            #print(f"{region_key}: Sum of pixels = {sum_of_pixels}, Region shape = {region_pixels.shape}")
+            print(f"{region_key}: Sum of pixels = {sum_of_pixels}, Region shape = {region_pixels.shape}")
 
             if sum_of_pixels <= self.thresholds[region_key]:
 
@@ -186,7 +183,7 @@ class Video_Analyzer:
                 cv2.waitKey(1)
 
                 #zone_activations = self.check_zones(frame)
-
+                print(self.zone_activations)
                 return self.zone_activations
 
     def get_zone_activations(self):

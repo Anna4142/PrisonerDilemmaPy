@@ -1,5 +1,5 @@
 from VideoAnalyzerSim import Video_Analyzer
-from MouseMonitor import MouseMonitor
+from modelling_opponent.MouseMonitor import MouseMonitor
 import time
 
 

@@ -1,8 +1,11 @@
 # The first group of import statements control the simulated vs real HW environments
 
-#from Video_analyser_code.VideoAnalyser import Video_Analyzer
+from Video_analyser_code.VideoAnalyser import Video_Analyzer
 #from Video_analyser_code.VideoAnalyzerStub import Video_Analyzer
-from Video_analyser_code.VideoAnalyzerSim import Video_Analyzer
+#from Video_analyser_code.VideoAnalyzerSim import Video_Analyzer
+
+from Arduino_related_code.ArduinoDigital import ArduinoDigital
+#from Arduino_related_code.ArduinoDigitalSim import ArduinoDigital
 
 # The following are configuration independent imports
 from Sound_manager_code.SoundManager import Play, Sounds
@@ -24,20 +27,25 @@ class ExperimentManager:
     def __init__(self, comport):
         # initialize software components
         self.reward_manager = RewardManager(comport)
-        self.videoAnalyser = Video_Analyzer()
+
+        self.mouse_id="1780"
+        self.videoAnalyser = Video_Analyzer(self.mouse_id)
         self.stateManager = StateManager()
         self.trial_logger = TrialLogger()
+
         #initialize data_analyser
         #self.data_analyzer = DataAnalyzer(self.data_path)
-        #initialize experimenter
-        #self.experimenter = Experimenter(self.videoAnalyser)
+
+        #initialize reward manager
+
+        self.opponent_type = ""  ##for the logger
 
         # Set default reward and punishment times
         self.reward_time = 0.2
         self.sucker_time = 0
         self.temptation_time = 0.09
         self.punishment_time = 0.004
-        self.center_reward_time = 1
+        self.center_reward_time = 0.05
 
         # initialize experiment control variables
         self.numcompletedtrial = 0
@@ -120,10 +128,11 @@ class ExperimentManager:
             #self.numcompletedtrial += 1
             # Log that the trial has been aborted
             print("Trial has been aborted.")
-            self.opponent_choice = "N/A",
-            self.mouse_choice = "N/A",
-            self.mouse_reward = "-",
+            self.opponent_choice = "N/A"
+            self.mouse_choice = "N/A"
+            self.mouse_reward = "-"
             self.opponent_reward = "-"
+
             self.trial_logger.log_trial_data(self.numcompletedtrial, "Return Abort", self.opponent_choice, self.mouse_choice,self.mouse_reward, self.opponent_reward)
 
         elif state == States.DecisionAbort:
@@ -132,10 +141,11 @@ class ExperimentManager:
             #self.numcompletedtrial += 1
             # Handle DecisionAbort state
             print("IN DECISION ABORT")
-            self.opponent_choice = "N/A",
-            self.mouse_choice = "N/A",
-            self.mouse_reward = "-",
+            self.opponent_choice = "N/A"
+            self.mouse_choice = "N/A"
+            self.mouse_reward = "-"
             self.opponent_reward = "-"
+
             self.trial_logger.log_trial_data(self.numcompletedtrial, "Decision Abort", self.opponent_choice, self.mouse_choice,self.mouse_reward, self.opponent_reward)
 
         elif state == States.End:
@@ -164,6 +174,7 @@ class ExperimentManager:
 
         currentstate = None
         state_history = []
+
         while currentstate != States.End:
             trialevents = 0
             """""

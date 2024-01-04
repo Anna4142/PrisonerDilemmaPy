@@ -1,7 +1,8 @@
 import time
 from enum import Enum
 
-class States (Enum):
+class States(Enum):
+
     Start               = 1
     CenterReward        = 2
     TrialStarted        = 3
@@ -15,19 +16,22 @@ class States (Enum):
     DecisionAbort       = 11
     End                 = 12
 
-class Events (Enum):
-    Mouse1InCenter   = 1
-    Mouse2InCenter   = 2
-    Mouse1Cooporated = 4
-    Mouse2Cooporated = 8
-    Mouse1Defected   = 16
-    Mouse2Defected   = 32
-    LastTrial        = 64
-    RewardDelivered  = 128
+class Events(Enum):
+
+    Mouse1InCenter    = 1
+    Mouse2InCenter    = 2
+    Mouse1Cooporated  = 4
+    Mouse2Cooporated  = 8
+    Mouse1Defected    = 16
+    Mouse2Defected    = 32
+    LastTrial         = 64
+    RewardDelivered   = 128
+
 
 class StateManager:
     def __init__(self):
         self.NextState = {
+
             States.Start : [States.CenterReward],
             States.CenterReward : [States.TrialStarted],
             States.TrialStarted : [States.M1CM2C, States.M1CM2D, States.M1DM2C, States.M1DM2D],
@@ -43,31 +47,36 @@ class StateManager:
         }
 
         self.TransitionEvent = {
-            States.Start : [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value],
-            States.CenterReward : [Events.RewardDelivered.value],
-            States.TrialStarted : [Events.Mouse1Cooporated.value + Events.Mouse2Cooporated.value,
-                                   Events.Mouse1Cooporated.value + Events.Mouse2Defected.value,
-                                   Events.Mouse1Defected.value + Events.Mouse2Cooporated.value,
-                                   Events.Mouse1Defected.value + Events.Mouse2Defected.value],
-            States.M1CM2C : [Events.RewardDelivered.value],
-            States.M1CM2D: [Events.RewardDelivered.value],
-            States.M1DM2C: [Events.RewardDelivered.value],
-            States.M1DM2D: [Events.RewardDelivered.value],
-            States.WaitForReturn:[Events.Mouse1InCenter.value + Events.Mouse2InCenter.value],
-            States.TrialCompleted:[Events.LastTrial.value],
-            States.TrialAbort:[Events.LastTrial.value, Events.Mouse1InCenter.value + Events.Mouse2InCenter.value],
-            States.DecisionAbort:[Events.LastTrial.value],
-            States.End:[0]
-        }
+                                   States.Start: [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value],
+                                   States.CenterReward: [Events.RewardDelivered.value],
+                                   States.TrialStarted: [Events.Mouse1Cooporated.value + Events.Mouse2Cooporated.value,
+                                                         Events.Mouse1Cooporated.value + Events.Mouse2Defected.value,
+                                                         Events.Mouse1Defected.value + Events.Mouse2Cooporated.value,
+                                                         Events.Mouse1Defected.value + Events.Mouse2Defected.value],
+                                   States.M1CM2C: [Events.RewardDelivered.value],
+                                   States.M1CM2D: [Events.RewardDelivered.value],
+                                   States.M1DM2C: [Events.RewardDelivered.value],
+                                   States.M1DM2D: [Events.RewardDelivered.value],
+                                   States.WaitForReturn: [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value],
+                                   States.TrialCompleted: [Events.LastTrial.value],
+                                   States.TrialAbort: [Events.LastTrial.value,
+                                                       Events.Mouse1InCenter.value + Events.Mouse2InCenter.value],
+
+            }
 
         self.TimeOutState = {
-            States.Start : None,
-            States.CenterReward : States.TrialStarted,   # allow for an unconditional (ignore Reward delivered event) transition
-            States.TrialStarted : States.DecisionAbort,
-            States.M1CM2C: States.WaitForReturn,         # allow for an unconditional (ignore Reward delivered event) transition
-            States.M1CM2D: States.WaitForReturn,         # allow for an unconditional (ignore Reward delivered event) transition
-            States.M1DM2C: States.WaitForReturn,         # allow for an unconditional (ignore Reward delivered event) transition
-            States.M1DM2D: States.WaitForReturn,         # allow for an unconditional (ignore Reward delivered event) transition
+            States.Start: None,
+            States.CenterReward: States.TrialStarted,
+            # allow for an unconditional (ignore Reward delivered event) transition
+            States.TrialStarted: States.DecisionAbort,
+            States.M1CM2C: States.WaitForReturn,
+            # allow for an unconditional (ignore Reward delivered event) transition
+            States.M1CM2D: States.WaitForReturn,
+            # allow for an unconditional (ignore Reward delivered event) transition
+            States.M1DM2C: States.WaitForReturn,
+            # allow for an unconditional (ignore Reward delivered event) transition
+            States.M1DM2D: States.WaitForReturn,
+            # allow for an unconditional (ignore Reward delivered event) transition
             States.WaitForReturn: States.TrialAbort,
             States.TrialCompleted: States.CenterReward,
             States.TrialAbort: None,
@@ -75,20 +84,22 @@ class StateManager:
             States.End: None
         }
 
+        # the time out setting are just defaults
+        self.decision_time = 0
+        self.return_time = 0
+
         self.TransitionTimeOut = {
             States.Start: None,
             States.CenterReward: 0,
-            States.TrialStarted: 10,    # 10 seconds is a default value. It is replaces by the SetTimeOut functions.
+            States.TrialStarted: 10,  # 10 seconds is a default value. It is replaces by the SetTimeOut functions.
             States.M1CM2C: 0,
             States.M1CM2D: 0,
             States.M1DM2C: 0,
             States.M1DM2D: 0,
-            States.WaitForReturn: 10,    # 10 seconds is a default value. It is replaces by the SetTimeOut functions.
+            States.WaitForReturn: 10,  # 10 seconds is a default value. It is replaces by the SetTimeOut functions.
             States.TrialCompleted: 0,
             States.TrialAbort: None,
-            States.DecisionAbort: 0,
-            States.End: None
-        }
+            States.DecisionAbort: 0,}
 
         self.current_state = States.Start
         self.StateStartTime = time.time()

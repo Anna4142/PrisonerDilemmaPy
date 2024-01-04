@@ -1,5 +1,5 @@
 import cv2
-from VideoAnalyzer1 import Video_Analyzer  # Replace 'your_module' with the actual name of your module
+from Video_analyser_code.VideoAnalyser import Video_Analyzer  # Replace 'your_module' with the actual name of your module
 
 def test_video_analyzer_with_camera():
     # Create an instance of the Video_Analyzer class
@@ -7,7 +7,7 @@ def test_video_analyzer_with_camera():
 
     try:
         # Start the stream and process method
-        analyzer.stream_and_process()
+        analyzer.process_single_frame()
     except Exception as e:
         print(f"An error occurred: {e}")
     finally:

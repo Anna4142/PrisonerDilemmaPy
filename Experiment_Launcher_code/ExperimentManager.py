@@ -20,12 +20,13 @@ from Reward_manager.RewardManager import RewardManager
 from Data_analysis.logger import TrialLogger
 from modelling_opponent.OpponentType import OpponentType
 from Experiment_Launcher_code import Experimenter
-
+import atexit
 
 class ExperimentManager:
     def __init__(self):
         # initialize software components
-        self.videoAnalyser = Video_Analyzer()
+        self.mouse_id="1780"
+        self.videoAnalyser = Video_Analyzer(self.mouse_id)
         self.stateManager = StateManager()
         self.trial_logger = TrialLogger()
         self.stateHistories = {}
@@ -51,7 +52,8 @@ class ExperimentManager:
         self.dc_cnt = 0
         self.dd_cnt = 0
         self.center_cnt = 0
-
+        self.trial_logger.start_logging(self.mouse_id)
+        atexit.register(self.trial_logger.finalize_logging)
     def initialize_arduino(self):
         comport = "COM11"
         self.board = ArduinoDigital(comport)
@@ -59,6 +61,7 @@ class ExperimentManager:
     def StateActivity(self, state, mouse1simulated, mouse2simulated):
         if state == States.Start:
             Play(Sounds.Start)
+
             pass
 
         #elif state == States.WaitForStart:
@@ -179,10 +182,11 @@ class ExperimentManager:
             #self.numcompletedtrial += 1
             # Log that the trial has been aborted
             print("Trial has been aborted.")
-            self.opponent_choice = "N/A",
-            self.mouse_choice = "N/A",
-            self.mouse_reward = "-",
+            self.opponent_choice = "N/A"
+            self.mouse_choice = "N/A"
+            self.mouse_reward = "-"
             self.opponent_reward = "-"
+
             self.trial_logger.log_trial_data(self.numcompletedtrial, "Return Abort", self.opponent_choice, self.mouse_choice,self.mouse_reward, self.opponent_reward)
 
         elif state == States.DecisionAbort:
@@ -190,10 +194,11 @@ class ExperimentManager:
             #self.numcompletedtrial += 1
             # Handle DecisionAbort state
             print("IN DECISION ABORT")
-            self.opponent_choice = "N/A",
-            self.mouse_choice = "N/A",
-            self.mouse_reward = "-",
+            self.opponent_choice = "N/A"
+            self.mouse_choice = "N/A"
+            self.mouse_reward = "-"
             self.opponent_reward = "-"
+
             self.trial_logger.log_trial_data(self.numcompletedtrial, "Decision Abort", self.opponent_choice, self.mouse_choice,self.mouse_reward, self.opponent_reward)
 
         elif state == States.End:

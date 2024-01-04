@@ -11,7 +11,7 @@ from Arduino_related_code.ArduinoDigital import ArduinoDigital
 from Sound_manager_code.SoundManager import Play, Sounds
 from modelling_opponent.MouseMonitor import MouseMonitor
 from modelling_opponent.MouseMonitor import Locations
-from modelling_opponent.simulated_mouse import Simulated_mouse
+from modelling_opponent.FixedStrategyPrisoner import FixedStrategyPrisoner
 #from modelling_opponent.Simulated_learner import Simulated_mouse
 from State_manager_code.StateManager import StateManager
 from State_manager_code.StateManager import States
@@ -20,22 +20,24 @@ from Reward_manager.RewardManager import RewardManager
 from Data_analysis.logger import TrialLogger
 from modelling_opponent.OpponentType import OpponentType
 from Experiment_Launcher_code import Experimenter
-import atexit
+from Reward_manager.RewardManager import RewardManager
+
 
 class ExperimentManager:
-    def __init__(self):
+    def __init__(self, comport):
         # initialize software components
+        self.reward_manager = RewardManager(comport)
+
         self.mouse_id="1780"
         self.videoAnalyser = Video_Analyzer(self.mouse_id)
         self.stateManager = StateManager()
         self.trial_logger = TrialLogger()
-        self.stateHistories = {}
+
         #initialize data_analyser
         #self.data_analyzer = DataAnalyzer(self.data_path)
-        # Initialize Arduino board
-        self.initialize_arduino()
+
         #initialize reward manager
-        self.reward_manager = RewardManager(self.board, [7, 8, 9, 10, 11, 12])
+
         self.opponent_type = ""  ##for the logger
 
         # Set default reward and punishment times
@@ -52,16 +54,9 @@ class ExperimentManager:
         self.dc_cnt = 0
         self.dd_cnt = 0
         self.center_cnt = 0
-        self.trial_logger.start_logging(self.mouse_id)
-        atexit.register(self.trial_logger.finalize_logging)
-    def initialize_arduino(self):
-        comport = "COM11"
-        self.board = ArduinoDigital(comport)
 
-    def StateActivity(self, state, mouse1simulated, mouse2simulated):
+    def StateActivity(self, state, mouse1, mouse2):
         if state == States.Start:
-            Play(Sounds.Start)
-
             pass
 
         #elif state == States.WaitForStart:
@@ -70,22 +65,13 @@ class ExperimentManager:
         elif state == States.CenterReward:
             self.center_cnt += 1
             print("delivering reward in the center ")
-            self.reward_manager.deliver_reward('center', 1, self.punishment_time)
-            self.reward_manager.deliver_reward('center', 2, self.punishment_time)
-            """""
-            if not mouse1simulated:
-
-                self.reward_manager.deliver_reward('dd', 8, self.punishment_time)
-            if not mouse2simulated:
-                self.reward_manager.deliver_reward('dd', 11, self.punishment_time)
-            """
+            mouse1.DeliverReward(Locations.Center, self.center_reward_time)
+            mouse2.DeliverReward(Locations.Center, self.center_reward_time)
 
         elif state == States.TrialStarted:
-
-            if mouse1simulated:
-                mouse1simulated.NewTrial()
-            if mouse2simulated:
-                mouse2simulated.NewTrial()
+            Play(Sounds.Start)
+            mouse1.NewTrial()
+            mouse2.NewTrial()
 
         elif state == States.M1CM2C:
             # Actions for M1CM2C state
@@ -94,18 +80,8 @@ class ExperimentManager:
             self.mouse_reward = "12"
             self.opponent_reward = "12"
             self.cc_cnt += 1
-            self.reward_manager.deliver_reward('cc', 1, self.reward_time)
-            self.reward_manager.deliver_reward('cc', 2, self.reward_time)
-            """""
-            if mouse1simulated:
-                mouse1simulated.setRewardReceived()
-            else:
-                self.reward_manager.deliver_reward('cc', 1, self.reward_time)
-            if mouse2simulated:
-                mouse2simulated.setRewardReceived()
-            else:
-                self.reward_manager.deliver_reward('cc', 2, self.reward_time)
-            """
+            mouse1.DeliverReward(Locations.Cooperate, self.reward_time)
+            mouse2.DeliverReward(Locations.Cooperate, self.reward_time)
 
         elif state == States.M1CM2D:
             # Actions for M1CDM2D state
@@ -114,18 +90,8 @@ class ExperimentManager:
             self.mouse_reward = "0"
             self.opponent_reward = "15"
             self.cd_cnt += 1
-            self.reward_manager.deliver_reward('cd', 1, self.reward_time)
-            self.reward_manager.deliver_reward('cd', 2, self.punishment_time)
-            """""
-            if mouse1simulated:
-                mouse1simulated.setRewardReceived()
-            else:
-                self.reward_manager.deliver_reward('cd', 1, self.reward_time)
-            if mouse2simulated:
-                mouse2simulated.setRewardReceived()
-            else:
-                self.reward_manager.deliver_reward('cd', 2, self.punishment_time)
-            """
+            mouse1.DeliverReward(Locations.Defect, self.sucker_time)
+            mouse2.DeliverReward(Locations.Cooperate, self.temptation_time)
 
         elif state == States.M1DM2C:
             # Actions for M1DCM2C state
@@ -134,42 +100,21 @@ class ExperimentManager:
             self.mouse_reward = "15"
             self.opponent_reward = "0"
             self.dc_cnt += 1
-
-            self.reward_manager.deliver_reward('dc', 1, self.punishment_time)
-            self.reward_manager.deliver_reward('dc', 2, self.reward_time)
-            """""
-            if mouse1simulated:
-                mouse1simulated.setRewardReceived()
-            else:
-                self.reward_manager.deliver_reward('dc', 1, self.punishment_time)
-            if mouse2simulated:
-                mouse2simulated.setRewardReceived()
-            else:
-                self.reward_manager.deliver_reward('dc', 2, self.reward_time)
-            """
+            mouse1.DeliverReward(Locations.Cooperate, self.temptation_time)
+            mouse2.DeliverReward(Locations.Defect, self.sucker_time)
 
         elif state == States.M1DM2D:
-            # Actions for M1DDM2D state
+            # Actions for M1DM2D state
             self.mouse_choice = "D"
             self.opponent_choice = "D"
             self.mouse_reward = "15"
             self.opponent_reward = "15"
             self.dd_cnt += 1
-            self.reward_manager.deliver_reward('dd', 1, self.punishment_time)
-            self.reward_manager.deliver_reward('dd', 2, self.punishment_time)
-            """""
-            if mouse1simulated:
-                mouse1simulated.setRewardReceived()
-            else:
-                self.reward_manager.deliver_reward('dd', 1, self.punishment_time)
-            if mouse2simulated:
-                mouse2simulated.setRewardReceived()
-            else:
-                self.reward_manager.deliver_reward('dd', 2, self.punishment_time)
-            """
+            mouse1.DeliverReward(Locations.Defect, self.punishment_time)
+            mouse2.DeliverReward(Locations.Defect, self.punishment_time)
 
         elif state == States.WaitForReturn:
-            Play(Sounds.Abort)
+            pass
 
         elif state == States.TrialCompleted:
             # Increment the trial number counter
@@ -178,6 +123,7 @@ class ExperimentManager:
             self.trial_logger.log_trial_data(self.numcompletedtrial, "Completed Trial", self.opponent_choice, self.mouse_choice, self.mouse_reward, self.opponent_reward)
 
         elif state == States.TrialAbort:
+            Play(Sounds.Abort)
             # Increment the trial number counter
             #self.numcompletedtrial += 1
             # Log that the trial has been aborted
@@ -190,6 +136,7 @@ class ExperimentManager:
             self.trial_logger.log_trial_data(self.numcompletedtrial, "Return Abort", self.opponent_choice, self.mouse_choice,self.mouse_reward, self.opponent_reward)
 
         elif state == States.DecisionAbort:
+            Play(Sounds.Abort)
             # Increment the trial number counter
             #self.numcompletedtrial += 1
             # Handle DecisionAbort state
@@ -213,87 +160,60 @@ class ExperimentManager:
         print("opponent ", opponent_type)
         print("opponent strategy ", opponent1_strategy)
 
-
         if opponent_type == OpponentType.MOUSE_MOUSE:
-            mouse1 = MouseMonitor(self.videoAnalyser, 1)
-            mouse1sim = None
-            mouse2 = MouseMonitor(self.videoAnalyser, 2)
-            mouse2sim = None
-            self.opponent_type ="MOUSE_MOUSE"  ##for the logger
+            mouse1 = MouseMonitor(1, self.videoAnalyser, self.reward_manager)
+            mouse2 = MouseMonitor(2, self.videoAnalyser, self.reward_manager)
         elif opponent_type == OpponentType.MOUSE_COMPUTER:
-
-            mouse1 = MouseMonitor(self.videoAnalyser, 1)
-            mouse1sim = None
-            mouse2 = Simulated_mouse()
-            mouse2.SetStrategy(opponent1_strategy)
-            mouse2sim = mouse2
-            self.opponent_type = "MOUSE_COMPUTER"  ##for the logger
+            mouse1 = MouseMonitor(1, self.videoAnalyser, self.reward_manager)
+            mouse2 = FixedStrategyPrisoner(opponent1_strategy, probability=0.8)
         else:
-            mouse1 = Simulated_mouse()
-            mouse1.SetStrategy(opponent1_strategy)
-            mouse1sim = mouse1
-            mouse2 = Simulated_mouse()
-            mouse2.SetStrategy(opponent2_strategy)
-            mouse2sim = mouse2
-            self.opponent_type = "COMPUTER_COMPUTER" ##for the logger
+            mouse1 = FixedStrategyPrisoner(opponent1_strategy, probability=0.8)
+            mouse2 = FixedStrategyPrisoner(opponent2_strategy, probability=0.8)
 
-        self.stateManager.SetTimeOuts(decision_time, return_time)
+        self.stateManager.SetTimeOut(decision_time, return_time)
 
         currentstate = None
-        mouse1location = None
-        mouse2location = None
-
         state_history = []
 
         while currentstate != States.End:
-            trialevents = 0;
-            print("current state",currentstate)
-            if self.numcompletedtrial not in self.stateHistories:
-                self.stateHistories[self.numcompletedtrial] = []
-            self.stateHistories[self.numcompletedtrial].append(currentstate)
+            trialevents = 0
+            """""
+            if self.experimenter.check_for_start():
+                # If true, trigger the trial start event
+                print("Experimenter has initiated the trial.")
+                trialevents += Events.StartTrial.value
+            """
             if self.numcompletedtrial == self.num_trial:
                 trialevents += Events.LastTrial.value
-            else:
-                zone_activations = self.videoAnalyser.process_single_frame()
 
+            if self.reward_manager.is_reward_delivered():
+                trialevents += Events.RewardDelivered.value
 
-                if opponent_type == OpponentType.MOUSE_MOUSE:
+            zone_activations = self.videoAnalyser.process_single_frame()
+            #print("zone activations", zone_activations)  ##just for debugging purposes
 
-                    # Retrieve locations from both queues for real mice
-                    mouselocation = mouse1.getDecision(zone_activations)
-                    opponent_choice = mouse2.getDecision(zone_activations)
-                elif opponent_type == OpponentType.MOUSE_COMPUTER:
-                    # Retrieve location for the real mouse from its queue and get the simulated mouse's location
-                    mouselocation = mouse1.getDecision(zone_activations, currentstate)
+            first_opponent_choice = mouse1.getDecision(zone_activations)
+            Second_opponent_choice = mouse2.getDecision(zone_activations)
 
-                    opponent_choice = mouse2sim.get_mouse_location(Locations.Unknown, currentstate)
-                else:
+            if first_opponent_choice == Locations.Center:
+                trialevents = trialevents + Events.Mouse1InCenter.value
+            elif first_opponent_choice == Locations.Cooperate:
+                trialevents = trialevents + Events.Mouse1Cooporated.value
+            elif first_opponent_choice == Locations.Defect:
+                trialevents = trialevents + Events.Mouse1Defected.value
 
-
-                    mouselocation = mouse1sim.get_mouse_location(Locations.Unknown, currentstate)
-
-                    opponent_choice = mouse2sim.get_mouse_location(Locations.Unknown, currentstate)
-
-                if mouselocation == Locations.Center:
-                    trialevents = trialevents + Events.Mouse1InCenter.value
-                elif mouselocation == Locations.Cooperate:
-                    trialevents = trialevents + Events.Mouse1Cooporated.value
-                elif mouselocation == Locations.Defect:
-                    trialevents = trialevents + Events.Mouse1Defected.value
-
-                if opponent_choice == Locations.Center:
-                    trialevents = trialevents + Events.Mouse2InCenter.value
-                elif opponent_choice == Locations.Cooperate:
-                    trialevents = trialevents + Events.Mouse2Cooporated.value
-                elif opponent_choice == Locations.Defect:
-                    trialevents = trialevents + Events.Mouse2Defected.value
+            if Second_opponent_choice == Locations.Center:
+                trialevents = trialevents + Events.Mouse2InCenter.value
+            elif Second_opponent_choice == Locations.Cooperate:
+                trialevents = trialevents + Events.Mouse2Cooporated.value
+            elif Second_opponent_choice == Locations.Defect:
+                trialevents = trialevents + Events.Mouse2Defected.value
 
             nextstate = self.stateManager.DetermineState(trialevents)
 
-            # print(f"next State: {nextstate}")
             if nextstate != currentstate:
                 currentstate = nextstate
-                print(f"Current State: {nextstate}")
+                print(f"Current State: {currentstate}")
                 state_history.append(currentstate)
-                self.StateActivity(currentstate, mouse1sim, mouse2sim)
+                self.StateActivity(currentstate, mouse1, mouse2)
 

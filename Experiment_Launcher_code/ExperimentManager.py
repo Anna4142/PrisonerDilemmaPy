@@ -29,7 +29,7 @@ class ExperimentManager:
         # initialize software components
         self.reward_manager = RewardManager(comport)
 
-        self.mouse_id="1800"
+        self.mouse_id="2000"
         self.videoAnalyser = Video_Analyzer(self.mouse_id)
         self.stateManager = StateManager()
         self.trial_logger = TrialLogger()
@@ -76,9 +76,10 @@ class ExperimentManager:
         #    pass
 
         elif state == States.CenterReward:
-            if self.numcompletedtrial > 0:
-                if self.time_to_make_decision is not None:
-                    self.time_to_return_to_center = time.time() - self.time_to_make_decision
+            self.time_start = time.time()
+            self.time_to_make_decision = 0
+            self.time_to_return_to_center = 0
+
             self.center_cnt += 1
             print("delivering reward in the center ")
             mouse1.DeliverReward(Locations.Center, self.center_reward_time)
@@ -99,6 +100,7 @@ class ExperimentManager:
             self.cc_cnt += 1
             mouse1.DeliverReward(Locations.Cooperate, self.reward_time)
             mouse2.DeliverReward(Locations.Cooperate, self.reward_time)
+            self.time_to_make_decision = time.time() - self.time_start
 
         elif state == States.M1CM2D:
             # Actions for M1CDM2D state
@@ -109,6 +111,7 @@ class ExperimentManager:
             self.cd_cnt += 1
             mouse1.DeliverReward(Locations.Defect, self.sucker_time)
             mouse2.DeliverReward(Locations.Cooperate, self.temptation_time)
+            self.time_to_make_decision = time.time() - self.time_start
 
         elif state == States.M1DM2C:
             # Actions for M1DCM2C state
@@ -119,6 +122,7 @@ class ExperimentManager:
             self.dc_cnt += 1
             mouse1.DeliverReward(Locations.Cooperate, self.temptation_time)
             mouse2.DeliverReward(Locations.Defect, self.sucker_time)
+            self.time_to_make_decision = time.time() - self.time_start
 
         elif state == States.M1DM2D:
             # Actions for M1DM2D state
@@ -129,12 +133,17 @@ class ExperimentManager:
             self.dd_cnt += 1
             mouse1.DeliverReward(Locations.Defect, self.punishment_time)
             mouse2.DeliverReward(Locations.Defect, self.punishment_time)
+            self.time_to_make_decision = time.time() - self.time_start
 
         elif state == States.WaitForReturn:
-            self.time_to_make_decision = time.time()-self.time_start
+            pass
+
 
         elif state == States.TrialCompleted:
             # Increment the trial number counter
+            if self.numcompletedtrial > 0:
+                if self.time_to_make_decision is not None:
+                    self.time_to_return_to_center = time.time() - self.time_to_make_decision
             self.numcompletedtrial += 1
             print("Trial Completed. Number of completed trials: ", self.numcompletedtrial)
             self.trial_logger.log_trial_data(self.numcompletedtrial, "Completed Trial", self.opponent_choice,

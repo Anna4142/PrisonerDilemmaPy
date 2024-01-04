@@ -26,6 +26,7 @@ class Events(Enum):
     Mouse2Defected    = 32
     LastTrial         = 64
     RewardDelivered   = 128
+    TrialAbort=256
 
 
 class StateManager:
@@ -61,6 +62,7 @@ class StateManager:
                                    States.TrialCompleted: [Events.LastTrial.value],
                                    States.TrialAbort: [Events.LastTrial.value,
                                                        Events.Mouse1InCenter.value + Events.Mouse2InCenter.value],
+                                   States.DecisionAbort: [Events.TrialAbort.value],
 
             }
 
@@ -89,41 +91,60 @@ class StateManager:
         self.return_time = 0
 
         self.TransitionTimeOut = {
-            States.Start: None,
-            States.CenterReward: 0,
-            States.TrialStarted: 10,  # 10 seconds is a default value. It is replaces by the SetTimeOut functions.
-            States.M1CM2C: 0,
-            States.M1CM2D: 0,
-            States.M1DM2C: 0,
-            States.M1DM2D: 0,
-            States.WaitForReturn: 10,  # 10 seconds is a default value. It is replaces by the SetTimeOut functions.
-            States.TrialCompleted: 0,
-            States.TrialAbort: None,
-            States.DecisionAbort: 0,}
+            States.Start: (None, None),
+            States.CenterReward: (0, None),
+            States.TrialStarted: (10, None),
+            # 10 seconds is a default value. It will be replaced by the SetTimeOut functions.
+            States.M1CM2C: (0, None),
+            States.M1CM2D: (0, None),
+            States.M1DM2C: (0, None),
+            States.M1DM2D: (0, None),
+            States.WaitForReturn: (10, None),
+            # 10 seconds is a default value. It will be replaced by the SetTimeOut functions.
+            States.TrialCompleted: (0, None),
+            States.TrialAbort: (None, None),
+            States.DecisionAbort: (0, None),
+        }
 
         self.current_state = States.Start
         self.StateStartTime = time.time()
 
-    def SetTimeOut(self, decision_time, return_time):
-        self.TransitionTimeOut[States.TrialStarted] = decision_time
-        self.TransitionTimeOut[States.WaitForReturn] = return_time
+    def SetTimeOut(self, decision_time, return_time, force_end_time):
+        # Update each state's timeout with the force_end_time
+        for state in self.TransitionTimeOut:
+            current_timeout = self.TransitionTimeOut[state][0]
+            self.TransitionTimeOut[state] = (current_timeout, force_end_time)
+
+
 
     def DetermineState(self, events):
-        TransitionEvents = self.TransitionEvent[self.current_state]
+            TransitionEvents = self.TransitionEvent[self.current_state]
 
-        # Check and Perform Event base transition
-        for i, event in enumerate(TransitionEvents):
-            if event & events == event:
-                # Transition to the next state based on the event
-                self.current_state = self.NextState[self.current_state][i]
-                self.StateStartTime = time.time()
-                return self.current_state
+            # Check and Perform Event base transition
+            for i, event in enumerate(TransitionEvents):
+                if event & events == event:
+                    # Transition to the next state based on the event
+                    self.current_state = self.NextState[self.current_state][i]
+                    self.StateStartTime = time.time()
+                    return self.current_state
 
-        # Check and Perform timeout base transition
-        if self.TimeOutState[self.current_state]:
-            if time.time() - self.StateStartTime > self.TransitionTimeOut[self.current_state]:
-                # Transition to the timeout state
-                self.current_state = self.TimeOutState[self.current_state]
-                self.StateStartTime = time.time()
+            # Check and Perform timeout based transition
+            current_state_timeout, force_end_time = self.TransitionTimeOut[self.current_state]
 
-        return self.current_state
+            if current_state_timeout is not None:
+                if time.time() - self.StateStartTime > current_state_timeout:
+                    # Transition to the timeout state
+                    self.current_state = self.TimeOutState[self.current_state]
+                    self.StateStartTime = time.time()
+
+                    return self.current_state
+
+            # Check and Perform force_end_time based transition
+            if force_end_time is not None:
+                if time.time() - self.StateStartTime > force_end_time:
+
+                    self.current_state = States.End
+                    self.StateStartTime = time.time()
+
+
+            return self.current_state

@@ -8,7 +8,7 @@ import pandas as pd
 
 
 class Video_Analyzer:
-    def __init__(self,filename):
+    def __init__(self,filename,opponenttype):
         self.root = tk.Tk()
 
         # Initialize the Vimba SDK and VideoAnalyzer
@@ -16,12 +16,16 @@ class Video_Analyzer:
 
             self.vimba = vimba
 
-        current_datetime = pd.Timestamp.now()
+
 
         # Formatting the date and time
-        datetime_string = current_datetime.strftime("%Y%m%d")
+        current_datetime = pd.Timestamp.now()
+        datetime_string = current_datetime.strftime("%Y%m%d_%H%M%S")
         # Format the file path to include the filename and the date string
-        self.video_file_loc = f'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/video_captures/{filename}{datetime_string}.avi'
+        if opponenttype=="MOUSE_COMPUTER" :
+         self.video_file_loc = f'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/{opponenttype}/{filename}/video_captures/{datetime_string}.avi'
+        else:
+         self.video_file_loc = f'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/{opponenttype}/video_captures/{datetime_string}.avi'
 
         self.video_writer = VideoWriter(output_file=self.video_file_loc)
         self.regions = self.define_regions()
@@ -267,7 +271,7 @@ class Video_Analyzer:
                 cv2.waitKey(1)
 
                 #zone_activations = self.check_zones(frame)
-                print(self.zone_activations)
+
                 return self.zone_activations
 
     def get_zone_activations(self):

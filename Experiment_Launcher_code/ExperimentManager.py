@@ -66,11 +66,12 @@ class ExperimentManager:
             self.time_start = time.time()
             self.time_to_make_decision =0
             self.time_to_return_to_center = 0
-            self. timestamps = {
-            'Start Time': self.time_start,
-            'Decision Time': self.time_to_make_decision,
-            'Return Time': self.time_to_return_to_center
-        }
+            self.timestamps = {
+                'Start Time': self.time_start,
+                'Decision Time': self.time_to_make_decision,
+                'Return Time': self.time_to_return_to_center
+            }
+
 
         #elif state == States.WaitForStart:
         #    pass
@@ -80,6 +81,7 @@ class ExperimentManager:
             self.time_to_make_decision = 0
             self.time_to_return_to_center = 0
 
+            print(self.timestamps)
             self.center_cnt += 1
             print("delivering reward in the center ")
             mouse1.DeliverReward(Locations.Center, self.center_reward_time)
@@ -141,10 +143,17 @@ class ExperimentManager:
 
         elif state == States.TrialCompleted:
             # Increment the trial number counter
-            if self.numcompletedtrial > 0:
-                if self.time_to_make_decision is not None:
-                    self.time_to_return_to_center = time.time() - self.time_to_make_decision
             self.numcompletedtrial += 1
+            if self.numcompletedtrial > 0:
+
+                    self.time_to_return_to_center = time.time() - self.time_to_make_decision- self.time_start
+            self.timestamps = {
+                'Start Time': self.time_start,
+                'Decision Time': self.time_to_make_decision,
+                'Return Time': self.time_to_return_to_center
+            }
+
+
             print("Trial Completed. Number of completed trials: ", self.numcompletedtrial)
             self.trial_logger.log_trial_data(self.numcompletedtrial, "Completed Trial", self.opponent_choice,
                                              self.mouse_choice, self.mouse_reward, self.opponent_reward,

@@ -5,7 +5,7 @@
 from pynput.keyboard import Key, Listener
 
 class Video_Analyzer:
-    def __init__(self):
+    def __init__(self, mouseID):
         self.mouseLocations = [0] * 6     # a list of 6 zeros
         self.mouse = 1
         listener = Listener(on_press = self.on_press, on_release = self.on_release)

@@ -22,7 +22,7 @@ def main():
         opponent_configuration = experiment_gui.get_opponent_configuration()
 
         # Instantiate software components
-        video_analyzer = Video_Analyzer()
+        video_analyzer = Video_Analyzer("1780")
         reward_manager = RewardManager(comport_name)
 
         if opponent_configuration.get("opponent1_type") == OpponentType.MOUSE:

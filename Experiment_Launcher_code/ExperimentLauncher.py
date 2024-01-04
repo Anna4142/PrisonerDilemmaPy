@@ -23,7 +23,7 @@ def main():
         opponent2_probability = settings.get('opponent2_probability')
 
         # Initialize and start the experiment
-        expManager = ExperimentManager()
+        expManager = ExperimentManager(comport_name)
         print("Experiment manager now running")
         expManager.start_streaming_exp(experiment_name, num_trials, decision_time, return_time, opponent_type,
                                        opponent1_strategy, opponent2_strategy)

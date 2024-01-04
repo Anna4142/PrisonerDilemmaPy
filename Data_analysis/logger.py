@@ -7,8 +7,8 @@ class TrialLogger:
 
     def start_logging(self, filename):
         current_datetime = pd.Timestamp.now()
-        datetime_string = current_datetime.strftime("%Y%m%d")
-        filepath = f'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/data_from_trials/{filename}.csv'
+        datetime_string = current_datetime.strftime("%Y%m%d_%H%M%S")
+        filepath = f'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/{filename}/data_from_trials/{datetime_string}.csv'
 
         self.csv_file = open(filepath, 'w', newline='')
         self.csv_writer = csv.writer(self.csv_file)

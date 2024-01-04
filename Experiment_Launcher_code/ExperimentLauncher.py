@@ -16,6 +16,7 @@ def main():
         num_trials = settings.get('num_trials')
         return_time = settings.get('return_time')
         decision_time = settings.get('decision_time')
+        mouse_id=settings.get('mouse_id')
         opponent_type = settings.get('opponent_type')
         opponent1_strategy = settings.get('opponent1_strategy')
         opponent2_strategy = settings.get('opponent2_strategy')
@@ -23,7 +24,7 @@ def main():
         opponent2_probability = settings.get('opponent2_probability')
 
         # Initialize and start the experiment
-        expManager = ExperimentManager(comport_name)
+        expManager = ExperimentManager(comport_name,mouse_id)
         print("Experiment manager now running")
         expManager.start_streaming_exp(experiment_name, num_trials, decision_time, return_time, opponent_type,
                                        opponent1_strategy, opponent2_strategy)

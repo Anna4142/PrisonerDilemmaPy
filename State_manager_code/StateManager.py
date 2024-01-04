@@ -26,6 +26,7 @@ class Events(Enum):
     Mouse2Defected    = 32
     LastTrial         = 64
     RewardDelivered   = 128
+    TrialAbort=256
 
 
 class StateManager:
@@ -61,6 +62,7 @@ class StateManager:
                                    States.TrialCompleted: [Events.LastTrial.value],
                                    States.TrialAbort: [Events.LastTrial.value,
                                                        Events.Mouse1InCenter.value + Events.Mouse2InCenter.value],
+                                   States.DecisionAbort: [Events.TrialAbort.value],
 
             }
 

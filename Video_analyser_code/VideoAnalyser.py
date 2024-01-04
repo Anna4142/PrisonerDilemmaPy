@@ -1,12 +1,11 @@
 from vimba import *
-from vidgear.gears import WriteGear
 import time
 import cv2
 import numpy as np
 import tkinter as tk
 from Video_analyser_code.VideoWriter import VideoWriter
 import pandas as pd
-from datetime import datetime
+
 
 class Video_Analyzer:
     def __init__(self,filename):
@@ -169,8 +168,8 @@ class Video_Analyzer:
                 zone_activation[idx] = 1
 
         # Optional: Print the number of contours detected in each region
-        for region_key, count in contour_counts.items():
-            print(f"{region_key}: Number of contours detected = {count}")
+        #for region_key, count in contour_counts.items():
+            #print(f"{region_key}: Number of contours detected = {count}")
 
         return zone_activation
 
@@ -233,11 +232,12 @@ class Video_Analyzer:
 
         return frame
 
-    def process_single_frame(self):
+    def process_single_frame(self, timestamps):
         with self.vimba:
             with self.cam:
                 frame = self.cam.get_frame().as_opencv_image()
-                self.video_writer.write_frame(frame)
+
+                self.video_writer.write_frame(frame, timestamps)
                 # Increment and display the frame number
                 self.frame_counter += 1
 
@@ -246,7 +246,7 @@ class Video_Analyzer:
                 frame = self.draw_regions(frame, self.pixel_sums)
                 #self.zone_activations = self.check_zones(frame)  ##FOR THRESHOLD BASED APPROACH
                 contours = self.find_contours(frame)
-                print("no of contours detected", len(contours))
+                #print("no of contours detected", len(contours))
                 cv2.drawContours(frame, contours, -1, (0, 0, 0), 5)
                 self.zone_activations = self.check_zones(frame,contours)
                 self.exp_zone = self.zone_activations[-1] if self.zone_activations else None

@@ -102,7 +102,7 @@ class StateManager:
             States.WaitForReturn: 10,  # 10 seconds is a default value. It is replaces by the SetTimeOut functions.
             States.TrialCompleted: 0,
             States.TrialAbort: None,
-            States.DecisionAbort: 0,}
+            States.DecisionAbort: None,}
 
         self.current_state = States.Start
         self.StateStartTime = time.time()

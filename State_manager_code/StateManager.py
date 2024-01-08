@@ -44,7 +44,7 @@ class StateManager:
             States.WaitForReturn:[States.TrialCompleted],
             States.TrialCompleted:[States.End],
             States.TrialAbort:[States.End, States.TrialStarted],
-            States.DecisionAbort:[States.End],
+            States.DecisionAbort:[States.End,States.TrialStarted],
             States.End:[States.End]
         }
 
@@ -63,7 +63,7 @@ class StateManager:
                                    States.TrialCompleted: [Events.LastTrial.value],
                                    States.TrialAbort: [Events.LastTrial.value,
                                                        Events.Mouse1InCenter.value + Events.Mouse2InCenter.value],
-                                   States.DecisionAbort: [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value],
+                                   States.DecisionAbort: [Events.LastTrial.value,Events.Mouse1InCenter.value + Events.Mouse2InCenter.value],
 
             }
 
@@ -83,7 +83,7 @@ class StateManager:
             States.WaitForReturn: States.TrialAbort,
             States.TrialCompleted: States.CenterReward,
             States.TrialAbort: None,
-            States.DecisionAbort: States.TrialStarted,
+            States.DecisionAbort: None,
             States.End: None
         }
 
@@ -102,7 +102,7 @@ class StateManager:
             States.WaitForReturn: 10,  # 10 seconds is a default value. It is replaces by the SetTimeOut functions.
             States.TrialCompleted: 0,
             States.TrialAbort: None,
-            States.DecisionAbort: 0,}
+            States.DecisionAbort: None,}
 
         self.current_state = States.Start
         self.StateStartTime = time.time()

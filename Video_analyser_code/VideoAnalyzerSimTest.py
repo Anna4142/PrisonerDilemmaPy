@@ -5,7 +5,7 @@ import time
 
 # main code for VideoAnalyzerSim unit test
 print("test program for VideoAnalyzerStub")
-videoAnalyzer = Video_Analyzer()
+videoAnalyzer = Video_Analyzer("12")
 mouse1 = MouseMonitor(videoAnalyzer, 1)
 mouse2 = MouseMonitor(videoAnalyzer, 2)
 

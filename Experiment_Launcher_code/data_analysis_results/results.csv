@@ -1,0 +1,2 @@
+Date,Num trials,Mean Reward,Total Reward,Water to be given,Mean Reward by Opponent,Average Time to Make Decision,Average Time to Return to Center,Number of C Choices,Number of D Choices,Percentage of C Choices,Percentage of D Choices
+20240114,1,0.032,0.032,1.468,{'C': 0.03},1.2890605926513672,0.0,1,0,100.0,0.0

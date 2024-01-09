@@ -11,7 +11,7 @@ class ExperimentGUI:
         # create window layout
         self.system_panel = tk.Frame(self.window, width = 490, height = 60, relief = tk.RAISED, borderwidth = 2)
         tk.Label(self.system_panel, text = "System Parameters").place(x = 210, y = 2)
-        self.experiment_panel = tk.Frame(self.window, width=490, height=245, relief=tk.RAISED, borderwidth=2)
+        self.experiment_panel = tk.Frame(self.window, width=490, height=300, relief=tk.RAISED, borderwidth=2)
         tk.Label(self.experiment_panel, text ="Experiment Parameters").place(x = 200, y = 2)
         self.first_opponent_panel = tk.Frame(self.window, width=245, height=250, relief=tk.RAISED, borderwidth=2)
         tk.Label(self.first_opponent_panel, text ="First Computer Opponent Strategy").place(x = 20, y = 2)
@@ -19,15 +19,16 @@ class ExperimentGUI:
         tk.Label(self.second_opponent_panel, text ="Second Computer Opponent Strategy").place(x = 20, y = 2)
         self.system_panel.place(x = 5, y = 5)
         self.experiment_panel.place(x = 5, y = 70)
-        self.first_opponent_panel.place(x = 5, y = 320)
-        self.second_opponent_panel.place(x = 250, y = 320)
+        self.first_opponent_panel.place(x = 5, y = 370)
+        self.second_opponent_panel.place(x = 250, y = 370)
 
         # Initialize entry variables
         self.experiment_name = tk.StringVar(value = "Experiment 1")
         self.comport_name = tk.StringVar(value = "COM11")
-        self.num_trials_var = tk.StringVar(value = "4")
+        self.num_trials_var = tk.StringVar(value = "20")
         self.return_time_var = tk.StringVar(value = "30")
         self.decision_time_var = tk.StringVar(value = "30")
+        self.mouse_id_var = tk.StringVar(value="1777")
         self.selected_opp = tk.StringVar(value = None)
         self.first_opponent_type = tk.StringVar(value = None)
         self.second_opponent_type = tk.StringVar(value = None)
@@ -39,6 +40,7 @@ class ExperimentGUI:
         self.populate_system_parameters_panel()
         self.create_input_fields()
         self.create_opp_options()
+
         self.create_strategy_option(self.first_opponent_panel, self.first_opponent_type, self.first_opponent_prob)
         self.create_strategy_option(self.second_opponent_panel, self.second_opponent_type, self.second_opponent_prob)
 
@@ -46,6 +48,7 @@ class ExperimentGUI:
         self.start_button = tk.Button(self.window, text="Start Experiment", command=self.start_experiment)
         self.start_button.place(x = 205, y = 590)
         self.window.mainloop()
+
 
     def populate_system_parameters_panel(self):
         tk.Label(self.system_panel, text="COM port name:").place(x = 30, y = 30)
@@ -62,7 +65,7 @@ class ExperimentGUI:
 
     def create_opp_options(self):
         # Create opponent selection radio buttons
-        tk.Label(self.experiment_panel, text="Select the opponent:").place(x = 30, y = 150)
+        tk.Label(self.experiment_panel, text="Select the opponent:").place(x = 30, y = 180)
         self.selected_opp.set("mouse_computer")
         opp_options = [ ("Mouse and Mouse", "mouse_mouse"),
                         ("Mouse and Computer", "mouse_computer"),
@@ -71,7 +74,7 @@ class ExperimentGUI:
         buttonoffset = 0
         for text, mode in opp_options:
             radiobutton = tk.Radiobutton(self.experiment_panel, text=text, variable=self.selected_opp, value=mode)
-            radiobutton.place(x = 200, y = 150 + buttonoffset * 30)
+            radiobutton.place(x = 200, y = 180 + buttonoffset * 30)
             buttonoffset += 1
 
     def create_input_fields(self):
@@ -90,6 +93,10 @@ class ExperimentGUI:
         tk.Label(self.experiment_panel, text="Return to center (seconds):").place(x = 30, y = 120)
         self.decision_time_entry = tk.Entry(self.experiment_panel, textvariable=self.decision_time_var)
         self.decision_time_entry.place(x = 200, y = 120)
+
+        tk.Label(self.experiment_panel, text="Mouse ID:").place(x=30, y=150)
+        mouse_id_entry = tk.Entry(self.experiment_panel, textvariable=self.mouse_id_var)
+        mouse_id_entry.place(x=200, y=150)
 
     def create_strategy_option(self, panel, opvar, probvar):
         # Define strategy options
@@ -172,6 +179,7 @@ class ExperimentGUI:
             num_trials = int(self.num_trials_var.get())
             return_time = int(self.return_time_var.get())
             decision_time = int(self.decision_time_var.get())
+            mouse_id = int(self.mouse_id_var.get())
             opponent_type=self.selected_opp.get()
 
             first_opponent_strategy = self.first_opponent_type.get()
@@ -183,7 +191,7 @@ class ExperimentGUI:
                 'num_trials': num_trials,
                 'return_time': return_time,
                 'decision_time': decision_time,
-
+                'mouse_id': mouse_id,
                 'opponent_type': self.get_opponent_type(opponent_type),
                 'opponent1_strategy': first_opponent_strategy,
                 'opponent2_strategy': second_opponent_strategy,

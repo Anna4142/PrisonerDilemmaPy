@@ -20,6 +20,8 @@ class RewardManager:
         else:
             valve_map = self.reward_mapping.get('second_prisoner', {})
         valveindex = valve_map.get(location)
+        if valveindex is None:
+            valveindex=4
         self.valves[valveindex].OpenValve(reward_time)
 
     def is_reward_delivered(self):

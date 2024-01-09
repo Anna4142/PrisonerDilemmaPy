@@ -14,6 +14,7 @@ class States(Enum):
     TrialCompleted      = 9
     TrialAbort          = 10
     DecisionAbort       = 11
+
     End                 = 12
 
 class Events(Enum):
@@ -26,6 +27,7 @@ class Events(Enum):
     Mouse2Defected    = 32
     LastTrial         = 64
     RewardDelivered   = 128
+
 
 
 class StateManager:
@@ -61,6 +63,7 @@ class StateManager:
                                    States.TrialCompleted: [Events.LastTrial.value],
                                    States.TrialAbort: [Events.LastTrial.value,
                                                        Events.Mouse1InCenter.value + Events.Mouse2InCenter.value],
+                                   States.DecisionAbort: [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value],
 
             }
 
@@ -99,7 +102,7 @@ class StateManager:
             States.WaitForReturn: 10,  # 10 seconds is a default value. It is replaces by the SetTimeOut functions.
             States.TrialCompleted: 0,
             States.TrialAbort: None,
-            States.DecisionAbort: 0,}
+            States.DecisionAbort: None,}
 
         self.current_state = States.Start
         self.StateStartTime = time.time()

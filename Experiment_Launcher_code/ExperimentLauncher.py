@@ -16,7 +16,7 @@ def main():
     experiment_gui.setup_gui()
 
     # After the GUI is closed, get the settings using the appropriate methods
-    if experiment_gui.is_data_valid():
+    if experiment_gui.experiment_started():
         comport_name = experiment_gui.get_com_port()
         experiment_parameters = experiment_gui.get_experiment_parameters()
         opponent_configuration = experiment_gui.get_opponent_configuration()

@@ -36,7 +36,7 @@ class ExperimentGUI:
         self.second_opponent_prob = tk.StringVar(value = None)
 
         # Control Variables
-        self.data_valid = False
+        self.start_button_clicked = False
 
     def setup_gui(self):
         # Entry fields for trials, duration, etc.
@@ -117,7 +117,7 @@ class ExperimentGUI:
             return
 
         # Display a confirmation or start the experiment
-        self.data_valid = True
+        self.start_button_clicked = True
         messagebox.showinfo("Experiment Starting", "The experiment is now starting with the provided settings.")
         self.window.destroy()
 
@@ -163,8 +163,8 @@ class ExperimentGUI:
             messagebox.showerror("Invalid Input", "Please enter valid numbers for trials, duration, and decision time.")
             return None
 
-    def is_data_valid(self):
-        return self.data_valid
+    def experiment_started(self):
+        return self.start_button_clicked
 
     def get_com_port(self):
         return self.comport_name.get()

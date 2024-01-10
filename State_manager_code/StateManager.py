@@ -37,12 +37,11 @@ class StateManager:
             States.Start : [States.CenterReward],
             States.CenterReward : [States.TrialStarted],
             States.TrialStarted : [States.M1CM2C, States.M1CM2D, States.M1DM2C, States.M1DM2D],
-            States.M1CM2C : [States.WaitForReturn],
-            States.M1CM2D: [States.WaitForReturn],
-            States.M1DM2C: [States.WaitForReturn],
-            States.M1DM2D: [States.WaitForReturn],
-            States.WaitForReturn:[States.TrialCompleted],
-            States.TrialCompleted:[States.End],
+            States.M1CM2C : [States.TrialCompleted],
+            States.M1CM2D: [States.TrialCompleted],
+            States.M1DM2C: [States.TrialCompleted],
+            States.M1DM2D: [States.TrialCompleted],
+            States.TrialCompleted:[States.CenterReward,States.End],
             States.TrialAbort:[States.End, States.TrialStarted],
             States.DecisionAbort:[States.End,States.TrialStarted],
             States.End:[States.End]
@@ -59,30 +58,24 @@ class StateManager:
                                    States.M1CM2D: [Events.RewardDelivered.value],
                                    States.M1DM2C: [Events.RewardDelivered.value],
                                    States.M1DM2D: [Events.RewardDelivered.value],
-                                   States.WaitForReturn: [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value],
-                                   States.TrialCompleted: [Events.LastTrial.value],
+
+                                   States.TrialCompleted: [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value,Events.LastTrial.value],
                                    States.TrialAbort: [Events.LastTrial.value,
                                                        Events.Mouse1InCenter.value + Events.Mouse2InCenter.value],
                                    States.DecisionAbort: [Events.LastTrial.value,
-                                                       Events.Mouse1InCenter.value + Events.Mouse2InCenter.value],
+                                                       Events.Mouse1InCenter.value ],
 
             }
 
         self.TimeOutState = {
             States.Start: None,
             States.CenterReward: States.TrialStarted,
-            # allow for an unconditional (ignore Reward delivered event) transition
             States.TrialStarted: States.DecisionAbort,
-            States.M1CM2C: States.WaitForReturn,
-            # allow for an unconditional (ignore Reward delivered event) transition
-            States.M1CM2D: States.WaitForReturn,
-            # allow for an unconditional (ignore Reward delivered event) transition
-            States.M1DM2C: States.WaitForReturn,
-            # allow for an unconditional (ignore Reward delivered event) transition
-            States.M1DM2D: States.WaitForReturn,
-            # allow for an unconditional (ignore Reward delivered event) transition
-            States.WaitForReturn: States.TrialAbort,
-            States.TrialCompleted: States.CenterReward,
+            States.M1CM2C: States.TrialCompleted,
+            States.M1CM2D:States.TrialCompleted,
+            States.M1DM2C: States.TrialCompleted,
+            States.M1DM2D: States.TrialCompleted,
+            States.TrialCompleted: States.TrialAbort,
             States.TrialAbort: None,
             States.DecisionAbort: None,
             States.End: None
@@ -100,8 +93,7 @@ class StateManager:
             States.M1CM2D: 0,
             States.M1DM2C: 0,
             States.M1DM2D: 0,
-            States.WaitForReturn: 10,  # 10 seconds is a default value. It is replaces by the SetTimeOut functions.
-            States.TrialCompleted: 0,
+            States.TrialCompleted: 10, # 10 seconds is a default value. It is replaces by the SetTimeOut functions.
             States.TrialAbort: None,
             States.DecisionAbort: None,}
 
@@ -110,7 +102,7 @@ class StateManager:
 
     def SetTimeOut(self, decision_time, return_time):
         self.TransitionTimeOut[States.TrialStarted] = decision_time
-        self.TransitionTimeOut[States.WaitForReturn] = return_time
+        self.TransitionTimeOut[States.TrialCompleted] = return_time
 
     def DetermineState(self, events):
         TransitionEvents = self.TransitionEvent[self.current_state]
@@ -126,8 +118,9 @@ class StateManager:
         # Check and Perform timeout base transition
         if self.TimeOutState[self.current_state]:
             if time.time() - self.StateStartTime > self.TransitionTimeOut[self.current_state]:
-                # Transition to the timeout state
+
                 self.current_state = self.TimeOutState[self.current_state]
+                print("timeout state",self.current_state )
                 self.StateStartTime = time.time()
 
         return self.current_state

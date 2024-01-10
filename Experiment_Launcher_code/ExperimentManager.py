@@ -51,11 +51,11 @@ class ExperimentManager:
         self.opponent_type = ""  ##for the logger
 
         # Set default reward and punishment times
-        self.reward_time = 0.2
+        self.reward_time = 0.02
         self.sucker_time = 0
-        self.temptation_time = 0.4
-        self.punishment_time = 0.1
-        self.center_reward_time = 0.1
+        self.temptation_time = 0.04
+        self.punishment_time = 0.01
+        self.center_reward_time = 0.09
 
         # initialize experiment control variables
         self.numcompletedtrial = 0
@@ -103,8 +103,8 @@ class ExperimentManager:
             # Actions for M1CM2C state
             self.mouse_choice = "C"
             self.opponent_choice = "C"
-            self.mouse_reward = "0.01"
-            self.opponent_reward = "0.01"
+            self.mouse_reward = "0.03"
+            self.opponent_reward = "0.03"
             self.mouse_center_reward="0.0"
             self.opponent_center_reward = "0.0"
             self.cc_cnt += 1
@@ -117,7 +117,7 @@ class ExperimentManager:
             self.mouse_choice = "C"
             self.opponent_choice = "D"
             self.mouse_reward = "0"
-            self.opponent_reward = "0.02"
+            self.opponent_reward = "0.06"
             self.mouse_center_reward = "0.0"
             self.opponent_center_reward = "0.0"
             self.cd_cnt += 1
@@ -129,7 +129,7 @@ class ExperimentManager:
             # Actions for M1DCM2C state
             self.mouse_choice = "D"
             self.opponent_choice = "C"
-            self.mouse_reward = "0.02"
+            self.mouse_reward = "0.06"
             self.opponent_reward = "0"
             self.mouse_center_reward = "0.0"
             self.opponent_center_reward = "0.0"
@@ -142,8 +142,8 @@ class ExperimentManager:
             # Actions for M1DM2D state
             self.mouse_choice = "D"
             self.opponent_choice = "D"
-            self.mouse_reward = "0.005"
-            self.opponent_reward = "0.005"
+            self.mouse_reward = "0.015"
+            self.opponent_reward = "0.015"
             self.mouse_center_reward = "0.0"
             self.opponent_center_reward = "0.0"
             self.dd_cnt += 1
@@ -151,8 +151,7 @@ class ExperimentManager:
             mouse2.DeliverReward(Locations.Defect, self.punishment_time)
             self.time_to_make_decision = time.time() - self.time_start
 
-        elif state == States.WaitForReturn:
-            pass
+
 
 
         elif state == States.TrialCompleted:
@@ -167,8 +166,8 @@ class ExperimentManager:
                 'Return Time': self.time_to_return_to_center
             }
             if self.visit_cen==True:
-                self.mouse_center_reward = "0.005"
-                self.opponent_center_reward = "0.005"
+                self.mouse_center_reward = "0.002"
+                self.opponent_center_reward = "0.002"
             else:
                 self.mouse_center_reward = "0.00"
                 self.opponent_center_reward = "0.00"

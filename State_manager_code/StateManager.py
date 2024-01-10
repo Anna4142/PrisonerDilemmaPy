@@ -63,7 +63,8 @@ class StateManager:
                                    States.TrialCompleted: [Events.LastTrial.value],
                                    States.TrialAbort: [Events.LastTrial.value,
                                                        Events.Mouse1InCenter.value + Events.Mouse2InCenter.value],
-                                   States.DecisionAbort: [Events.LastTrial.value,Events.Mouse1InCenter.value + Events.Mouse2InCenter.value],
+                                   States.DecisionAbort: [Events.LastTrial.value,
+                                                       Events.Mouse1InCenter.value + Events.Mouse2InCenter.value],
 
             }
 

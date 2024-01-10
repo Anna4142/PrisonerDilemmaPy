@@ -88,7 +88,7 @@ class DataAnalyzer:
             "Num trials": num_trials,
             "Mean Reward": reward_mean,
             "Total Reward": total_reward,
-            "Reward to be Delivered": reward_to_be_delivered,
+            "Water to be given": reward_to_be_delivered,
             "Mean Reward by Opponent": mean_reward_by_opponent_choice.to_dict(),
             "Average Time to Make Decision": average_time_to_make_decision,
             "Average Time to Return to Center": average_time_to_return_to_center,
@@ -102,7 +102,7 @@ class DataAnalyzer:
     def save_results_to_file(self, results):
         result_file_path = self.data_file_path.replace('data_from_trials', 'data_analysis_results').replace(
             '.csv', '.txt')
-
+        print("results file path",result_file_path)
         with open(result_file_path, 'w') as file:
             for key, value in results.items():
                 file.write(f'{key}: {value}\n')

@@ -25,9 +25,10 @@ class ExperimentGUI:
         # Initialize entry variables
         self.experiment_name = tk.StringVar(value = "Experiment 1")
         self.comport_name = tk.StringVar(value = "COM11")
-        self.num_trials_var = tk.StringVar(value = "4")
-        self.return_time_var = tk.StringVar(value = "15")
-        self.decision_time_var = tk.StringVar(value = "15")
+        self.num_trials_var = tk.StringVar(value = "20")
+        self.return_time_var = tk.StringVar(value = "30")
+        self.decision_time_var = tk.StringVar(value = "30")
+        self.mouse_id_var = tk.StringVar(value="1777")
         self.first_opponent_type = tk.StringVar(value = None)
         self.second_opponent_type = tk.StringVar(value = None)
         self.first_opponent_strategy = tk.StringVar(value = None)
@@ -51,6 +52,7 @@ class ExperimentGUI:
         self.start_button = tk.Button(self.window, text="Start Experiment", command=self.start_experiment)
         self.start_button.place(x = 205, y = 570)
         self.window.mainloop()
+
 
     def populate_system_parameters_panel(self):
         tk.Label(self.system_panel, text="COM port name:").place(x = 30, y = 30)
@@ -92,6 +94,10 @@ class ExperimentGUI:
         tk.Label(self.experiment_panel, text="Return to center (seconds):").place(x = 30, y = 120)
         self.decision_time_entry = tk.Entry(self.experiment_panel, textvariable=self.decision_time_var)
         self.decision_time_entry.place(x = 200, y = 120)
+
+        tk.Label(self.experiment_panel, text="Mouse ID:").place(x=30, y=150)
+        mouse_id_entry = tk.Entry(self.experiment_panel, textvariable=self.mouse_id_var)
+        mouse_id_entry.place(x=200, y=150)
 
     def create_strategy_option(self, panel, opvar, probvar):
         # Define strategy options
@@ -152,11 +158,11 @@ class ExperimentGUI:
             num_trials = int(self.num_trials_var.get())
             return_time = int(self.return_time_var.get())
             decision_time = int(self.decision_time_var.get())
+            mouse_id = int(self.mouse_id_var.get())
             opponent_type=self.selected_opp.get()
 
             first_opponent_strategy = self.first_opponent_type.get()
             second_opponent_strategy = self.second_opponent_type.get()
-
 
         except ValueError:
             # Handle the case where the input is not a valid integer

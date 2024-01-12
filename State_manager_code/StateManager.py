@@ -58,7 +58,8 @@ class StateManager:
                 States.TrialCompleted: [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value,
                                         Events.LastTrial.value],
                 States.ReturnTimeOut: [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value],
-                States.DecisionTimeOut: [ Events.Mouse1InCenter.value]   ##TEM0PARY FIX
+                States.DecisionTimeOut: [ Events.Mouse1InCenter.value]  , ##TEM0PARY FIX
+                States.End:[0]
             }
 
             self.TimeOutState = {
@@ -85,7 +86,8 @@ class StateManager:
                 States.M1DM2D: 0,
                 States.TrialCompleted: 10,  # 10 seconds is a default value. It is replaced by the SetTimeOut functions.
                 States.ReturnTimeOut: None,
-                States.DecisionTimeOut: None
+                States.DecisionTimeOut: None,
+                States.End:None
             }
 
             self.current_state = States.Start

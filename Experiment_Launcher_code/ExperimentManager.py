@@ -5,7 +5,7 @@ from State_manager_code.StateManager import StateManager
 from State_manager_code.StateManager import States
 from State_manager_code.StateManager import Events
 from Data_analysis.logger import TrialLogger
-from Data_analysis.DataAnalysisScript import DataAnalyzer
+#from Data_analysis.DataAnalysisScript import DataAnalyzer
 from modelling_opponent.OpponentType import OpponentType
 from Experiment_Launcher_code import Experimenter
 from Reward_manager.RewardManager import RewardManager
@@ -16,17 +16,8 @@ class ExperimentManager:
         # initialize software components
         self.reward_manager = reward_manager
         self.videoAnalyser = video_analyzer
-        self.opponent_path=opponenttype  # Micky - Fix
-        self.mouse_number=mouse_id       # # Micky - Fix
-        self.videoAnalyser = Video_Analyzer(self.mouse_number,self.opponent_path)  # Micky - Fix
-
         self.stateManager = StateManager()
         self.trial_logger = TrialLogger()
-        #self.data_analyzer = DataAnalyzer(self.trial_logger)
-
-        #initialize reward manager
-
-        self.opponent_type = ""  ##for the logger
 
         # Set default reward and punishment times
         self.reward_time = 0.2
@@ -137,7 +128,6 @@ class ExperimentManager:
             # Increment the trial number counter
             self.numcompletedtrial += 1
             if self.numcompletedtrial > 0:
-
                     self.time_to_return_to_center = time.time() - self.time_to_make_decision- self.time_start
             self.timestamps = {
                 'Start Time': self.time_start,
@@ -201,11 +191,10 @@ class ExperimentManager:
         # Retrieve the file path from the TrialLogger instance
         return self.trial_logger.get_csv_file_path()
 
-    def start_streaming_exp(self, experiment_parameters, mouse1, mouse2):
-        self.opponent_path = "COMPUTER_COMPUTER"   # Micky - Make it work
-        self.trial_logger.start_logging(self.mouse_number,self.opponent_path)
+    def start_streaming_exp(self, experiment_parameters, mouse1, mouse2, opponent_path):
+        self.trial_logger.start_logging(experiment_parameters.get("mouse_id"), opponent_path)
         self.num_trial = experiment_parameters.get("num_trials")
-        force_end_time = num_trial * (decision_time + return_time)
+        force_end_time = self.num_trial * (experiment_parameters.get("decision_time") + experiment_parameters.get("return_time"))
 
         self.stateManager.SetTimeOut(experiment_parameters.get("decision_time"), experiment_parameters.get("return_time"))
 

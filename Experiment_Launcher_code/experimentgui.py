@@ -6,12 +6,12 @@ class ExperimentGUI:
     def __init__(self):
         self.window = tk.Tk()
         self.window.title("Prisoner's Dilemma Experiment")
-        self.window.geometry("500x610")
+        self.window.geometry("500x620")
 
         # create window layout
         self.system_panel = tk.Frame(self.window, width = 490, height = 60, relief = tk.RAISED, borderwidth = 2)
         tk.Label(self.system_panel, text = "System Parameters").place(x = 210, y = 2)
-        self.experiment_panel = tk.Frame(self.window, width=490, height=155, relief=tk.RAISED, borderwidth=2)
+        self.experiment_panel = tk.Frame(self.window, width=490, height=185, relief=tk.RAISED, borderwidth=2)
         tk.Label(self.experiment_panel, text ="Experiment Parameters").place(x = 200, y = 2)
         self.first_opponent_panel = tk.Frame(self.window, width=243, height=325, relief=tk.RAISED, borderwidth=2)
         tk.Label(self.first_opponent_panel, text ="First Opponent").place(x = 70, y = 2)
@@ -19,8 +19,8 @@ class ExperimentGUI:
         tk.Label(self.second_opponent_panel, text ="Second Opponent").place(x = 70, y = 2)
         self.system_panel.place(x = 5, y = 5)
         self.experiment_panel.place(x = 5, y = 70)
-        self.first_opponent_panel.place(x = 5, y = 230)
-        self.second_opponent_panel.place(x = 252, y = 230)
+        self.first_opponent_panel.place(x = 5, y = 260)
+        self.second_opponent_panel.place(x = 252, y = 260)
 
         # Initialize entry variables
         self.experiment_name = tk.StringVar(value = "Experiment 1")
@@ -50,7 +50,7 @@ class ExperimentGUI:
 
         # Create a button to start the experiment
         self.start_button = tk.Button(self.window, text="Start Experiment", command=self.start_experiment)
-        self.start_button.place(x = 205, y = 570)
+        self.start_button.place(x = 205, y = 590)
         self.window.mainloop()
 
 
@@ -77,6 +77,8 @@ class ExperimentGUI:
             radiobutton = tk.Radiobutton(panel, text = type, variable = opvar, value = type)
             radiobutton.place(x = 50, y = 50 + buttonoffset * 25)
             buttonoffset += 1
+            if type == "Learner":
+                radiobutton.config(state='disabled')
 
     def create_input_fields(self):
         tk.Label(self.experiment_panel, text="Experiment Name:").place(x = 30, y = 30)
@@ -132,6 +134,7 @@ class ExperimentGUI:
         num_trials_str = self.num_trials_var.get()
         trial_duration_str = self.return_time_var.get()
         decision_time_str = self.decision_time_var.get()
+        mouse_id_str = self.mouse_id_var.get()
         if not num_trials_str or not trial_duration_str or not decision_time_str:
             messagebox.showerror("Invalid Input", "One or more fields are empty. Please fill out all fields.")
             return False
@@ -141,6 +144,7 @@ class ExperimentGUI:
             num_trials = int(num_trials_str)
             trial_duration = int(trial_duration_str)
             decision_time = int(decision_time_str)
+            mouse_id = int(mouse_id_str)
         except ValueError:
             messagebox.showerror("Invalid Input", "Please enter valid numbers for trials, duration, and decision time.")
             return False
@@ -151,23 +155,6 @@ class ExperimentGUI:
             return False
 
         return True
-
-    def get_settings(self):
-        try:
-            # Retrieve the values from StringVars
-            num_trials = int(self.num_trials_var.get())
-            return_time = int(self.return_time_var.get())
-            decision_time = int(self.decision_time_var.get())
-            mouse_id = int(self.mouse_id_var.get())
-            opponent_type=self.selected_opp.get()
-
-            first_opponent_strategy = self.first_opponent_type.get()
-            second_opponent_strategy = self.second_opponent_type.get()
-
-        except ValueError:
-            # Handle the case where the input is not a valid integer
-            messagebox.showerror("Invalid Input", "Please enter valid numbers for trials, duration, and decision time.")
-            return None
 
     def experiment_started(self):
         return self.start_button_clicked
@@ -180,7 +167,8 @@ class ExperimentGUI:
             'experiment_name' : self.experiment_name.get(),
             'num_trials': int(self.num_trials_var.get()),
             'return_time': int(self.return_time_var.get()),
-            'decision_time': int(self.decision_time_var.get())}
+            'decision_time': int(self.decision_time_var.get()),
+            'mouse_id': int(self.mouse_id_var.get())}
         print(settings)
         return settings
 

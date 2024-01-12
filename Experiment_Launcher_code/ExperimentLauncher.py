@@ -1,11 +1,15 @@
-# use video analyzer import to select simulated of read mice
-from Video_analyser_code.VideoAnalyser import Video_Analyzer
-#from Video_analyser_code.VideoAnalyzerStub import Video_Analyzer
-#from Video_analyser_code.VideoAnalyzerSim import Video_Analyzer
+from Experiment_Launcher_code.ModuleConfiguration import __USE_VIDEO_SIM
+from Experiment_Launcher_code.ModuleConfiguration import __USE_VIDEO_STUB
+if __USE_VIDEO_SIM:
+    from Video_analyser_code.VideoAnalyzerSim import Video_Analyzer
+elif __USE_VIDEO_STUB:
+    from Video_analyser_code.VideoAnalyzerStub import Video_Analyzer
+else:
+    from Video_analyser_code.VideoAnalyser import Video_Analyzer
 
 from modelling_opponent.MouseMonitor import MouseMonitor
 from modelling_opponent.FixedStrategyPrisoner import FixedStrategyPrisoner
-from modelling_opponent.Simulated_learner import Simulated_mouse
+#from modelling_opponent.Simulated_learner import Simulated_mouse
 from Reward_manager.RewardManager import RewardManager
 from Experiment_Launcher_code.ExperimentManager import ExperimentManager
 from Experiment_Launcher_code.experimentgui import ExperimentGUI, OpponentType
@@ -21,29 +25,34 @@ def main():
         comport_name = experiment_gui.get_com_port()
         experiment_parameters = experiment_gui.get_experiment_parameters()
         opponent_configuration = experiment_gui.get_opponent_configuration()
+        if opponent_configuration.get("opponent1_type") == OpponentType.MOUSE:
+            opponent_path = "MOUSE_COMPUTER"
+        else:
+            opponent_path = "COMPUTER_COMPUTER"
 
         # Instantiate software components
-        video_analyzer = Video_Analyzer("1780")
+        video_analyzer = Video_Analyzer(experiment_parameters.get("mouse_id"), opponent_path)
         reward_manager = RewardManager(comport_name)
 
+        # Configure Opponents
         if opponent_configuration.get("opponent1_type") == OpponentType.MOUSE:
             first_opponent = MouseMonitor(1, video_analyzer, reward_manager)
         elif opponent_configuration.get("opponent1_type") == OpponentType.FIXED_STRATEGY:
             first_opponent = FixedStrategyPrisoner(opponent_configuration.get("opponent1_strategy"), opponent_configuration.get("opponent1_probability"))
         else:
-            first_opponent = Simulated_mouse()
+            pass #first_opponent = Simulated_mouse()
 
         if opponent_configuration.get("opponent2_type") == OpponentType.MOUSE:
             second_opponent = MouseMonitor(2, video_analyzer, reward_manager)
         elif opponent_configuration.get("opponent2_type") == OpponentType.FIXED_STRATEGY:
             second_opponent = FixedStrategyPrisoner(opponent_configuration.get("opponent2_strategy"), opponent_configuration.get("opponent2_probability"))
         else:
-            second_opponent = Simulated_mouse()
+            pass #second_opponent = Simulated_mouse()
 
         # Initialize and start the experiment
         expManager = ExperimentManager(video_analyzer, reward_manager)
         print("Experiment manager now running")
-        expManager.start_streaming_exp(experiment_parameters, first_opponent, second_opponent)
+        expManager.start_streaming_exp(experiment_parameters, first_opponent, second_opponent, opponent_path)
     
         data_file_path = expManager.get_data_file_path()  # Get the path of the logged data
 

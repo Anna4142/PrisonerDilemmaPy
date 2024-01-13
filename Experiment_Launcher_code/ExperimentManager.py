@@ -81,7 +81,7 @@ class ExperimentManager:
         #    pass
 
         elif state == States.CenterReward:
-            self.time_start = time.time()
+
             self.time_to_make_decision = 0
             self.time_to_return_to_center = 0
 
@@ -91,11 +91,15 @@ class ExperimentManager:
             print("delivering reward in the center ")
             mouse1.DeliverReward(Locations.Center, self.center_reward_time)
             mouse2.DeliverReward(Locations.Center, self.center_reward_time)
+            if self.numcompletedtrial > 0:
+
+                    self.time_to_return_to_center = time.time() - self.time_to_make_decision- self.time_start
+
 
 
         elif state == States.TrialStarted:
             Play(Sounds.Start)
-
+            self.time_start = time.time()
             mouse1.NewTrial()
             mouse2.NewTrial()
 
@@ -156,10 +160,8 @@ class ExperimentManager:
 
         elif state == States.TrialCompleted:
             # Increment the trial number counter
-            self.numcompletedtrial += 1
-            if self.numcompletedtrial > 0:
 
-                    self.time_to_return_to_center = time.time() - self.time_to_make_decision- self.time_start
+            self.numcompletedtrial += 1
             self.timestamps = {
                 'Start Time': self.time_start,
                 'Decision Time': self.time_to_make_decision,
@@ -176,7 +178,7 @@ class ExperimentManager:
             self.trial_logger.log_trial_data(self.numcompletedtrial, "Completed Trial", self.opponent_choice,
                                              self.mouse_choice, self.mouse_reward,self.mouse_center_reward, self.opponent_reward,self.opponent_center_reward,
                                              self.time_start, self.time_to_make_decision, self.time_to_return_to_center)
-            self.visit_cen == False
+
 
         elif state == States.ReturnTimeOut:
             Play(Sounds.Abort)
@@ -193,6 +195,7 @@ class ExperimentManager:
             self.trial_logger.log_trial_data(self.numcompletedtrial, "Not Completed Trial", self.opponent_choice,
                                              self.mouse_choice, self.mouse_reward,self.mouse_center_reward, self.opponent_reward,self.opponent_center_reward,
                                              self.time_start, self.time_to_make_decision, self.time_to_return_to_center)
+            self.visit_cen == False
 
 
         elif state == States.DecisionTimeOut:

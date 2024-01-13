@@ -25,6 +25,7 @@ class Events(Enum):
         Mouse2Defected = 32
         LastTrial = 64
         RewardDelivered = 128
+        ExperimentStopped=256
 
 class StateManager:
         def __init__(self):
@@ -37,8 +38,8 @@ class StateManager:
                 States.M1DM2C: [States.TrialCompleted],
                 States.M1DM2D: [States.TrialCompleted],
                 States.TrialCompleted: [States.CenterReward, States.End],
-                States.ReturnTimeOut: [ States.TrialStarted],
-                States.DecisionTimeOut: [ States.TrialStarted],
+                States.ReturnTimeOut: [ States.TrialStarted,States.End],
+                States.DecisionTimeOut: [ States.TrialStarted,States.End],
                 States.End: [States.End]
             }
 
@@ -56,9 +57,9 @@ class StateManager:
                 States.M1DM2C: [Events.RewardDelivered.value],
                 States.M1DM2D: [Events.RewardDelivered.value],
                 States.TrialCompleted: [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value,
-                                        Events.LastTrial.value],
-                States.ReturnTimeOut: [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value],
-                States.DecisionTimeOut: [ Events.Mouse1InCenter.value]  , ##TEM0PARY FIX
+                                        Events.LastTrial.value or Events.ExperimentStopped.value],
+                States.ReturnTimeOut: [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value,Events.ExperimentStopped.value],
+                States.DecisionTimeOut: [ Events.Mouse1InCenter.value,Events.ExperimentStopped.value]  , ##TEM0PARY FIX
                 States.End:[0]
             }
 

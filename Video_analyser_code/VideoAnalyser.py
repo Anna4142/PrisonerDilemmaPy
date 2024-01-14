@@ -168,7 +168,7 @@ class Video_Analyzer:
                     contour_counts[region_key] += 1  # Increment count for this region
 
             # Activate zone only if more than 4 contours are detected in the region
-            if contour_counts[region_key] > 3:
+            if contour_counts[region_key] > 5:
                 zone_activation[idx] = 1
 
         # Optional: Print the number of contours detected in each region

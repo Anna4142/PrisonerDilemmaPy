@@ -47,6 +47,7 @@ class ExperimentGUI:
         # Create a button to start the experiment and disable it initially
         self.start_button = tk.Button(self.window, text="Start Experiment", command=self.start_experiment)
         self.start_button.place(x = 205, y = 590)
+
         self.window.mainloop()
 
 

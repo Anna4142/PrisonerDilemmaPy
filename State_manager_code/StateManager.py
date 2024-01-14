@@ -2,7 +2,7 @@
 
 import time
 from enum import Enum
-
+from pynput.keyboard import Key, Listener
 class States(Enum):
         Start = 1
         CenterReward = 2
@@ -29,39 +29,44 @@ class Events(Enum):
 
 class StateManager:
         def __init__(self):
+
             self.NextState = {
-                States.Start: [States.CenterReward],
-                States.CenterReward: [States.TrialStarted],
-                States.TrialStarted: [States.M1CM2C, States.M1CM2D, States.M1DM2C, States.M1DM2D],
-                States.M1CM2C: [States.TrialCompleted],
-                States.M1CM2D: [States.TrialCompleted],
-                States.M1DM2C: [States.TrialCompleted],
-                States.M1DM2D: [States.TrialCompleted],
-                States.TrialCompleted: [States.CenterReward, States.End],
-                States.ReturnTimeOut: [ States.TrialStarted,States.End],
-                States.DecisionTimeOut: [ States.TrialStarted,States.End],
-                States.End: [States.End]
-            }
+                        States.Start: [States.CenterReward, States.End],
+                        States.CenterReward: [States.TrialStarted, States.End],
+                        States.TrialStarted: [States.M1CM2C, States.M1CM2D, States.M1DM2C, States.M1DM2D, States.End],
+                        States.M1CM2C: [States.TrialCompleted, States.End],
+                        States.M1CM2D: [States.TrialCompleted, States.End],
+                        States.M1DM2C: [States.TrialCompleted, States.End],
+                        States.M1DM2D: [States.TrialCompleted, States.End],
+                        States.TrialCompleted: [States.End, States.CenterReward, States.End],
+                        States.ReturnTimeOut: [States.TrialStarted, States.End, States.End],
+                        States.DecisionTimeOut: [States.TrialStarted, States.End, States.End],
+                        States.End: [States.End]
+                    }
 
             self.TransitionEvent = {
-                States.Start: [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value],
-                States.CenterReward: [Events.RewardDelivered.value],
-                States.TrialStarted: [
-                    Events.Mouse1Cooporated.value + Events.Mouse2Cooporated.value,
-                    Events.Mouse1Cooporated.value + Events.Mouse2Defected.value,
-                    Events.Mouse1Defected.value + Events.Mouse2Cooporated.value,
-                    Events.Mouse1Defected.value + Events.Mouse2Defected.value
-                ],
-                States.M1CM2C: [Events.RewardDelivered.value],
-                States.M1CM2D: [Events.RewardDelivered.value],
-                States.M1DM2C: [Events.RewardDelivered.value],
-                States.M1DM2D: [Events.RewardDelivered.value],
-                States.TrialCompleted: [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value,
-                                        Events.LastTrial.value or Events.ExperimentStopped.value],
-                States.ReturnTimeOut: [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value,Events.ExperimentStopped.value],
-                States.DecisionTimeOut: [ Events.Mouse1InCenter.value,Events.ExperimentStopped.value]  , ##TEM0PARY FIX
-                States.End:[0]
-            }
+                        States.Start: [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value,
+                                       Events.ExperimentStopped.value],
+                        States.CenterReward: [Events.RewardDelivered.value, Events.ExperimentStopped.value],
+                        States.TrialStarted: [
+                            Events.Mouse1Cooporated.value + Events.Mouse2Cooporated.value,
+                            Events.Mouse1Cooporated.value + Events.Mouse2Defected.value,
+                            Events.Mouse1Defected.value + Events.Mouse2Cooporated.value,
+                            Events.Mouse1Defected.value + Events.Mouse2Defected.value,
+                            Events.ExperimentStopped.value
+                        ],
+                        States.M1CM2C: [Events.RewardDelivered.value, Events.ExperimentStopped.value],
+                        States.M1CM2D: [Events.RewardDelivered.value, Events.ExperimentStopped.value],
+                        States.M1DM2C: [Events.RewardDelivered.value, Events.ExperimentStopped.value],
+                        States.M1DM2D: [Events.RewardDelivered.value, Events.ExperimentStopped.value],
+                        States.TrialCompleted: [Events.LastTrial.value,
+                                                Events.Mouse1InCenter.value + Events.Mouse2InCenter.value,
+                                                Events.ExperimentStopped.value],
+                        States.ReturnTimeOut: [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value,
+                                               Events.ExperimentStopped.value],
+                        States.DecisionTimeOut: [Events.Mouse1InCenter.value, Events.ExperimentStopped.value],
+                        States.End: [0]
+                    }
 
             self.TimeOutState = {
                 States.Start: None,

@@ -1,6 +1,6 @@
 from enum import Enum
 
 class OpponentType(Enum):
-    MOUSE_MOUSE = 1
-    MOUSE_COMPUTER = 2
-    COMPUTER_COMPUTER= 3
+    MOUSE           = 1
+    FIXED_STRATEGY  = 2
+    LEARNER         = 3

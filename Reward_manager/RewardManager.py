@@ -1,6 +1,8 @@
-# Use the Arduino import statement to select between real and simulated HW
-from Arduino_related_code.ArduinoDigital import ArduinoDigital
-#from Arduino_related_code.ArduinoDigitalSim import ArduinoDigital
+from Experiment_Launcher_code.ModuleConfiguration import __USE_ARDUINO_SIM
+if __USE_ARDUINO_SIM:
+    from Arduino_related_code.ArduinoDigitalSim import ArduinoDigital
+else:
+    from Arduino_related_code.ArduinoDigital import ArduinoDigital
 
 from Arduino_related_code.ValveControl import ValveControl
 from Video_analyser_code.locations import Locations

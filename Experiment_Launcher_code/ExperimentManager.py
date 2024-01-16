@@ -1,52 +1,27 @@
-# The first group of import statements control the simulated vs real HW environments
 
-from Video_analyser_code.VideoAnalyser import Video_Analyzer
-#from Video_analyser_code.VideoAnalyzerStub import Video_Analyzer
-#from Video_analyser_code.VideoAnalyzerSim import Video_Analyzer
-
-from Arduino_related_code.ArduinoDigital import ArduinoDigital
-#from Arduino_related_code.ArduinoDigitalSim import ArduinoDigital
-
-# The following are configuration independent imports
 from Sound_manager_code.SoundManager import Play, Sounds
-from modelling_opponent.MouseMonitor import MouseMonitor
 from modelling_opponent.MouseMonitor import Locations
-from modelling_opponent.FixedStrategyPrisoner import FixedStrategyPrisoner
-#from modelling_opponent.Simulated_learner import Simulated_mouse
 from State_manager_code.StateManager import StateManager
 from State_manager_code.StateManager import States
 from State_manager_code.StateManager import Events
-
 from Data_analysis.logger import TrialLogger
 from Data_analysis.event_logger import EventLogger
 from Data_analysis.DataAnalysisScript import DataAnalyzer
 from modelling_opponent.OpponentType import OpponentType
-
 from Reward_manager.RewardManager import RewardManager
 import time
-
-
 from pynput.keyboard import Key, Listener
 from threading import Lock
+
+
 class ExperimentManager:
-    def __init__(self, comport,mouse_id,opponenttype):
+    def __init__(self, video_analyzer, reward_manager):
         # initialize software components
-        self.reward_manager = RewardManager(comport)
-        self.opponent_path=opponenttype
-        self.mouse_number=mouse_id
-        if opponenttype == OpponentType.MOUSE_MOUSE:
-
-            self.opponent_path ="MOUSE_MOUSE"
-        elif opponenttype == OpponentType.MOUSE_COMPUTER:
-
-            self.opponent_path = "MOUSE_COMPUTER"
-        else:
-
-            self.opponent_path = "COMPUTER_COMPUTER"
-
-        self.videoAnalyser = Video_Analyzer(self.mouse_number,self.opponent_path)
+        self.reward_manager = reward_manager
+        self.videoAnalyser = video_analyzer
         self.stateManager = StateManager()
         self.trial_logger = TrialLogger()
+
         self.event_logger = EventLogger()
         #self.data_analyzer = DataAnalyzer(self.trial_logger)
 
@@ -195,8 +170,8 @@ class ExperimentManager:
 
         elif state == States.TrialCompleted:
             # Increment the trial number counter
-
             self.numcompletedtrial += 1
+
             self.timestamps = {
                 'Start Time': self.time_start,
                 'Decision Time': self.time_to_make_decision,
@@ -255,39 +230,18 @@ class ExperimentManager:
         elif state == States.End:
             # Stop recording, finalize logs, show end message, etc.
             self.trial_logger.finalize_logging()
-            #if self.numcompletedtrial>1:
-                #analysis_results = self.data_analyzer.analyze_data()
-                #print(analysis_results)
+            
     def get_data_file_path(self):
         # Retrieve the file path from the TrialLogger instance
         return self.trial_logger.get_csv_file_path()
 
-    def start_streaming_exp(self, experiment_name, num_trial, decision_time, return_time, opponent_type,
-                            opponent1_strategy, opponent2_strategy):
 
-        self.num_trial = num_trial
+    def start_streaming_exp(self, experiment_parameters, mouse1, mouse2, opponent_path):
+        self.trial_logger.start_logging(experiment_parameters.get("mouse_id"), opponent_path)
+        self.num_trial = experiment_parameters.get("num_trials")
+        force_end_time = self.num_trial * (experiment_parameters.get("decision_time") + experiment_parameters.get("return_time"))
 
-
-        print("opponent ", opponent_type)
-        print("opponent strategy ", opponent1_strategy)
-
-
-        if opponent_type == OpponentType.MOUSE_MOUSE:
-            mouse1 = MouseMonitor(1, self.videoAnalyser, self.reward_manager)
-            mouse2 = MouseMonitor(2, self.videoAnalyser, self.reward_manager)
-            self.opponent_path = "MOUSE_MOUSE"
-        elif opponent_type == OpponentType.MOUSE_COMPUTER:
-            mouse1 = MouseMonitor(1, self.videoAnalyser, self.reward_manager)
-            mouse2 = FixedStrategyPrisoner(opponent1_strategy, probability=0.8)
-            self.opponent_path = "MOUSE_COMPUTER"
-        else:
-            mouse1 = FixedStrategyPrisoner(opponent1_strategy, probability=0.8)
-            mouse2 = FixedStrategyPrisoner(opponent2_strategy, probability=0.8)
-            self.opponent_path = "COMPUTER_COMPUTER"
-        self.trial_logger.start_logging(self.mouse_number, self.opponent_path)
-        self.event_logger.start_logging(self.mouse_number, self.opponent_path)
-
-        self.stateManager.SetTimeOut(decision_time, return_time)
+        self.stateManager.SetTimeOut(experiment_parameters.get("decision_time"), experiment_parameters.get("return_time"))
 
         currentstate = None
         state_history = []

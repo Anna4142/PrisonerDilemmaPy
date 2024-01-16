@@ -8,7 +8,7 @@ import pandas as pd
 
 
 class Video_Analyzer:
-    def __init__(self,filename,opponenttype):
+    def __init__(self):
         self.root = tk.Tk()
 
         # Initialize the Vimba SDK and VideoAnalyzer

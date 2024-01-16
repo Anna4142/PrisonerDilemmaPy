@@ -1,6 +1,6 @@
 import csv
-import pandas as pd
-#from datetime import datetime
+#import pandas as pd
+from datetime import datetime
 
 class TrialLogger:
     def __init__(self):
@@ -8,6 +8,7 @@ class TrialLogger:
         self.csv_file_path=None
 
     def start_logging(self, filename, opponenttype):
+        '''
         current_datetime = pd.Timestamp.now()
         datetime_string = current_datetime.strftime("%Y%m%d_%H%M%S")
         if opponenttype=="MOUSE_COMPUTER" :
@@ -18,7 +19,7 @@ class TrialLogger:
         current_datetime = datetime.now()
         datetime_string = current_datetime.strftime("%Y%m%d_%H%M%S")
         self.csv_file_path = f'./../../ExperimentLogFiles/Experiment_{datetime_string}.csv'
-        '''
+
         self.csv_file = open(self.csv_file_path, 'w', newline='')
         self.csv_writer = csv.writer(self.csv_file)
 

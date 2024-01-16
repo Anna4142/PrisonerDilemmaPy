@@ -13,7 +13,9 @@ from modelling_opponent.FixedStrategyPrisoner import FixedStrategyPrisoner
 from Reward_manager.RewardManager import RewardManager
 from Experiment_Launcher_code.ExperimentManager import ExperimentManager
 from Experiment_Launcher_code.experimentgui import ExperimentGUI, OpponentType
-from Data_analysis.DataAnalysisScript import DataAnalyzer
+#from Data_analysis.DataAnalysisScript import DataAnalyzer
+import Data_analysis.FileUtilities as fUtile
+
 
 def main():
     # Create an instance of the ExperimentGUI class
@@ -25,13 +27,12 @@ def main():
         comport_name = experiment_gui.get_com_port()
         experiment_parameters = experiment_gui.get_experiment_parameters()
         opponent_configuration = experiment_gui.get_opponent_configuration()
-        if opponent_configuration.get("opponent1_type") == OpponentType.MOUSE:
-            opponent_path = "MOUSE_COMPUTER"
-        else:
-            opponent_path = "COMPUTER_COMPUTER"
+
+        fUtile.set_file_name(experiment_parameters.get('session_type'), experiment_parameters.get('session_num'))
+        write_configuration_file(experiment_parameters, opponent_configuration)
 
         # Instantiate software components
-        video_analyzer = Video_Analyzer(experiment_parameters.get("mouse_id"), opponent_path)
+        video_analyzer = Video_Analyzer()
         reward_manager = RewardManager(comport_name)
 
         # Configure Opponents
@@ -68,6 +69,31 @@ def main():
         del expManager
     else:
         print("No valid settings were provided.")
+
+
+def write_configuration_file(experiment_parameters, opponent_configuration):
+    filepath = fUtile.get_file_path(fUtile.FileType.EXPERIMENT_CONFIGURATION) + ".txt"
+    with open(filepath, 'w') as file:
+        file.write('Experiment name: ' + experiment_parameters.get('experiment_name') + '\n')
+        file.write('Session Type & number: ' + experiment_parameters.get('session_type') + ', ' + experiment_parameters.get('session_num') + '\n')
+        file.write('Number of Trials: ' + experiment_parameters.get('num_trials') + '\n')
+        file.write('Decision and Return Time limits: ' + experiment_parameters.get('decision_time') + ', ' + experiment_parameters.get('return_time') + '\n')
+        write_opponent_configuration(file, 'First')
+        write_opponent_configuration(file, 'Second')
+
+def write_opponent_configuration(file, oppid):
+
+
+        if opponent_configuration.get('opponent1_type') == OpponentType.MOUSE:
+            file.write('First Opponent: Mouse, Mouse ID: ' + opponent_configuration.get('mouse_1_id') + '\n')
+        elif opponent_configuration.get('opponent1_type') == OpponentType.FIXED_STRATEGY:
+            if opponent_configuration.get('opponent1_strategy') == 'Probability p Cooperator':
+                file.write('First Opponent: Fixed Strategy: ' + opponent_configuration.get('opponent1_strategy') + 'Probability: ' + opponent_configuration.get('opponent1_probability') + '\n')
+            else:
+                file.write('First Opponent: Fixed Strategy: ' + opponent_configuration.get('opponent1_strategy') +  '\n')
+        else:
+            file.write('First Opponent: Learner. ' + '\n')
+
 
 # Run the main function
 if __name__ == "__main__":

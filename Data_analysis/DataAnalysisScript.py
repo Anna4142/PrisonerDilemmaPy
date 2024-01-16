@@ -1,16 +1,16 @@
 
-
 import pandas as pd
 import os
 
+
 class DataAnalyzer:
-    def __init__(self,filepath):
+    def __init__(self, filepath):
         self.data_file_path = filepath
 
     def analyze_data(self):
         # Read the CSV file into a DataFrame
 
-        df = pd.read_csv( self.data_file_path, delimiter=',')
+        df = pd.read_csv(self.data_file_path, delimiter=',')
 
         # Perform analysis
         num_trials = df['Trial Number'].max()  # Get the maximum value in 'Trial Number' column
@@ -48,7 +48,9 @@ class DataAnalyzer:
         percentage_d = (num_d_choices / num_trials) * 100
         # Return the analysis results as a dictionary
         current_datetime = pd.Timestamp.now()
+
         current_date =  current_datetime.strftime("%Y%m%d")
+
         analysis_results = {
             "Date": current_date,
             "Num trials": num_trials,

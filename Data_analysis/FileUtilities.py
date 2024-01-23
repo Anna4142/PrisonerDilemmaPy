@@ -8,6 +8,9 @@ class FileType(Enum):
     EXPERIMENT_LOG              = 2
     VIDEO_CAPTURE               = 3
     DATA_ANALYSIS               = 4
+    EXPERIMENT_EVENT_LOG        = 5
+    MOUSE_PROFILE               = 6
+
 
 
 project_directory = ""
@@ -18,10 +21,10 @@ file_name = ""
 
 def get_mouse_sub_directory(filetype):
     mapping = {
-        FileType.EXPERIMENT_CONFIGURATION: "/trial_configuration",
-        FileType.EXPERIMENT_LOG: "/data_from_trials",
-        FileType.VIDEO_CAPTURE: "/video_captures",
-        FileType.DATA_ANALYSIS: "/data_analysis"}
+        FileType.EXPERIMENT_CONFIGURATION:  "/trial_configuration",
+        FileType.EXPERIMENT_LOG:            "/data_from_trials",
+        FileType.VIDEO_CAPTURE:             "/video_captures",
+        FileType.EXPERIMENT_EVENT_LOG:      "/event_data_from_trials"}
     return mapping.get(filetype)
 
 
@@ -63,7 +66,11 @@ def set_experiment_directory(path):
 
 def set_mouse_directory(mouse):
     global experiment_directory, mouse_directory
-    mouse_path = experiment_directory + "/Mouse" + mouse
+    if mouse == 'COMPUTER':
+        prefix = ''
+    else:
+        prefix = 'Mouse'
+    mouse_path = f'{experiment_directory}/{prefix}{mouse}'
     if os.path.exists(mouse_path) and os.path.isdir(mouse_path):
         mouse_directory = mouse_path
         return True
@@ -75,7 +82,7 @@ def set_mouse_directory(mouse):
             os.makedirs(mouse_directory + "/" + get_mouse_sub_directory(FileType.EXPERIMENT_CONFIGURATION))
             os.makedirs(mouse_directory + "/" + get_mouse_sub_directory(FileType.EXPERIMENT_LOG))
             os.makedirs(mouse_directory + "/" + get_mouse_sub_directory(FileType.VIDEO_CAPTURE))
-            os.makedirs(mouse_directory + "/" + get_mouse_sub_directory(FileType.DATA_ANALYSIS))
+            os.makedirs(mouse_directory + "/" + get_mouse_sub_directory(FileType.EXPERIMENT_EVENT_LOG))
             return True
         else:
             return False
@@ -84,17 +91,19 @@ def set_mouse_directory(mouse):
 def set_file_name(sessiontype, sessionnum):
     global file_name
     current_datetime = datetime.now()
-    datetime_string = current_datetime.strftime("%Y%m%d_%H%M%S")
+    datetime_string = current_datetime.strftime("%Y%m%d-%H%M%S")
     splitindex = mouse_directory.rfind('/')
     mouseid = mouse_directory[splitindex + 1 : ]
     experiment = mouse_directory[:splitindex]
     splitindex = experiment.rfind('/')
     experiment = experiment[splitindex + 1 : ]
     file_name = f'{datetime_string}_{experiment}_{mouseid}_{sessiontype}{sessionnum}'
-    return file_name
 
 
 def get_file_path(filetype):
     global mouse_directory, file_name
-    subdir = get_mouse_sub_directory(filetype)
-    return f'{mouse_directory}{subdir}/{file_name}'
+    if filetype in [FileType.DATA_ANALYSIS, FileType.MOUSE_PROFILE]:
+        return mouse_directory
+    else:
+        subdir = get_mouse_sub_directory(filetype)
+        return f'{mouse_directory}{subdir}/{file_name}'

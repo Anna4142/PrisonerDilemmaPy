@@ -2,7 +2,7 @@ import serial
 
 class ArduinoDigital:
     def __init__(self, portname):
-        self.comport = serial.Serial(portname, 9600)
+        self.comport = serial.Serial(portname, 9600, dtr = False)
 
     def DigitalHigh(self, pin):
         outbyte = pin.to_bytes(1, 'big')

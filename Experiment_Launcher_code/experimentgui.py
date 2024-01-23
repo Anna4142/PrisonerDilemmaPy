@@ -27,8 +27,8 @@ class ExperimentGUI:
         # Initialize entry variables
         self.comport_name = tk.StringVar(value = "COM11")
         self.project_directory_var = tk.StringVar(value = None)
-        self.experiment_name = tk.StringVar(value = "Experiment 1")
-        self.session_type = tk.StringVar(value = "Training")
+        self.experiment_name = tk.StringVar(value = "Experiment-1")
+        self.session_type = tk.StringVar(value = "Session")
         self.session_num = tk.StringVar(value = "1")
         self.num_trials_var = tk.StringVar(value = "20")
         self.return_time_var = tk.StringVar(value = "30")
@@ -116,11 +116,11 @@ class ExperimentGUI:
         self.num_trials_entry.place(x = 400, y = 30)
 
         tk.Label(self.experiment_panel, text="Decision Time (sec):").place(x = 270, y = 60)
-        self.decision_time_entry = tk.Entry(self.experiment_panel, textvariable=self.return_time_var)
+        self.decision_time_entry = tk.Entry(self.experiment_panel, textvariable=self.decision_time_var)
         self.decision_time_entry.place(x = 400, y = 60)
 
         tk.Label(self.experiment_panel, text="Return Time (sec):").place(x = 270, y = 90)
-        self.decision_time_entry = tk.Entry(self.experiment_panel, textvariable=self.decision_time_var)
+        self.decision_time_entry = tk.Entry(self.experiment_panel, textvariable=self.return_time_var)
         self.decision_time_entry.place(x = 400, y = 90)
 
     def create_strategy_option(self, panel, opvar, probvar):
@@ -141,15 +141,11 @@ class ExperimentGUI:
         probability_entry.place(x = 150, y = 260, width = 50)
 
     def start_experiment(self):
-        # Validate the input values
-        if not self.validate_inputs():
-            messagebox.showerror("Invalid Input", "Please check your inputs.")
-            return
-
-        # Display a confirmation or start the experiment
-        self.start_button_clicked = True
-        messagebox.showinfo("Experiment Starting", "The experiment is now starting with the provided settings.")
-        self.window.destroy()
+        # Start the experiment only if input data is valid
+        if self.validate_inputs():
+            self.start_button_clicked = True
+            messagebox.showinfo("Experiment Starting", "The experiment is now starting with the provided settings.")
+            self.window.destroy()
 
     def validate_inputs(self):
         # comport name must be defined.

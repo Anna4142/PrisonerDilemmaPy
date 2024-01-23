@@ -2,7 +2,7 @@ from Arduino_related_code.ArduinoDigital import ArduinoDigital
 
 ##### main
 opcode = -1
-arduino = ArduinoDigital("COM11")
+arduino = ArduinoDigital("COM4")
 
 while opcode != 0:
     opcodestr = input("opcode [0- exit, 1- Valve on, 2- Valve of]: ")

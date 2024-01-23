@@ -13,15 +13,10 @@ def calibrate_valve(pin, duration_ms, arduino):
         valve_control.OpenValve(duration_s)  # Open valve for the specified duration in seconds
 
         while valve_control.IsValveOpen():
-            time.sleep(0.1)  # Check every 0.1 seconds
+           pass
 
         print(f"Valve on pin {pin} closed.")
         time.sleep(1)  # Short delay between iterations
-
-# Function to handle calibration in a separate thread
-def start_calibration(pin, duration_ms):
-    thread = Thread(target=calibrate_valve, args=(pin, duration_ms, arduino))
-    thread.start()
 
 # Initialize the ArduinoDigital object
 comport = "COM11"
@@ -44,8 +39,8 @@ duration_entry.pack()
 
 # Button to start calibration
 calibrate_button = tk.Button(root, text="Start Calibration",
-                             command=lambda: start_calibration(int(pin_entry.get()),
-                                                               int(duration_entry.get())))
+                             command=lambda: calibrate_valve(int(pin_entry.get()),
+                                                               int(duration_entry.get(),arduino)))
 calibrate_button.pack()
 
 # Start the GUI event loop

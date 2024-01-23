@@ -92,18 +92,19 @@ class ExperimentManager:
 
     def on_release(self, key):
         print(f"Key released: {key}")
-
+    """""
     def start_state_timer(self, state):
-        """ Start the timer for a given state """
+      
         self.state_start_times[state] = time.time()
 
     def get_state_duration(self, state):
-        """ Calculate the duration spent in a given state """
+       
         return time.time() - self.state_start_times.get(state, time.time())
+    """
     def StateActivity(self, state, mouse1, mouse2):
         if state is not None:
-            duration = self.get_state_duration(state)
-            self.event_logger.log_event_data(self.numcompletedtrial,state,duration)
+
+            self.event_logger.log_event_data(self.numcompletedtrial,state,time.time())
 
         if state == States.Start:
 

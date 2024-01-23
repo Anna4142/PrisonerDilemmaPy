@@ -118,8 +118,8 @@ class ExperimentManager:
             # Actions for M1CM2C state
             self.mouse_choice = "C"
             self.opponent_choice = "C"
-            self.mouse_reward = "0.03"
-            self.opponent_reward = "0.03"
+            self.mouse_reward = "0.012"
+            self.opponent_reward = "0.012"
             self.mouse_center_reward="0.0"
             self.opponent_center_reward = "0.0"
             self.cc_cnt += 1
@@ -132,7 +132,7 @@ class ExperimentManager:
             self.mouse_choice = "C"
             self.opponent_choice = "D"
             self.mouse_reward = "0"
-            self.opponent_reward = "0.06"
+            self.opponent_reward = "0.024"
             self.mouse_center_reward = "0.0"
             self.opponent_center_reward = "0.0"
             self.cd_cnt += 1
@@ -144,7 +144,7 @@ class ExperimentManager:
             # Actions for M1DCM2C state
             self.mouse_choice = "D"
             self.opponent_choice = "C"
-            self.mouse_reward = "0.06"
+            self.mouse_reward = "0.024"
             self.opponent_reward = "0"
             self.mouse_center_reward = "0.0"
             self.opponent_center_reward = "0.0"
@@ -157,8 +157,8 @@ class ExperimentManager:
             # Actions for M1DM2D state
             self.mouse_choice = "D"
             self.opponent_choice = "D"
-            self.mouse_reward = "0.015"
-            self.opponent_reward = "0.015"
+            self.mouse_reward = "0.006"
+            self.opponent_reward = "0.006"
             self.mouse_center_reward = "0.0"
             self.opponent_center_reward = "0.0"
             self.dd_cnt += 1

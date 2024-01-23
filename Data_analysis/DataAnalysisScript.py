@@ -1,56 +1,16 @@
-"""""
-import pandas as pd
-
-class DataAnalyzer:
-    def __init__(self,trial_logger):
-        self.trial_logger=trial_logger
-        
-    def analyze_data(self):
-        # Read the CSV file into a DataFrame
-        data_file_path = self.trial_logger.csv_file_path
-
-        df = pd.read_csv(data_file_path, delimiter=',')  # Assuming the data is tab-separated
-
-        # Perform analysis
-        num_trials = len(df)  # Assuming num_trials is the number of rows in the DataFrame
-        additional_reward = num_trials * 0.005
-
-        total_reward = df['Reward'].sum() + additional_reward
-        reward_mean = total_reward / num_trials
-        total_reward = df['Reward'].sum()
-        reward_to_be_delivered = 1.5 - total_reward
-        completed_trials_count = df[df['Trial Validity'] == 'Completed Trial'].shape[0]
-        mean_reward_by_opponent_choice = df.groupby('Opponent Choice')['Reward'].mean()
-        average_time_to_make_decision = df['Time to Make Decision'].mean()
-        average_time_to_return_to_center = df['Time to Return to Center'].mean()
-
-        # Return the analysis results as a dictionary
-        analysis_results = {
-            "Num trials": num_trials,
-            "Mean Reward": reward_mean,
-            "Total Reward": total_reward,
-            "Reward to be Delivered": reward_to_be_delivered,
-            "Number of Completed Trials": completed_trials_count,
-            #"Mean Reward by Opponent": mean_reward_by_opponent_choice.to_dict(),
-            "Average Time to Make Decision": average_time_to_make_decision,
-            "Average Time to Return to Center": average_time_to_return_to_center
-        }
-
-        return analysis_results
-"""""
-import pandas as pd
 
 import pandas as pd
 import os
 
+
 class DataAnalyzer:
-    def __init__(self,filepath):
+    def __init__(self, filepath):
         self.data_file_path = filepath
 
     def analyze_data(self):
         # Read the CSV file into a DataFrame
 
-        df = pd.read_csv( self.data_file_path, delimiter=',')
+        df = pd.read_csv(self.data_file_path, delimiter=',')
 
         # Perform analysis
         num_trials = df['Trial Number'].max()  # Get the maximum value in 'Trial Number' column
@@ -88,7 +48,9 @@ class DataAnalyzer:
         percentage_d = (num_d_choices / num_trials) * 100
         # Return the analysis results as a dictionary
         current_datetime = pd.Timestamp.now()
+
         current_date =  current_datetime.strftime("%Y%m%d")
+
         analysis_results = {
             "Date": current_date,
             "Num trials": num_trials,

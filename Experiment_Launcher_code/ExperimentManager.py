@@ -126,6 +126,7 @@ class ExperimentManager:
             mouse1.DeliverReward(Locations.Cooperate, self.reward_time)
             mouse2.DeliverReward(Locations.Cooperate, self.reward_time)
             self.time_to_make_decision = time.time() - self.time_start
+            self.numcompletedtrial += 1
 
         elif state == States.M1CM2D:
             # Actions for M1CDM2D state
@@ -139,6 +140,7 @@ class ExperimentManager:
             mouse1.DeliverReward(Locations.Defect, self.sucker_time)
             mouse2.DeliverReward(Locations.Cooperate, self.temptation_time)
             self.time_to_make_decision = time.time() - self.time_start
+            self.numcompletedtrial += 1
 
         elif state == States.M1DM2C:
             # Actions for M1DCM2C state
@@ -152,6 +154,7 @@ class ExperimentManager:
             mouse1.DeliverReward(Locations.Cooperate, self.temptation_time)
             mouse2.DeliverReward(Locations.Defect, self.sucker_time)
             self.time_to_make_decision = time.time() - self.time_start
+            self.numcompletedtrial += 1
 
         elif state == States.M1DM2D:
             # Actions for M1DM2D state
@@ -165,13 +168,14 @@ class ExperimentManager:
             mouse1.DeliverReward(Locations.Defect, self.punishment_time)
             mouse2.DeliverReward(Locations.Defect, self.punishment_time)
             self.time_to_make_decision = time.time() - self.time_start
+            self.numcompletedtrial += 1
 
 
 
 
         elif state == States.TrialCompleted:
             # Increment the trial number counter
-            self.numcompletedtrial += 1
+
 
             self.timestamps = {
                 'Start Time': self.time_start,
@@ -239,6 +243,7 @@ class ExperimentManager:
 
     def start_streaming_exp(self, experiment_parameters, mouse1, mouse2, opponent_path):
         self.trial_logger.start_logging(experiment_parameters.get("mouse_id"), opponent_path)
+        self.event_logger.start_logging(experiment_parameters.get("mouse_id"), opponent_path)
         self.num_trial = experiment_parameters.get("num_trials")
         force_end_time = self.num_trial * (experiment_parameters.get("decision_time") + experiment_parameters.get("return_time"))
 

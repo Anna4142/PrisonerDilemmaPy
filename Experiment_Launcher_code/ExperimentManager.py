@@ -79,16 +79,10 @@ class ExperimentManager:
     def StateActivity(self, state, mouse1, mouse2):
         if state is not None:
 
-            self.event_logger.log_event_data(self.numcompletedtrial,state,time.time())
+            self.event_logger.log_data(self.numcompletedtrial,state,time.time())
 
         if state == States.Start:
-
-
-            self.visit_cen=False
-
-
-        #elif state == States.WaitForStart:
-        #    pass
+           self.visit_cen=False
 
         elif state == States.CenterReward:
             print("in cen reward dec time",self.time_to_make_decision)
@@ -198,7 +192,7 @@ class ExperimentManager:
                 self.opponent_center_reward = "0.00"
 
             print("Trial Completed. Number of completed trials: ", self.numcompletedtrial)
-            self.trial_logger.log_trial_data(self.numcompletedtrial, "Completed Trial", self.opponent_choice,
+            self.trial_logger.log_data(self.numcompletedtrial, "Completed Trial", self.opponent_choice,
                                              self.mouse_choice, self.mouse_reward,self.mouse_center_reward, self.opponent_reward,self.opponent_center_reward,
                                              self.time_start, self.time_to_make_decision, self.time_to_return_to_center)
 
@@ -216,7 +210,7 @@ class ExperimentManager:
             self.opponent_reward = "-"
             self.opponent_center_reward = "0.00"
             self.mouse_center_reward = "0.00"
-            self.trial_logger.log_trial_data(self.numcompletedtrial, "Not Completed Trial", self.opponent_choice,
+            self.trial_logger.log_data(self.numcompletedtrial, "Not Completed Trial", self.opponent_choice,
                                              self.mouse_choice, self.mouse_reward,self.mouse_center_reward, self.opponent_reward,self.opponent_center_reward,
                                              self.time_start, self.time_to_make_decision, self.time_to_return_to_center)
             self.visit_cen == False
@@ -235,16 +229,16 @@ class ExperimentManager:
             self.opponent_center_reward = "0.00"
             self.mouse_center_reward = "0.00"
 
-            self.trial_logger.log_trial_data(self.numcompletedtrial, "Not Completed Trial", self.opponent_choice,
+            self.trial_logger.log_data(self.numcompletedtrial, "Not Completed Trial", self.opponent_choice,
                                          self.mouse_choice, self.mouse_reward, self.mouse_center_reward,
                                          self.opponent_reward, self.opponent_center_reward,
                                          self.time_start, self.time_to_make_decision, self.time_to_return_to_center)
 
 
         elif state == States.End:
-            # Stop recording, finalize logs, show end message, etc.
-            self.trial_logger.finalize_logging()
-            
+            print("END OF TRIAL")
+
+
     def get_data_file_path(self):
         # Retrieve the file path from the TrialLogger instance
         return self.trial_logger.get_csv_file_path()

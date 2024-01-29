@@ -55,18 +55,15 @@ class ExperimentManager:
 
     def on_release(self, key):
         print(f"Key released: {key}")
-    """""
+
     def start_state_timer(self, state):
-      
         self.state_start_times[state] = time.time()
 
     def get_state_duration(self, state):
-       
         return time.time() - self.state_start_times.get(state, time.time())
 
     def StateActivity(self, state, mouse1, mouse2):
         if state is not None:
-
             self.event_logger.log_data(self.numcompletedtrial,state,time.time())
 
         if state == States.Start:
@@ -198,7 +195,7 @@ class ExperimentManager:
             self.trial_logger.finalize_logging()
             self.event_logger.finalize_logging()
 
-   def start_streaming_exp(self, experiment_parameters, mouse1, mouse2):
+    def start_streaming_exp(self, experiment_parameters, mouse1, mouse2):
         self.trial_logger.start_logging()
         self.event_logger.start_logging()
         num_trial = experiment_parameters.get("num_trials")

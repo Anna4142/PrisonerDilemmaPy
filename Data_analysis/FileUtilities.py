@@ -55,7 +55,7 @@ def set_experiment_directory(path):
         experiment_directory = experiment_path
         return True
     else:
-        result = messagebox.askquestion("Invalid Input", "Experiment directory does not exist. Create?", icon='error')
+        result = messagebox.askquestion("Directory Warning", "Experiment directory does not exist. Create?", icon='warning')
         if result == "yes":
             experiment_directory = experiment_path
             os.makedirs(experiment_directory)
@@ -75,7 +75,7 @@ def set_mouse_directory(mouse):
         mouse_directory = mouse_path
         return True
     else:
-        result = messagebox.askquestion("Invalid Input", "Mouse directory does not exist. Create?", icon='error')
+        result = messagebox.askquestion("Directory Warning", "Mouse directory does not exist. Create?", icon='warning')
         if result == "yes":
             mouse_directory = mouse_path
             os.makedirs(mouse_directory)

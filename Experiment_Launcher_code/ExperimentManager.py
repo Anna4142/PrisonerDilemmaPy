@@ -196,7 +196,8 @@ class ExperimentManager:
         elif state == States.End:
             # Stop recording, finalize logs, show end message, etc.
             self.trial_logger.finalize_logging()
-            
+            self.event_logger.finalize_logging()
+
     def start_streaming_exp(self, experiment_parameters, mouse1, mouse2):
         self.trial_logger.start_logging()
         self.event_logger.start_logging()

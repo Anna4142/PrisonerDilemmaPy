@@ -1,11 +1,15 @@
-from Arduino_related_code.ArduinoDigital import ArduinoDigital
+from Experiment_Launcher_code.ModuleConfiguration import __USE_ARDUINO_SIM
+if __USE_ARDUINO_SIM:
+    import Arduino_related_code.ArduinoDigitalSim as arduino
+else:
+    import Arduino_related_code.ArduinoDigital as arduino
 
 ##### main
 opcode = -1
-arduino = ArduinoDigital("COM11")
+arduino.openComPort("COM11");
 
 while opcode != 0:
-    opcodestr = input("opcode [0- exit, 1- Valve on, 2- Valve of]: ")
+    opcodestr = input("opcode [0- exit, 1- Valve on, 2- Valve of, 3 - high pule, 4 - low pulse]: ")
     opcode = int(opcodestr)
 
     if opcode == 0:

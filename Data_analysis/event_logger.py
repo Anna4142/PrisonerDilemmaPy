@@ -1,6 +1,23 @@
 import csv
-import pandas as pd
+import pandas as  pd
+from Data_analysis.LoggerABC import BaseLogger
+class EventLogger(BaseLogger):
+    def start_logging(self, filename, opponenttype):
+        base_path = self._construct_base_file_path(filename, opponenttype)
+        folder_path = base_path + 'event_data_from_trials/'
 
+        current_datetime = pd.Timestamp.now()
+        datetime_string = current_datetime.strftime("%Y%m%d_%H%M%S")
+        self.csv_file_path = f'{folder_path}{datetime_string}.csv'
+
+        header = ["Trial Number", "Event", "Time"]
+        self._create_file(self.csv_file_path, header)
+
+    def log_data(self, trial_number, event, time):
+        data = [trial_number, event, time]
+        super().log_data(data)
+
+"""""
 class EventLogger:
     def __init__(self):
         self.csv_file = None
@@ -33,3 +50,4 @@ class EventLogger:
 
     def get_csv_file_path(self):
         return self.csv_file_path
+"""""

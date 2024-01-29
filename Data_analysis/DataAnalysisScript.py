@@ -47,9 +47,11 @@ class DataAnalyzer:
         percentage_c = (num_c_choices / num_trials) * 100
         percentage_d = (num_d_choices / num_trials) * 100
         # Return the analysis results as a dictionary
+
         current_datetime = pd.Timestamp.now()
 
         current_date =  current_datetime.strftime("%Y%m%d")
+
 
         analysis_results = {
             "Date": current_date,

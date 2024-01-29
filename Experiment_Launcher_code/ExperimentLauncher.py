@@ -4,9 +4,9 @@ if __USE_VIDEO_SIM:
     from Video_analyser_code.VideoAnalyzerSim import Video_Analyzer
 elif __USE_VIDEO_STUB:
     from Video_analyser_code.VideoAnalyzerStub import Video_Analyzer
+
 else:
     from Video_analyser_code.VideoAnalyser import Video_Analyzer
-
 from modelling_opponent.MouseMonitor import MouseMonitor
 from modelling_opponent.FixedStrategyPrisoner import FixedStrategyPrisoner
 #from modelling_opponent.Simulated_learner import Simulated_mouse

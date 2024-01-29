@@ -55,22 +55,22 @@ class ExperimentManager:
 
     def on_release(self, key):
         print(f"Key released: {key}")
-
+    """""
     def start_state_timer(self, state):
-        """ Start the timer for a given state """
+      
         self.state_start_times[state] = time.time()
 
     def get_state_duration(self, state):
-        """ Calculate the duration spent in a given state """
+       
         return time.time() - self.state_start_times.get(state, time.time())
 
     def StateActivity(self, state, mouse1, mouse2):
         if state is not None:
-            duration = self.get_state_duration(state)
-            self.event_logger.log_event_data(self.numcompletedtrial,state,duration)
+
+            self.event_logger.log_data(self.numcompletedtrial,state,time.time())
 
         if state == States.Start:
-            self.visit_cen=False
+           self.visit_cen=False
 
         elif state == States.CenterReward:
             self.time_to_make_decision = 0
@@ -81,10 +81,10 @@ class ExperimentManager:
             print("delivering reward in the center ")
             mouse1.DeliverReward(Locations.Center, self.center_reward_time)
             mouse2.DeliverReward(Locations.Center, self.center_reward_time)
+            self.time_start = time.time()
 
         elif state == States.TrialStarted:
             Play(Sounds.Start)
-            self.time_start = time.time()
             if self.numcompletedtrial > 0:
                 self.time_to_return_to_center = time.time() - self.time_to_make_decision - self.time_start
             mouse1.NewTrial()
@@ -94,8 +94,8 @@ class ExperimentManager:
             # Actions for M1CM2C state
             self.mouse_choice = "C"
             self.opponent_choice = "C"
-            self.mouse_reward = "0.03"
-            self.opponent_reward = "0.03"
+            self.mouse_reward = "0.012"
+            self.opponent_reward = "0.012"
             self.mouse_center_reward="0.0"
             self.opponent_center_reward = "0.0"
             self.cc_cnt += 1
@@ -108,7 +108,7 @@ class ExperimentManager:
             self.mouse_choice = "C"
             self.opponent_choice = "D"
             self.mouse_reward = "0"
-            self.opponent_reward = "0.06"
+            self.opponent_reward = "0.024"
             self.mouse_center_reward = "0.0"
             self.opponent_center_reward = "0.0"
             self.cd_cnt += 1
@@ -120,7 +120,7 @@ class ExperimentManager:
             # Actions for M1DCM2C state
             self.mouse_choice = "D"
             self.opponent_choice = "C"
-            self.mouse_reward = "0.06"
+            self.mouse_reward = "0.024"
             self.opponent_reward = "0"
             self.mouse_center_reward = "0.0"
             self.opponent_center_reward = "0.0"
@@ -133,8 +133,8 @@ class ExperimentManager:
             # Actions for M1DM2D state
             self.mouse_choice = "D"
             self.opponent_choice = "D"
-            self.mouse_reward = "0.015"
-            self.opponent_reward = "0.015"
+            self.mouse_reward = "0.006"
+            self.opponent_reward = "0.006"
             self.mouse_center_reward = "0.0"
             self.opponent_center_reward = "0.0"
             self.dd_cnt += 1
@@ -158,7 +158,7 @@ class ExperimentManager:
                 self.opponent_center_reward = "0.00"
 
             print("Trial Completed. Number of completed trials: ", self.numcompletedtrial)
-            self.trial_logger.log_trial_data(self.numcompletedtrial, "Completed Trial", self.opponent_choice,
+            self.trial_logger.log_data(self.numcompletedtrial, "Completed Trial", self.opponent_choice,
                                              self.mouse_choice, self.mouse_reward,self.mouse_center_reward, self.opponent_reward,self.opponent_center_reward,
                                              self.time_start, self.time_to_make_decision, self.time_to_return_to_center)
 
@@ -172,7 +172,7 @@ class ExperimentManager:
             self.opponent_reward = "-"
             self.opponent_center_reward = "0.00"
             self.mouse_center_reward = "0.00"
-            self.trial_logger.log_trial_data(self.numcompletedtrial, "Not Completed Trial", self.opponent_choice,
+            self.trial_logger.log_data(self.numcompletedtrial, "Not Completed Trial", self.opponent_choice,
                                              self.mouse_choice, self.mouse_reward,self.mouse_center_reward, self.opponent_reward,self.opponent_center_reward,
                                              self.time_start, self.time_to_make_decision, self.time_to_return_to_center)
             self.visit_cen == False
@@ -188,7 +188,7 @@ class ExperimentManager:
             self.opponent_center_reward = "0.00"
             self.mouse_center_reward = "0.00"
 
-            self.trial_logger.log_trial_data(self.numcompletedtrial, "Not Completed Trial", self.opponent_choice,
+            self.trial_logger.log_data(self.numcompletedtrial, "Not Completed Trial", self.opponent_choice,
                                          self.mouse_choice, self.mouse_reward, self.mouse_center_reward,
                                          self.opponent_reward, self.opponent_center_reward,
                                          self.time_start, self.time_to_make_decision, self.time_to_return_to_center)
@@ -198,7 +198,7 @@ class ExperimentManager:
             self.trial_logger.finalize_logging()
             self.event_logger.finalize_logging()
 
-    def start_streaming_exp(self, experiment_parameters, mouse1, mouse2):
+   def start_streaming_exp(self, experiment_parameters, mouse1, mouse2):
         self.trial_logger.start_logging()
         self.event_logger.start_logging()
         num_trial = experiment_parameters.get("num_trials")

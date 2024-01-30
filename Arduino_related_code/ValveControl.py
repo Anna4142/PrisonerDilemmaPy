@@ -14,9 +14,7 @@ class ValveControl:
         self.valveopen = False
 
     def OpenValve(self, duration):
-
         if duration > 0:
-
             self.starttime = time.time()
             self.duration = duration
             Arduino.DigitalLowPulse(self.channel, int(duration * 1000))  # Start Low pulse, time is converted to mSec
@@ -24,7 +22,6 @@ class ValveControl:
 
     def CloseValve(self):
         Arduino.DigitalHigh(self.channel)  # Set the pin high
-
         self.valveopen = False
 
     def IsValveOpen(self):

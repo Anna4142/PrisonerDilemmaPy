@@ -4,11 +4,11 @@ from Arduino_related_code.ArduinoDigital import ArduinoDigital
 from Arduino_related_code.ValveControl import ValveControl
 import time
 
-def calibrate_valve(pin, duration_ms, arduino):
+def calibrate_valve(pin, duration_ms,opening_number, arduino):
     valve_control = ValveControl(pin, arduino)
     duration_s = duration_ms / 1000  # Convert duration from milliseconds to seconds
 
-    for i in range(25):
+    for i in range(opening_number):
         print(f"Calibrating valve on pin {pin}: Iteration {i+1}")
         valve_control.OpenValve(duration_s)  # Open valve for the specified duration in seconds
 
@@ -37,10 +37,16 @@ duration_label.pack()
 duration_entry = tk.Entry(root)
 duration_entry.pack()
 
+OpeningNumber_label = tk.Label(root, text="Enter number of times you want the valve to open and close:")
+OpeningNumber_label.pack()
+OpeningNumber_entry = tk.Entry(root)
+OpeningNumber_entry.pack()
+
 # Button to start calibration
 calibrate_button = tk.Button(root, text="Start Calibration",
                              command=lambda: calibrate_valve(int(pin_entry.get()),
-                                                               int(duration_entry.get(),arduino)))
+                                                               int(duration_entry.get()),int(OpeningNumber_entry.get()),
+                                                             int(arduino)))
 calibrate_button.pack()
 
 # Start the GUI event loop

@@ -20,20 +20,12 @@ def jaccard_similarity(set1, set2):
 def load_csv(file_path):
     return pd.read_csv(file_path)
 
-# Function to find the latest CSV file based on modification time
-def find_latest_csv(directory):
-    csv_files = [os.path.join(directory, f) for f in os.listdir(directory) if f.endswith('.csv')]
-    latest_file = max(csv_files, key=os.path.getmtime)
-    return latest_file
+# Main function to calculate Jaccard scores between a specific CSV and all others in the folder
+def compare_with_all(latest_csv_path, directory):
+    # Load the specified CSV into a DataFrame
+    latest_df = load_csv(latest_csv_path)
 
-# Main function to calculate Jaccard scores between the latest CSV and all others in the folder
-def compare_latest_with_all(directory):
-    # Find the latest CSV file
-    latest_csv = find_latest_csv(directory)
-    # Load the latest CSV into a DataFrame
-    latest_df = load_csv(latest_csv)
-
-    # Process the event data for the latest CSV
+    # Process the event data for the specified CSV
     latest_event_sets = process_events(latest_df)
 
     # Store Jaccard scores
@@ -42,7 +34,7 @@ def compare_latest_with_all(directory):
     # Loop through all CSV files in the directory
     for csv_file in os.listdir(directory):
         file_path = os.path.join(directory, csv_file)
-        if csv_file.endswith('.csv') and file_path != latest_csv:
+        if csv_file.endswith('.csv') and file_path != latest_csv_path:
             # Load the CSV file into a DataFrame
             current_df = load_csv(file_path)
 
@@ -63,11 +55,14 @@ def compare_latest_with_all(directory):
 
     return jaccard_scores
 
-# Directory containing the CSV files
-directory = 'C:/Users/EngelHardBlab.MEDICINE/Downloads/PrisonerDilemmaPy_(4)/PrisonerDilemmaPy/Ground_Truth_Data/StrategyData'
+# Path to the latest CSV file
+directory= 'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/COMPUTER_COMPUTER/event_data_from_trials/'
+
+# Directory containing the other CSV files
+latest_csv_path = 'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/MOUSE_COMPUTER/1775/event_data_from_trials/20240123_105302.csv'
 
 # Compare the latest CSV with all others and get the Jaccard scores
-scores = compare_latest_with_all(directory)
+scores = compare_with_all(latest_csv_path, directory)
 
 # Output the Jaccard scores
 for file, score in scores.items():

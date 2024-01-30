@@ -11,9 +11,9 @@ class BaseLogger(ABC):
         # Construct and return the base file path
         #return f'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/{opponenttype}/{filename}/'
         if opponenttype == "MOUSE_COMPUTER":
-            return f'C:/Users/anush/Downloads/Data/{opponenttype}/{filename}/'
+            return f'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/{opponenttype}/{filename}/'
         elif opponenttype == "COMPUTER_COMPUTER":
-            return  f'C:/Users/anush/Downloads/Data/{opponenttype}/'
+            return f'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/{opponenttype}/'
 
 
     @abstractmethod

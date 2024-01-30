@@ -25,10 +25,10 @@ class ExperimentGUI:
         # Initialize entry variables
         self.experiment_name = tk.StringVar(value = "Experiment 1")
         self.comport_name = tk.StringVar(value = "COM11")
-        self.num_trials_var = tk.StringVar(value = "50")
+        self.num_trials_var = tk.StringVar(value = "100")
         self.return_time_var = tk.StringVar(value = "20")
         self.decision_time_var = tk.StringVar(value = "20")
-        self.mouse_id_var = tk.StringVar(value="1777")
+        self.mouse_id_var = tk.StringVar(value="1111")
         self.first_opponent_type = tk.StringVar(value = None)
         self.second_opponent_type = tk.StringVar(value = None)
         self.first_opponent_strategy = tk.StringVar(value = None)

@@ -26,6 +26,13 @@ void setup()
   // Digital system initialization
   pinMode(ONBOARD_LED, OUTPUT);
   
+  // Close all vales
+  for (int i = 7; i <= 12; i++)
+  {
+    pinMode(i, OUTPUT);
+    digitalWrite(i, HIGH);
+  }
+  
   // Serial port initialization
   Serial.begin(baud_rate);
   

@@ -10,7 +10,6 @@ Arduino.openComPort(comport)
 # Initialize ValveControl for a specific channel
 valve_control = ValveControl(8)  # Assume pin 8 for the valve
 
-text = input("Start (press Enter)? ")
 for i in range(5):
     print(f"Opening valve.")
     valve_control.OpenValve(2)  # Open valve for 2 seconds

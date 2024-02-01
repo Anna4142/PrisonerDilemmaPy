@@ -1,11 +1,16 @@
-from Arduino_related_code.ArduinoDigital import ArduinoDigital
+from Experiment_Launcher_code.ModuleConfiguration import __USE_ARDUINO_SIM
+if __USE_ARDUINO_SIM:
+    import Arduino_related_code.ArduinoDigitalSim as arduino
+else:
+    import Arduino_related_code.ArduinoDigital as arduino
 
 ##### main
 opcode = -1
-arduino = ArduinoDigital("COM4")
+comport = input("COM Port?: ")
+arduino.openComPort(comport);
 
 while opcode != 0:
-    opcodestr = input("opcode [0- exit, 1- Valve on, 2- Valve of]: ")
+    opcodestr = input("opcode [0- exit, 1- Valve on, 2- Valve of, 3 - high pule, 4 - low pulse]: ")
     opcode = int(opcodestr)
 
     if opcode == 0:
@@ -18,6 +23,16 @@ while opcode != 0:
     elif opcode == 2:
         pin = int(input("select valve: "))
         arduino.DigitalLow(pin)
+
+    elif opcode == 3:
+        pin = int(input("select valve: "))
+        width = int(input("select openning time: "))
+        arduino.DigitalHighPulse(pin, width)
+
+    elif opcode == 4:
+        pin = int(input("select valve: "))
+        width = int(input("select openning time: "))
+        arduino.DigitalLowPulse(pin, width)
 
     else:
         print ("illegal opcode")

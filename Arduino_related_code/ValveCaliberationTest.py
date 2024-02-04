@@ -1,11 +1,11 @@
 import tkinter as tk
 from threading import Thread
-from Arduino_related_code.ArduinoDigital import ArduinoDigital
+from Arduino_related_code.ArduinoDigital import *
 from Arduino_related_code.ValveControl import ValveControl
 import time
 
 def calibrate_valve(pin, duration_ms,opening_number, arduino):
-    valve_control = ValveControl(pin, arduino)
+    valve_control = ValveControl(pin)
     duration_s = duration_ms / 1000  # Convert duration from milliseconds to seconds
 
     for i in range(opening_number):
@@ -20,7 +20,7 @@ def calibrate_valve(pin, duration_ms,opening_number, arduino):
 
 # Initialize the ArduinoDigital object
 comport = "COM11"
-arduino = ArduinoDigital(comport)
+arduino = openComPort(comport)
 
 # Setting up the Tkinter window
 root = tk.Tk()
@@ -32,7 +32,7 @@ pin_label.pack()
 pin_entry = tk.Entry(root)
 pin_entry.pack()
 
-duration_label = tk.Label(root, text="Enter Duration (ms):")
+duration_label = tk.Label(root, text="Enter Duration (millisec):")
 duration_label.pack()
 duration_entry = tk.Entry(root)
 duration_entry.pack()
@@ -51,3 +51,5 @@ calibrate_button.pack()
 
 # Start the GUI event loop
 root.mainloop()
+
+

@@ -4,7 +4,7 @@ from Arduino_related_code.ValveControl import ValveControl
 import time
 
 # Initialize the ArduinoDigital object
-comport = "COM4"
+comport = "COM11"
 Arduino.openComPort(comport)
 
 # Initialize ValveControl for a specific channel
@@ -12,7 +12,7 @@ valve_control = ValveControl(8)  # Assume pin 8 for the valve
 
 for i in range(100):
     print(f"Opening valve.")
-    valve_control.OpenValve(0.02)  # Open valve for 2 seconds
+    valve_control.OpenValve(2)  # Open valve for 2 seconds
 
     # Wait until the valve is closed
     while valve_control.IsValveOpen():

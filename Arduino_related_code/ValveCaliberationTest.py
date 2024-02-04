@@ -45,8 +45,8 @@ OpeningNumber_entry.pack()
 # Button to start calibration
 calibrate_button = tk.Button(root, text="Start Calibration",
                              command=lambda: calibrate_valve(int(pin_entry.get()),
-                                                               int(duration_entry.get()),int(OpeningNumber_entry.get()),
-                                                             int(arduino)))
+                                                               int(duration_entry.get()),int(OpeningNumber_entry.get()),arduino))
+
 calibrate_button.pack()
 
 # Start the GUI event loop

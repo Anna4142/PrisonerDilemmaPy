@@ -1,14 +1,21 @@
 import datetime
 
+def openComPort(portname):
+    ct = datetime.datetime.now().strftime("%M:%S.%f")
+    print(f'COM port {portname} created.');
 
-class ArduinoDigital:
-    def __init__(self, portname):
-        self.comport = portname
+def DigitalHigh(pin):
+    ct = datetime.datetime.now().strftime("%M:%S.%f")
+    print(f"Arduino Digital channel {pin}, set to High. Time Stamp= {ct}")
 
-    def DigitalHigh(self, pin):
-        ct = datetime.datetime.now().strftime("%M:%S.%f")
-        print("Arduino Digital channel ", pin, "set to High. Time Stamp= ", ct)
+def DigitalLow(pin):
+    ct = datetime.datetime.now().strftime("%M:%S.%f")
+    print(f"Arduino Digital channel {pin}, set to High. Time Stamp= {ct}")
 
-    def DigitalLow(self, pin):
-        ct = datetime.datetime.now().strftime("%M:%S.%f")
-        print("Arduino Digital channel ", pin, "set to Low. Time Stamp= ", ct)
+def DigitalHighPulse(pin, width):
+    ct = datetime.datetime.now().strftime("%M:%S.%f")
+    print(f"Arduino Digital channel {pin} set to high pulse. Width {width}, Time Stamp= {ct}")
+
+def DigitalLowPulse(pin, width):
+    ct = datetime.datetime.now().strftime("%M:%S.%f")
+    print(f"Arduino Digital channel {pin} set to low pulse. Width {width}, Time Stamp= {ct}")

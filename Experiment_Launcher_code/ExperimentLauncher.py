@@ -1,3 +1,4 @@
+from Data_analysis.DataAnalysisScript import DataAnalyzer
 from Experiment_Launcher_code.ModuleConfiguration import __USE_VIDEO_SIM
 from Experiment_Launcher_code.ModuleConfiguration import __USE_VIDEO_STUB
 if __USE_VIDEO_SIM:
@@ -13,7 +14,9 @@ from modelling_opponent.FixedStrategyPrisoner import FixedStrategyPrisoner
 from Reward_manager.RewardManager import RewardManager
 from Experiment_Launcher_code.ExperimentManager import ExperimentManager
 from Experiment_Launcher_code.experimentgui import ExperimentGUI, OpponentType
-from Data_analysis.DataAnalysisScript import DataAnalyzer
+#from Data_analysis.DataAnalysisScript import DataAnalyzer
+import Data_analysis.FileUtilities as fUtile
+
 
 def main():
     # Create an instance of the ExperimentGUI class
@@ -25,13 +28,12 @@ def main():
         comport_name = experiment_gui.get_com_port()
         experiment_parameters = experiment_gui.get_experiment_parameters()
         opponent_configuration = experiment_gui.get_opponent_configuration()
-        if opponent_configuration.get("opponent1_type") == OpponentType.MOUSE:
-            opponent_path = "MOUSE_COMPUTER"
-        else:
-            opponent_path = "COMPUTER_COMPUTER"
+
+        fUtile.set_file_name(experiment_parameters.get('session_type'), experiment_parameters.get('session_num'))
+        write_configuration_file(experiment_parameters, opponent_configuration)
 
         # Instantiate software components
-        video_analyzer = Video_Analyzer(experiment_parameters.get("mouse_id"), opponent_path)
+        video_analyzer = Video_Analyzer()
         reward_manager = RewardManager(comport_name)
 
         # Configure Opponents
@@ -52,9 +54,9 @@ def main():
         # Initialize and start the experiment
         expManager = ExperimentManager(video_analyzer, reward_manager)
         print("Experiment manager now running")
-        expManager.start_streaming_exp(experiment_parameters, first_opponent, second_opponent, opponent_path)
+        expManager.start_streaming_exp(experiment_parameters, first_opponent, second_opponent)
     
-        data_file_path = expManager.get_data_file_path()  # Get the path of the logged data
+        data_file_path =fUtile.get_file_path(fUtile.FileType.EXPERIMENT_LOG) + '.csv'  # Get the path of the logged data
 
         # Initialize DataAnalyzer with the file path
         data_analyzer = DataAnalyzer(data_file_path)
@@ -68,6 +70,38 @@ def main():
         del expManager
     else:
         print("No valid settings were provided.")
+
+
+def write_configuration_file(experiment_parameters, opponent_configuration):
+    filepath = fUtile.get_file_path(fUtile.FileType.EXPERIMENT_CONFIGURATION) + ".txt"
+    with open(filepath, 'w') as file:
+        file.write('Experiment name: ' + experiment_parameters.get('experiment_name') + '\n')
+        file.write('Session Type & number: ' + experiment_parameters.get('session_type') + ', ' + experiment_parameters.get('session_num') + '\n')
+        file.write('Number of Trials: ' + str(experiment_parameters.get('num_trials')) + '\n')
+        file.write('Decision and Return Time limits: ' + str(experiment_parameters.get('decision_time')) + ', ' + str(experiment_parameters.get('return_time')) + '\n')
+        write_opponent_configuration(file, opponent_configuration, 'First')
+        write_opponent_configuration(file, opponent_configuration, 'Second')
+
+
+def write_opponent_configuration(file, configuration, oppid):
+    oppnum = '1'
+    if oppid == 'Second':
+        oppnum = '2'
+    otype = 'opponent1_type'.replace('1', oppnum)
+    mouseid = 'mouse_1_id'.replace('1', oppnum)
+    ostrategy = 'opponent1_strategy'.replace('1', oppnum)
+    oprobability = 'opponent1_probability'.replace('1', oppnum)
+
+    if configuration.get(otype) == OpponentType.MOUSE:
+        file.write(f'{oppid} Opponent: Mouse, Mouse ID: {configuration.get(mouseid)}\n')
+    elif configuration.get(otype) == OpponentType.FIXED_STRATEGY:
+        if configuration.get(ostrategy) == 'Probability p Cooperator':
+            file.write(f'{oppid} Opponent: Fixed Strategy: {configuration.get(ostrategy)}, Probability: {str(configuration.get(oprobability))}\n')
+        else:
+            file.write(f'{oppid} Opponent: Fixed Strategy: {configuration.get(ostrategy)}\n')
+    else:
+        file.write(f'{oppid} Opponent: Learner. \n')
+
 
 # Run the main function
 if __name__ == "__main__":

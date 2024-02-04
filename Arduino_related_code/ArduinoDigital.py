@@ -6,7 +6,7 @@ global comport;
 def openComPort(portname):
     global comport;
     comport = serial.Serial(portname, 9600)
-    time.sleep(2)                # Arduino resets itself when the port is opened. Give it time to complete.
+    time.sleep(2)
 
 def DigitalHigh(pin):
     sendMessage('E', pin, 1, 0);

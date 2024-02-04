@@ -1,3 +1,4 @@
+from Data_analysis.DataAnalysisScript import DataAnalyzer
 from Experiment_Launcher_code.ModuleConfiguration import __USE_VIDEO_SIM
 from Experiment_Launcher_code.ModuleConfiguration import __USE_VIDEO_STUB
 if __USE_VIDEO_SIM:
@@ -55,7 +56,7 @@ def main():
         print("Experiment manager now running")
         expManager.start_streaming_exp(experiment_parameters, first_opponent, second_opponent)
     
-        data_file_path = expManager.get_data_file_path()  # Get the path of the logged data
+        data_file_path =fUtile.get_file_path(fUtile.FileType.EXPERIMENT_LOG) + '.csv'  # Get the path of the logged data
 
         # Initialize DataAnalyzer with the file path
         data_analyzer = DataAnalyzer(data_file_path)

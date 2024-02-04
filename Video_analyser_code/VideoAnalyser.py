@@ -5,7 +5,7 @@ import numpy as np
 import tkinter as tk
 from Video_analyser_code.VideoWriter import VideoWriter
 import pandas as pd
-
+import Data_analysis.FileUtilities as fUtile
 
 class Video_Analyzer:
     def __init__(self):
@@ -16,8 +16,8 @@ class Video_Analyzer:
 
             self.vimba = vimba
 
-
-
+        self.video_file_loc=fUtile.get_file_path(fUtile.FileType.VIDEO_CAPTURE) + '.avi'
+        """""
         # Formatting the date and time
         current_datetime = pd.Timestamp.now()
         datetime_string = current_datetime.strftime("%Y%m%d_%H%M%S")
@@ -26,7 +26,7 @@ class Video_Analyzer:
          self.video_file_loc = f'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/{opponenttype}/{filename}/video_captures/{datetime_string}.avi'
         else:
          self.video_file_loc = f'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/{opponenttype}/video_captures/{datetime_string}.avi'
-
+        """""
         self.video_writer = VideoWriter(output_file=self.video_file_loc)
         self.regions = self.define_regions()
         self.thresholds = self.define_thresholds()

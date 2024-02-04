@@ -1,14 +1,14 @@
 # Assuming you have a class or module ArduinoDigital with the relevant methods
-from Arduino_related_code.ArduinoDigital import ArduinoDigital
+import Arduino_related_code.ArduinoDigital as Arduino
 from Arduino_related_code.ValveControl import ValveControl
 import time
 
 # Initialize the ArduinoDigital object
-comport = "COM11"
-arduino = ArduinoDigital(comport)
+comport = "COM4"
+Arduino.openComPort(comport)
 
 # Initialize ValveControl for a specific channel
-valve_control = ValveControl(7, arduino)  # Assume pin 8 for the valve
+valve_control = ValveControl(8)  # Assume pin 8 for the valve
 
 for i in range(5):
     print(f"Opening valve.")

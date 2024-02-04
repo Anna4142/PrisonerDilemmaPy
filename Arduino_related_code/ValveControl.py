@@ -1,9 +1,13 @@
+from Experiment_Launcher_code.ModuleConfiguration import __USE_ARDUINO_SIM
+if __USE_ARDUINO_SIM:
+    import Arduino_related_code.ArduinoDigitalSim as Arduino
+else:
+    import Arduino_related_code.ArduinoDigital as Arduino
 import time
 
 class ValveControl:
-    def __init__(self, channel, arduino):
+    def __init__(self, channel):
         self.channel = channel
-        self.arduino = arduino  # This is an instance of ArduinoDigital
         self.CloseValve()
         self.starttime = 0
         self.duration = 0
@@ -13,15 +17,15 @@ class ValveControl:
         if duration > 0:
             self.starttime = time.time()
             self.duration = duration
-            self.arduino.DigitalLow(self.channel)  # Set the pin low
+            Arduino.DigitalLowPulse(self.channel, int(duration * 1000))  # Start Low pulse, time is converted to mSec
             self.valveopen = True
 
     def CloseValve(self):
-        self.arduino.DigitalHigh(self.channel)  # Set the pin high
+        Arduino.DigitalHigh(self.channel)  # Set the pin high
         self.valveopen = False
 
     def IsValveOpen(self):
         if self.valveopen:
             if time.time() - self.starttime > self.duration:
-                self.CloseValve()
+                self.valveopen = False
         return self.valveopen

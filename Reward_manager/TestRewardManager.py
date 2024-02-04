@@ -3,7 +3,8 @@ from Video_analyser_code.locations import Locations
 
 
 opcode = -1
-reward_manager = RewardManager("COM11")
+comport = input("Comport: ")
+reward_manager = RewardManager(comport)
 rewards = []
 
 while opcode != 0:

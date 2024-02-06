@@ -248,7 +248,7 @@ class ExperimentManager:
         self.trial_logger.start_logging(experiment_parameters.get("mouse_id"), opponent_path)
         self.event_logger.start_logging(experiment_parameters.get("mouse_id"), opponent_path)
         self.num_trial = experiment_parameters.get("num_trials")
-        force_end_time = self.num_trial * (experiment_parameters.get("decision_time") + experiment_parameters.get("return_time"))
+
 
         self.stateManager.SetTimeOut(experiment_parameters.get("decision_time"), experiment_parameters.get("return_time"))
 

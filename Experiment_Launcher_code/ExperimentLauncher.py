@@ -1,4 +1,5 @@
 from Data_analysis.DataAnalysisScript import DataAnalyzer
+import os
 from Experiment_Launcher_code.ModuleConfiguration import __USE_VIDEO_SIM
 from Experiment_Launcher_code.ModuleConfiguration import __USE_VIDEO_STUB
 if __USE_VIDEO_SIM:
@@ -14,9 +15,9 @@ from modelling_opponent.FixedStrategyPrisoner import FixedStrategyPrisoner
 from Reward_manager.RewardManager import RewardManager
 from Experiment_Launcher_code.ExperimentManager import ExperimentManager
 from Experiment_Launcher_code.experimentgui import ExperimentGUI, OpponentType
-#from Data_analysis.DataAnalysisScript import DataAnalyzer
-import Data_analysis.FileUtilities as fUtile
 
+import Data_analysis.FileUtilities as fUtile
+from  Data_analysis.EventComparison import EventComparator
 
 def main():
     # Create an instance of the ExperimentGUI class
@@ -58,14 +59,21 @@ def main():
     
         data_file_path =fUtile.get_file_path(fUtile.FileType.EXPERIMENT_LOG) + '.csv'  # Get the path of the logged data
 
-        # Initialize DataAnalyzer with the file path
         data_analyzer = DataAnalyzer(data_file_path)
-
         # Perform data analysis
         analysis_results = data_analyzer.analyze_data()
-
         # Save analysis results
+        data_analysis_file_path = fUtile.get_file_path(fUtile.FileType.DATA_ANALYSIS) + '.csv'  # Get the path of the logged data
         result_file_path = data_analyzer.save_results_to_file(analysis_results)
+
+
+        event_csv_path = fUtile.get_file_path(fUtile.FileType.EXPERIMENT_EVENT_LOG) + '.csv'
+
+        ground_truth_directory="C:/Users/anush/Downloads/Experiment_Folder/Ground_Truth_Data/StrategyData"
+        comparator = EventComparator(ground_truth_directory, event_csv_path)
+        comparator.save_scores()
+        # Initialize DataAnalyzer with the file path
+
         print(f"Analysis results saved to {result_file_path}")
         del expManager
     else:

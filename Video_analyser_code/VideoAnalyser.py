@@ -5,10 +5,10 @@ import numpy as np
 import tkinter as tk
 from Video_analyser_code.VideoWriter import VideoWriter
 import pandas as pd
-
+import Data_analysis.FileUtilities as fUtile
 
 class Video_Analyzer:
-    def __init__(self,filename,opponenttype):
+    def __init__(self):
         self.root = tk.Tk()
 
         # Initialize the Vimba SDK and VideoAnalyzer
@@ -16,8 +16,8 @@ class Video_Analyzer:
 
             self.vimba = vimba
 
-
-
+        self.video_file_loc=fUtile.get_file_path(fUtile.FileType.VIDEO_CAPTURE) + '.avi'
+        """""
         # Formatting the date and time
         current_datetime = pd.Timestamp.now()
         datetime_string = current_datetime.strftime("%Y%m%d_%H%M%S")
@@ -26,7 +26,7 @@ class Video_Analyzer:
          self.video_file_loc = f'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/{opponenttype}/{filename}/video_captures/{datetime_string}.avi'
         else:
          self.video_file_loc = f'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/{opponenttype}/video_captures/{datetime_string}.avi'
-
+        """""
         self.video_writer = VideoWriter(output_file=self.video_file_loc)
         self.regions = self.define_regions()
         self.thresholds = self.define_thresholds()
@@ -92,9 +92,9 @@ class Video_Analyzer:
     def define_regions(self):
         # Define the regions of interest (ROI) for each mouse and their specific zones
         regions = {
-            'm1_c': [(475, 110), (510, 240)],  # Mouse 2 Cooperate Zone (Top Left)
+            'm1_c': [(445, 110), (480, 240)],  # Mouse 2 Cooperate Zone (Top Left)
             'm1_cen': [(330, 260), (400, 330)],  # Mouse 2 Center Zone (Center Left)
-            'm1_d': [(455, 370), (490, 480)],  # Mouse 2 Defect Zone (Bottom Left)
+            'm1_d': [(425, 370), (470, 480)],  # Mouse 2 Defect Zone (Bottom Left)
             'm2_c': [(525, 110), (565, 235)],  # Mouse 1 Cooperate Zone (Top Right)
             'm2_cen': [(610, 260), (680, 330)],  # Mouse 1 Center Zone (Center Right)
             'm2_d': [(515, 370), (550, 480)],  # Adjusted Mouse 1 Defect Zone (Bottom Right)

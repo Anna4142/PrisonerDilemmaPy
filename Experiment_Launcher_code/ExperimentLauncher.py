@@ -18,7 +18,7 @@ from Experiment_Launcher_code.experimentgui import ExperimentGUI, OpponentType
 
 import Data_analysis.FileUtilities as fUtile
 from  Data_analysis.EventComparison import EventComparator
-
+from  Data_analysis.Data_analysis_plots import DataPlotter
 def main():
     # Create an instance of the ExperimentGUI class
     experiment_gui = ExperimentGUI()
@@ -73,6 +73,15 @@ def main():
         comparator = EventComparator(ground_truth_directory, event_csv_path)
         comparator.save_scores()
         # Initialize DataAnalyzer with the file path
+
+
+        save_directory = fUtile.get_file_path(fUtile.FileType.DATA_ANALYSIS_PLOTS) # Specify your custom save directory here
+
+        plotter = DataPlotter(data_file_path, save_directory)
+        plotter.load_data()
+        plotter.filter_completed_trials()
+        plotter.plot_decision_time()  # This will now save to the specified directory
+        plotter.plot_return_time()
 
         print(f"Analysis results saved to {result_file_path}")
         del expManager

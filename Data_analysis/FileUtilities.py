@@ -11,6 +11,7 @@ class FileType(Enum):
     EXPERIMENT_EVENT_LOG        = 5
     MOUSE_PROFILE               = 6
     COMPARISON_EVENT_LOG        = 7
+    DATA_ANALYSIS_PLOTS         = 8
 
 
 
@@ -27,7 +28,9 @@ def get_mouse_sub_directory(filetype):
         FileType.VIDEO_CAPTURE:             "/video_captures",
         FileType.EXPERIMENT_EVENT_LOG:      "/event_data_from_trials",
         FileType.DATA_ANALYSIS:             "/data_analysis",
-        FileType.COMPARISON_EVENT_LOG:      "/comparison_event_data"}
+        FileType.COMPARISON_EVENT_LOG:      "/comparison_event_data",
+        FileType.DATA_ANALYSIS_PLOTS: "/comparison_event_data"
+    }
     return mapping.get(filetype)
 
 
@@ -88,6 +91,7 @@ def set_mouse_directory(mouse):
             os.makedirs(mouse_directory + "/" + get_mouse_sub_directory(FileType.EXPERIMENT_EVENT_LOG))
             os.makedirs(mouse_directory + "/" + get_mouse_sub_directory(FileType.DATA_ANALYSIS))
             os.makedirs(mouse_directory + "/" + get_mouse_sub_directory(FileType.COMPARISON_EVENT_LOG))
+            os.makedirs(mouse_directory + "/" + get_mouse_sub_directory(FileType.DATA_ANALYSIS_PLOTS))
 
             return True
         else:

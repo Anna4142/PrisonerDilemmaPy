@@ -57,6 +57,8 @@ class ExperimentGUI:
         self.create_mouseid_field(self.second_opponent_panel, self.mouse_2_id)
         self.create_strategy_option(self.first_opponent_panel, self.first_opponent_strategy, self.first_opponent_prob)
         self.create_strategy_option(self.second_opponent_panel, self.second_opponent_strategy, self.second_opponent_prob)
+        self.create_strategy_option(self.first_opponent_panel, self.first_opponent_strategy, self.first_opponent_prob)
+        self.create_strategy_option(self.second_opponent_panel, self.second_opponent_strategy,self.second_opponent_prob)
 
         # Create a button to start the experiment
         start_button = tk.Button(self.window, text="Start Experiment", command=self.start_experiment)
@@ -139,6 +141,38 @@ class ExperimentGUI:
         probvar.set("0.1")
         probability_entry = tk.Entry(panel, textvariable = probvar)
         probability_entry.place(x = 150, y = 260, width = 50)
+
+    def create_learner_options(self, panel, opvar):
+        # Clear existing strategy options
+        for widget in panel.winfo_children():
+            if isinstance(widget, tk.Radiobutton) or isinstance(widget, tk.Label) and widget.cget(
+                    "text") == "Probability: ":
+                widget.destroy()
+
+        # Define learner options
+        learner_options = ["Q-Learning Agent", "Actor-Critic Agent", "Reinforce Agent"]
+        opvar.set(learner_options[0])  # Set default selection
+
+        tk.Label(panel, text="Learning Strategy:").place(x=50, y=130)
+        for index, option in enumerate(learner_options):
+            radiobutton = tk.Radiobutton(panel, text=option, variable=opvar, value=option)
+            radiobutton.place(x=70, y=160 + index * 30)
+
+    def update_opponent_options(self):
+        # Assuming this method is already calling correctly when the opponent type changes
+        if self.first_opponent_type.get() == "Learner":
+            self.create_learner_options(self.first_opponent_panel, self.first_opponent_strategy)
+        else:
+            # Fallback to default strategy options if not 'Learner'
+            self.create_strategy_option(self.first_opponent_panel, self.first_opponent_strategy,
+                                        self.first_opponent_prob)
+
+        if self.second_opponent_type.get() == "Learner":
+            self.create_learner_options(self.second_opponent_panel, self.second_opponent_strategy)
+        else:
+            # Fallback to default strategy options if not 'Learner'
+            self.create_strategy_option(self.second_opponent_panel, self.second_opponent_strategy,
+                                        self.second_opponent_prob)
 
     def start_experiment(self):
         # Start the experiment only if input data is valid

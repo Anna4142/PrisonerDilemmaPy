@@ -6,7 +6,9 @@ class BaseLogger(ABC):
     def __init__(self):
         self.csv_file = None
         self.csv_file_path = None
+
         self.csv_writer = None
+
 
     @abstractmethod
     def start_logging(self):

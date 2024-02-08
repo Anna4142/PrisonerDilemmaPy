@@ -8,7 +8,7 @@ comport = "COM11"
 Arduino.openComPort(comport)
 
 # Initialize ValveControl for a specific channel
-valve_control = ValveControl(8)  # Assume pin 8 for the valve
+valve_control = ValveControl(11)  # Assume pin 8 for the valve
 
 for i in range(100):
     print(f"Opening valve.")

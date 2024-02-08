@@ -37,8 +37,10 @@ class ExperimentGUI:
         self.mouse_2_id = tk.StringVar(value="1778")
         self.first_opponent_type = tk.StringVar(value = None)
         self.second_opponent_type = tk.StringVar(value = None)
-        self.first_opponent_strategy = tk.StringVar(value = None)
-        self.second_opponent_strategy = tk.StringVar(value = None)
+        self.first_opponent_strategy = tk.StringVar(value=None)
+        self.second_opponent_strategy = tk.StringVar(value=None)
+        self.first_opponent_learning_strategy = tk.StringVar(value = None)
+        self.second_opponent_learning_strategy = tk.StringVar(value = None)
         self.first_opponent_prob = tk.StringVar(value = None)
         self.second_opponent_prob = tk.StringVar(value = None)
 
@@ -260,6 +262,40 @@ class ExperimentGUI:
             return False
 
         return True
+
+    def update_opponent_options(self):
+        # Check for the first opponent panel
+        if self.first_opponent_type.get() == "Learner":
+            self.create_learner_option(self.first_opponent_panel, self.first_opponent_learning_strategy)
+        else:
+            # You might need to clear the learner options or recreate standard options here
+            self.create_strategy_option(self.first_opponent_panel, self.first_opponent_strategy,
+                                        self.first_opponent_prob)
+
+        # Repeat for the second opponent panel
+        if self.second_opponent_type.get() == "Learner":
+            self.create_learner_option(self.second_opponent_panel, self.second_opponent_learning_strategy)
+        else:
+            # Similarly, clear the learner options or recreate standard options for the second panel
+            self.create_strategy_option(self.second_opponent_panel, self.second_opponent_strategy,
+                                        self.second_opponent_prob)
+
+    def create_learner_option(self, panel, opvar):
+        # Clear existing strategy options and probability field if they exist
+        for widget in panel.winfo_children():
+            widget.destroy()  # This removes all widgets, including labels and entries previously added
+
+
+
+
+        # Define learner options
+        learner_options = ["Q-Learning Agent", "Actor-Critic Agent", "Reinforce Agent"]
+        opvar.set(learner_options[0])  # Set default selection
+
+        tk.Label(panel, text="Learning Strategy:", anchor="w").place(x=50, y=base_y_position)
+        for index, option in enumerate(learner_options):
+            radiobutton = tk.Radiobutton(panel, text=option, variable=opvar, value=option)
+            radiobutton.place(x=70, y=base_y_position + 30 + (index * 30))  # Adjust y for each option
 
     def experiment_started(self):
         return self.start_button_clicked

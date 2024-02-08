@@ -119,7 +119,7 @@ class StateManager:
                 if time.time() - self.StateStartTime > self.TransitionTimeOut[self.current_state]:
 
                     self.current_state = self.TimeOutState[self.current_state]
-                    print("timeout state",self.current_state )
+                    #print("timeout state",self.current_state )
                     self.StateStartTime = time.time()
 
             return self.current_state

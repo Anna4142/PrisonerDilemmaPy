@@ -12,7 +12,7 @@ valve_control = ValveControl(11)  # Assume pin 8 for the valve
 
 for i in range(100):
     print(f"Opening valve.")
-    valve_control.OpenValve(0.02)  # Open valve for 2 seconds
+    valve_control.OpenValve(2)  # Open valve for 2 seconds
 
     # Wait until the valve is closed
     while valve_control.IsValveOpen():

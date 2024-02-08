@@ -4,7 +4,7 @@ from Arduino_related_code.ArduinoDigital import *
 from Arduino_related_code.ValveControl import ValveControl
 import time
 
-def calibrate_valve(pin, duration_ms,opening_number, arduino):
+def calibrate_valve(pin, duration_ms,opening_number):
     valve_control = ValveControl(pin)
     duration_s = duration_ms / 1000  # Convert duration from milliseconds to seconds
 
@@ -45,7 +45,7 @@ OpeningNumber_entry.pack()
 # Button to start calibration
 calibrate_button = tk.Button(root, text="Start Calibration",
                              command=lambda: calibrate_valve(int(pin_entry.get()),
-                                                               int(duration_entry.get()),int(OpeningNumber_entry.get()),arduino))
+                                                               int(duration_entry.get()),int(OpeningNumber_entry.get())))
 
 calibrate_button.pack()
 

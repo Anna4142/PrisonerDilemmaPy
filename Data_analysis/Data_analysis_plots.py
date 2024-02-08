@@ -1,14 +1,16 @@
-import pandas as pd
-import matplotlib.pyplot as plt
-import os
+
 import matplotlib
 matplotlib.use('Agg')
 
+import pandas as pd
+import matplotlib.pyplot as plt
+import os
+
 
 class DataPlotter:
-    def __init__(self, filepath, save_directory=None):
+    def __init__(self, filepath, save_directory):
         self.data_file_path = filepath
-        self.save_directory = save_directory  # Path to the directory where plots will be saved
+        self.save_directory = save_directory  # Directly use this directory to save plots
         self.data = None
 
     def load_data(self):
@@ -26,13 +28,8 @@ class DataPlotter:
 
     def save_plot_to_directory(self, filename):
         """Determine the save path for the plot."""
-        if self.save_directory is not None:
-            # Use the specified save directory
-            plots_directory_path = self.save_directory
-        else:
-            # Default behavior: replace part of the data file path
-            directory_path = os.path.dirname(self.data_file_path)
-            plots_directory_path = directory_path.replace('data_from_trials', 'data_plots')
+        # Use the specified save directory directly
+        plots_directory_path = self.save_directory
 
         # Ensure the plots directory exists
         os.makedirs(plots_directory_path, exist_ok=True)
@@ -41,6 +38,31 @@ class DataPlotter:
         plot_file_path = os.path.join(plots_directory_path, filename)
 
         return plot_file_path
+
+    def plot_data(self, column_name, title, ylabel, base_filename):
+        """Generic method to plot data and save with a specific filename format."""
+        if self.data is not None:
+            plt.figure(figsize=(10, 6))
+            plt.plot(self.data['Trial Number'], self.data[column_name], marker='o', linestyle='-', color='blue')
+            plt.title(title)
+            plt.xlabel('Trial Number')
+            plt.ylabel(ylabel)
+            plt.grid(True)
+
+            # Use pandas to format the filename with the current date
+            current_date_str = pd.Timestamp.now().strftime("%Y%m%d-%H%M%S")
+            # Ensure base_filename does not include '.png' for proper formatting
+            if base_filename.endswith('.png'):
+                base_filename = base_filename[:-4]
+            formatted_filename = f"{base_filename}_{current_date_str}.png"
+
+            # Save the plot to the specified directory with the formatted filename
+            save_path = self.save_plot_to_directory(formatted_filename)
+            plt.savefig(save_path)
+            plt.close()  # Close the plot figure
+            print(f"Plot saved to {save_path}")
+        else:
+            print("Data is not filtered or loaded yet.")
 
     def plot_decision_time(self):
         """Plot the time to make decisions."""
@@ -52,20 +74,3 @@ class DataPlotter:
         self.plot_data('Time to Return to Center', 'Time to Return to Center for Each Completed Trial',
                        'Time to Return to Center (seconds)', 'time_to_return_to_center_plot.png')
 
-    def plot_data(self, column_name, title, ylabel, filename):
-        """Generic method to plot data and save to a specific directory."""
-        if self.data is not None:
-            plt.figure(figsize=(10, 6))
-            plt.plot(self.data['Trial Number'], self.data[column_name], marker='o', linestyle='-', color='blue')
-            plt.title(title)
-            plt.xlabel('Trial Number')
-            plt.ylabel(ylabel)
-            plt.grid(True)
-
-            # Save the plot to the specified directory
-            save_path = self.save_plot_to_directory(filename)
-            plt.savefig(save_path)
-            plt.close()  # Close the plot to avoid displaying it in non-interactive environments
-            print(f"Plot saved to {save_path}")
-        else:
-            print("Data is not filtered or loaded yet.")

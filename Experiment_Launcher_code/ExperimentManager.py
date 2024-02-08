@@ -63,8 +63,10 @@ class ExperimentManager:
         return time.time() - self.state_start_times.get(state, time.time())
 
     def StateActivity(self, state, mouse1, mouse2):
+
         if state is not None:
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
+
 
         if state == States.Start:
 
@@ -115,10 +117,9 @@ class ExperimentManager:
             self.cc_cnt += 1
             mouse1.DeliverReward(Locations.Cooperate, self.reward_time)
             mouse2.DeliverReward(Locations.Cooperate, self.reward_time)
-            self.time_to_make_decision = time.time() - self.time_start
 
-            self.numcompletedtrial += 1
-            self.start_return_time = time.time()
+
+
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
 
         elif state == States.M1CM2D:
@@ -132,9 +133,8 @@ class ExperimentManager:
             self.cd_cnt += 1
             mouse1.DeliverReward(Locations.Defect, self.sucker_time)
             mouse2.DeliverReward(Locations.Cooperate, self.temptation_time)
-            self.time_to_make_decision = time.time() - self.time_start
-            self.numcompletedtrial += 1
-            self.start_return_time = time.time()
+
+
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
 
 
@@ -149,9 +149,8 @@ class ExperimentManager:
             self.dc_cnt += 1
             mouse1.DeliverReward(Locations.Cooperate, self.temptation_time)
             mouse2.DeliverReward(Locations.Defect, self.sucker_time)
-            self.time_to_make_decision = time.time() - self.time_start
-            self.numcompletedtrial += 1
-            self.start_return_time = time.time()
+
+
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
 
         elif state == States.M1DM2D:
@@ -165,18 +164,18 @@ class ExperimentManager:
             self.dd_cnt += 1
             mouse1.DeliverReward(Locations.Defect, self.punishment_time)
             mouse2.DeliverReward(Locations.Defect, self.punishment_time)
-            self.time_to_make_decision = time.time() - self.time_start
-            self.numcompletedtrial += 1
-            self.time_to_make_decision = 0
-            self.time_to_return_to_center = 0
-            self.start_return_time = time.time()
+
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
 
 
 
 
         elif state == States.TrialCompleted:
-            # Increment the trial number counter
+
+            self.time_to_make_decision = time.time() - self.time_start
+            self.numcompletedtrial += 1
+            self.start_return_time = time.time()
+
 
             self.timestamps = {
                 'Start Time': self.time_start,

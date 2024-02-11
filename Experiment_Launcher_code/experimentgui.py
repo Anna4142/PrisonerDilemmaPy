@@ -8,16 +8,16 @@ class ExperimentGUI:
     def __init__(self):
         self.window = tk.Tk()
         self.window.title("Prisoner's Dilemma Experiment setup")
-        self.window.geometry("550x600")
+        self.window.geometry("550x620")
 
         # create window layout
         self.system_panel = tk.Frame(self.window, width = 540, height = 90, relief = tk.RAISED, borderwidth = 2)
         tk.Label(self.system_panel, text = "System Parameters").place(x = 210, y = 2)
         self.experiment_panel = tk.Frame(self.window, width=540, height=122, relief=tk.RAISED, borderwidth=2)
         tk.Label(self.experiment_panel, text ="Experiment Parameters").place(x = 200, y = 2)
-        self.first_opponent_panel = tk.Frame(self.window, width=268, height=330, relief=tk.RAISED, borderwidth=2)
+        self.first_opponent_panel = tk.Frame(self.window, width=268, height=500, relief=tk.RAISED, borderwidth=2)
         tk.Label(self.first_opponent_panel, text ="First Opponent").place(x = 70, y = 2)
-        self.second_opponent_panel = tk.Frame(self.window, width=268, height=330, relief=tk.RAISED, borderwidth=2)
+        self.second_opponent_panel = tk.Frame(self.window, width=268, height=500, relief=tk.RAISED, borderwidth=2)
         tk.Label(self.second_opponent_panel, text ="Second Opponent").place(x = 70, y = 2)
         self.system_panel.place(x = 5, y = 5)
         self.experiment_panel.place(x = 5, y = 100)
@@ -52,17 +52,19 @@ class ExperimentGUI:
         self.populate_system_parameters_panel()
         self.populate_experiment_panel()
         self.create_opponent_options(self.first_opponent_panel, self.first_opponent_type, "Mouse")
-        self.create_opponent_options(self.second_opponent_panel, self.second_opponent_type, "Fixed Strategy")
+        self.create_opponent_options(self.second_opponent_panel, self.second_opponent_type, "Mouse")
+        #self.create_opponent_options(self.second_opponent_panel, self.second_opponent_type, "Fixed Strategy")
         self.create_mouseid_field(self.first_opponent_panel, self.mouse_1_id)
         self.create_mouseid_field(self.second_opponent_panel, self.mouse_2_id)
-        self.create_strategy_option(self.first_opponent_panel, self.first_opponent_strategy, self.first_opponent_prob)
-        self.create_strategy_option(self.second_opponent_panel, self.second_opponent_strategy, self.second_opponent_prob)
-        self.create_strategy_option(self.first_opponent_panel, self.first_opponent_strategy, self.first_opponent_prob)
-        self.create_strategy_option(self.second_opponent_panel, self.second_opponent_strategy,self.second_opponent_prob)
+
+        #self.create_strategy_option(self.first_opponent_panel, self.first_opponent_strategy, self.first_opponent_prob)
+        #self.create_strategy_option(self.second_opponent_panel, self.second_opponent_strategy, self.second_opponent_prob)
+        #self.create_strategy_option(self.first_opponent_panel, self.first_opponent_strategy, self.first_opponent_prob)
+        #self.create_strategy_option(self.second_opponent_panel, self.second_opponent_strategy,self.second_opponent_prob)
 
         # Create a button to start the experiment
         start_button = tk.Button(self.window, text="Start Experiment", command=self.start_experiment)
-        start_button.place(x = 225, y = 565)
+        start_button.place(x = 225, y = 595)
 
         self.project_directory_var.set(fUtile.get_project_directory())
         self.window.mainloop()
@@ -88,7 +90,7 @@ class ExperimentGUI:
     def create_opponent_options(self, panel, opvar, default):
         tk.Label(panel, text="Opponent type:").place(x=5, y=25)
         opponent_types = ["Mouse", "Fixed Strategy", "Learner"]
-        buttonoffset = [50, 105, 160]  # Adjusted offsets for proper alignment
+        buttonoffset = [50, 105, 280]  # Adjusted offsets for proper alignment
         opvar.set(default)
         for type in opponent_types:
             radiobutton = tk.Radiobutton(panel, text=type, variable=opvar, value=type,
@@ -142,7 +144,7 @@ class ExperimentGUI:
         probability_entry = tk.Entry(panel, textvariable = probvar)
         probability_entry.place(x = 150, y = 260, width = 50)
 
-    def create_learner_options(self, panel, opvar):
+    def create_learner_option(self, panel, opvar):
         # Clear existing strategy options
         for widget in panel.winfo_children():
             if isinstance(widget, tk.Radiobutton) or isinstance(widget, tk.Label) and widget.cget(
@@ -159,20 +161,26 @@ class ExperimentGUI:
             radiobutton.place(x=70, y=160 + index * 30)
 
     def update_opponent_options(self):
-        # Assuming this method is already calling correctly when the opponent type changes
-        if self.first_opponent_type.get() == "Learner":
-            self.create_learner_options(self.first_opponent_panel, self.first_opponent_strategy)
-        else:
-            # Fallback to default strategy options if not 'Learner'
-            self.create_strategy_option(self.first_opponent_panel, self.first_opponent_strategy,
-                                        self.first_opponent_prob)
+        # Assuming self.first_opponent_type and self.second_opponent_type are the variables for the opponent type
+        self.update_sub_options(self.first_opponent_panel, self.first_opponent_type.get())
+        self.update_sub_options(self.second_opponent_panel, self.second_opponent_type.get())
 
-        if self.second_opponent_type.get() == "Learner":
-            self.create_learner_options(self.second_opponent_panel, self.second_opponent_strategy)
-        else:
-            # Fallback to default strategy options if not 'Learner'
-            self.create_strategy_option(self.second_opponent_panel, self.second_opponent_strategy,
-                                        self.second_opponent_prob)
+    def update_sub_options(self, panel, opponent_type):
+        # Clear any existing sub-options first
+        self.clear_sub_options(panel)
+
+        # Based on the opponent type, show relevant sub-options
+        if opponent_type == "Learner":
+            self.create_learner_option(panel)
+        elif opponent_type == "Fixed Strategy":
+            self.create_fixed_strategy_option(panel)
+
+    def clear_sub_options(self, panel):
+        # This function will clear sub-options from the panel
+        for widget in panel.winfo_children():
+            if isinstance(widget, tk.Radiobutton) or isinstance(widget, tk.Label):
+                if widget.cget("text") in ["Learning Strategy:", "Strategy:", "Probability: "]:
+                    widget.destroy()
 
     def start_experiment(self):
         # Start the experiment only if input data is valid
@@ -292,10 +300,10 @@ class ExperimentGUI:
         learner_options = ["Q-Learning Agent", "Actor-Critic Agent", "Reinforce Agent"]
         opvar.set(learner_options[0])  # Set default selection
 
-        tk.Label(panel, text="Learning Strategy:", anchor="w").place(x=50, y=base_y_position)
+        tk.Label(panel, text="Learning Strategy:", anchor="w").place(x=50, y=100)
         for index, option in enumerate(learner_options):
             radiobutton = tk.Radiobutton(panel, text=option, variable=opvar, value=option)
-            radiobutton.place(x=70, y=base_y_position + 30 + (index * 30))  # Adjust y for each option
+            radiobutton.place(x=70, y=100 + 30 + (index * 30))  # Adjust y for each option
 
     def experiment_started(self):
         return self.start_button_clicked

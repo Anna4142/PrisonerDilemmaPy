@@ -64,7 +64,7 @@ class StateManager:
                                                 Events.ExperimentStopped.value],
                         States.ReturnTimeOut: [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value,
                                                Events.ExperimentStopped.value],
-                        States.DecisionTimeOut: [Events.Mouse1InCenter.value, Events.ExperimentStopped.value],
+                        States.DecisionTimeOut: [Events.Mouse1InCenter.value , Events.ExperimentStopped.value],
                         States.End: [0]
                     }
 
@@ -109,6 +109,7 @@ class StateManager:
             # Check and Perform Event base transition
             for i, event in enumerate(TransitionEvents):
                 if event & events == event:
+
                     # Transition to the next state based on the event
                     self.current_state = self.NextState[self.current_state][i]
                     self.StateStartTime = time.time()

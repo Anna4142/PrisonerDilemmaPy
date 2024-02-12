@@ -97,7 +97,7 @@ class ExperimentManager:
 
             if self.numcompletedtrial > 0:
                 self.time_to_return_to_center = time.time() - self.start_return_time
-            self.trial_logger.log_data(self.numcompletedtrial, "Completed Trial", self.opponent_choice,
+                self.trial_logger.log_data(self.numcompletedtrial, "Completed Trial", self.opponent_choice,
                                        self.mouse_choice, self.mouse_reward, self.mouse_center_reward,
                                        self.opponent_reward, self.opponent_center_reward,
                                        self.time_start, self.time_to_make_decision, self.time_to_return_to_center)

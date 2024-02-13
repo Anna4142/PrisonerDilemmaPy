@@ -110,6 +110,7 @@ class StateManager:
             # Check and Perform Event base transition
             for i, event in enumerate(TransitionEvents):
                 if event & events == event:
+
                     # Transition to the next state based on the event
                     self.current_state = self.NextState[self.current_state][i]
                     self.StateStartTime = time.time()
@@ -120,7 +121,7 @@ class StateManager:
                 if time.time() - self.StateStartTime > self.TransitionTimeOut[self.current_state]:
 
                     self.current_state = self.TimeOutState[self.current_state]
-                    print("timeout state",self.current_state )
+                    #print("timeout state",self.current_state )
                     self.StateStartTime = time.time()
 
             return self.current_state

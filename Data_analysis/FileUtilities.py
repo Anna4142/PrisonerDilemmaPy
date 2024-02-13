@@ -10,6 +10,8 @@ class FileType(Enum):
     DATA_ANALYSIS               = 4
     EXPERIMENT_EVENT_LOG        = 5
     MOUSE_PROFILE               = 6
+    COMPARISON_EVENT_LOG        = 7
+    DATA_ANALYSIS_PLOTS         = 8
 
 
 
@@ -24,7 +26,11 @@ def get_mouse_sub_directory(filetype):
         FileType.EXPERIMENT_CONFIGURATION:  "/trial_configuration",
         FileType.EXPERIMENT_LOG:            "/data_from_trials",
         FileType.VIDEO_CAPTURE:             "/video_captures",
-        FileType.EXPERIMENT_EVENT_LOG:      "/event_data_from_trials"}
+        FileType.EXPERIMENT_EVENT_LOG:      "/event_data_from_trials",
+        FileType.DATA_ANALYSIS:             "/data_analysis",
+        FileType.COMPARISON_EVENT_LOG:      "/comparison_event_data",
+        FileType.DATA_ANALYSIS_PLOTS:       "/data_analysis_plots"
+    }
     return mapping.get(filetype)
 
 
@@ -83,6 +89,10 @@ def set_mouse_directory(mouse):
             os.makedirs(mouse_directory + "/" + get_mouse_sub_directory(FileType.EXPERIMENT_LOG))
             os.makedirs(mouse_directory + "/" + get_mouse_sub_directory(FileType.VIDEO_CAPTURE))
             os.makedirs(mouse_directory + "/" + get_mouse_sub_directory(FileType.EXPERIMENT_EVENT_LOG))
+            os.makedirs(mouse_directory + "/" + get_mouse_sub_directory(FileType.DATA_ANALYSIS))
+            os.makedirs(mouse_directory + "/" + get_mouse_sub_directory(FileType.COMPARISON_EVENT_LOG))
+            os.makedirs(mouse_directory + "/" + get_mouse_sub_directory(FileType.DATA_ANALYSIS_PLOTS))
+
             return True
         else:
             return False
@@ -102,8 +112,15 @@ def set_file_name(sessiontype, sessionnum):
 
 def get_file_path(filetype):
     global mouse_directory, file_name
-    if filetype in [FileType.DATA_ANALYSIS, FileType.MOUSE_PROFILE]:
+    subdir = get_mouse_sub_directory(filetype)
+
+    if filetype == FileType.DATA_ANALYSIS_PLOTS:
+        # For DATA_ANALYSIS_PLOTS, return the directory path without setting a specific file name.
+        # You might want to adjust this if you have a specific naming convention for plots.
+        return f'{mouse_directory}{subdir}/'
+    elif filetype in [FileType.DATA_ANALYSIS, FileType.MOUSE_PROFILE]:
+        # For DATA_ANALYSIS and MOUSE_PROFILE, return the mouse_directory directly.
         return mouse_directory
     else:
-        subdir = get_mouse_sub_directory(filetype)
+        # For other file types, return the full path including the directory and the file name.
         return f'{mouse_directory}{subdir}/{file_name}'

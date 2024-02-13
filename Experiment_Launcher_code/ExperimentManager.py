@@ -112,6 +112,7 @@ class ExperimentManager:
             self.cc_cnt += 1
             mouse1.DeliverReward(Locations.Cooperate, self.reward_time)
             mouse2.DeliverReward(Locations.Cooperate, self.reward_time)
+            self.time_to_make_decision = time.time() - self.time_start
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
 
         elif state == States.M1CM2D:
@@ -125,6 +126,7 @@ class ExperimentManager:
             self.cd_cnt += 1
             mouse1.DeliverReward(Locations.Defect, self.sucker_time)
             mouse2.DeliverReward(Locations.Cooperate, self.temptation_time)
+            self.time_to_make_decision = time.time() - self.time_start
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
 
         elif state == States.M1DM2C:
@@ -138,6 +140,7 @@ class ExperimentManager:
             self.dc_cnt += 1
             mouse1.DeliverReward(Locations.Cooperate, self.temptation_time)
             mouse2.DeliverReward(Locations.Defect, self.sucker_time)
+            self.time_to_make_decision = time.time() - self.time_start
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
 
         elif state == States.M1DM2D:

@@ -16,23 +16,20 @@ class FixedStrategyPrisoner (Prisoner):
         self.trialStarted = True
         self.decisionMade = False
 
+    def DecisionAbort(self):
+        self.trialStarted = False
+
     def getDecision(self, zones_list):
         if self.trialStarted:
             if self.decisionMade:
                 decision = self.LastDecision
             else:
                 self.decisionMade = True
-                if self.strategy == "Unconditional Cooperator":
-                    decision = Locations.Cooperate
-
-                elif self.strategy == "Unconditional Defector":
-                    decision = Locations.Defect
+                if self.strategy == "Probability Cooperator":
+                    decision = Locations.Cooperate if random.random() < self.p else Locations.Defect  # Cooperate based on probability
 
                 elif self.strategy == "Random":
                     decision = random.choice([Locations.Cooperate,  Locations.Defect ])  # Randomly choose between Cooperate and Defect
-
-                elif self.strategy == "Probability p Cooperator":
-                    decision = Locations.Cooperate if random.random() < self.p else Locations.Defect  # Cooperate based on probability p
 
                 elif self.strategy == "Tit for Tat":
                     decision = self.opponentLastDecision # Tit for Tat strategy: Cooperate if opponent cooperated, otherwise defect
@@ -46,3 +43,4 @@ class FixedStrategyPrisoner (Prisoner):
         if opponent_decision != Locations.Center:
             self.opponentLastDecision = opponent_decision
         self.trialStarted = False
+

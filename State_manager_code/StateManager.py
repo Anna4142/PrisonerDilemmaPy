@@ -64,7 +64,8 @@ class StateManager:
                                                 Events.ExperimentStopped.value],
                         States.ReturnTimeOut: [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value,
                                                Events.ExperimentStopped.value],
-                        States.DecisionTimeOut: [Events.Mouse1InCenter.value, Events.ExperimentStopped.value],
+                        States.DecisionTimeOut: [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value,
+                                                 Events.ExperimentStopped.value],
                         States.End: [0]
                     }
 

@@ -67,15 +67,10 @@ class ExperimentManager:
         if state is not None:
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
 
-
         if state == States.Start:
 
             self.visit_cen = False
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
-
-
-        # elif state == States.WaitForStart:
-        #    pass
 
         elif state == States.CenterReward:
             print("in cen reward dec time", self.time_to_make_decision)
@@ -89,11 +84,6 @@ class ExperimentManager:
             mouse1.DeliverReward(Locations.Center, self.center_reward_time)
             mouse2.DeliverReward(Locations.Center, self.center_reward_time)
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
-
-
-
-
-
 
         elif state == States.TrialStarted:
             Play(Sounds.Start)
@@ -117,9 +107,6 @@ class ExperimentManager:
             self.cc_cnt += 1
             mouse1.DeliverReward(Locations.Cooperate, self.reward_time)
             mouse2.DeliverReward(Locations.Cooperate, self.reward_time)
-
-
-
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
 
         elif state == States.M1CM2D:
@@ -133,8 +120,6 @@ class ExperimentManager:
             self.cd_cnt += 1
             mouse1.DeliverReward(Locations.Defect, self.sucker_time)
             mouse2.DeliverReward(Locations.Cooperate, self.temptation_time)
-
-
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
 
 
@@ -149,8 +134,6 @@ class ExperimentManager:
             self.dc_cnt += 1
             mouse1.DeliverReward(Locations.Cooperate, self.temptation_time)
             mouse2.DeliverReward(Locations.Defect, self.sucker_time)
-
-
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
 
         elif state == States.M1DM2D:
@@ -164,18 +147,12 @@ class ExperimentManager:
             self.dd_cnt += 1
             mouse1.DeliverReward(Locations.Defect, self.punishment_time)
             mouse2.DeliverReward(Locations.Defect, self.punishment_time)
-
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
 
-
-
-
         elif state == States.TrialCompleted:
-
             self.time_to_make_decision = time.time() - self.time_start
             self.numcompletedtrial += 1
             self.start_return_time = time.time()
-
 
             self.timestamps = {
                 'Start Time': self.time_start,
@@ -197,13 +174,8 @@ class ExperimentManager:
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
 
 
-
         elif state == States.ReturnTimeOut:
-
             Play(Sounds.Abort)
-            # Increment the trial number counter
-            # self.numcompletedtrial += 1
-            # Log that the trial has been aborted
             print("Trial has been aborted.")
             self.opponent_choice = "N/A"
             self.mouse_choice = "N/A"
@@ -216,17 +188,14 @@ class ExperimentManager:
                                              self.opponent_reward, self.opponent_center_reward,
                                              self.time_start, self.time_to_make_decision, self.time_to_return_to_center)
             self.visit_cen == False
-
-
             self.start_return_time = time.time()
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
 
 
         elif state == States.DecisionTimeOut:
             Play(Sounds.Abort)
-            # Increment the trial number counter
-            # self.numcompletedtrial += 1
-            # Handle DecisionAbort state
+            mouse1.DecisionAbort()
+            mouse2.DecisionAbort()
             print("IN DECISION ABORT")
             self.opponent_choice = "N/A"
             self.mouse_choice = "N/A"
@@ -260,6 +229,7 @@ class ExperimentManager:
         state_history = []
         listener = Listener(on_press=self.on_press, on_release=self.on_release)
         listener.start()
+
 
         while currentstate != States.End:
             self.trialevents = 0

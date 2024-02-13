@@ -1,4 +1,4 @@
-from Data_analysis.DataAnalysisScript import DataAnalyzer
+#from Data_analysis.DataAnalysisScript import DataAnalyzer
 from Experiment_Launcher_code.ModuleConfiguration import __USE_VIDEO_SIM
 from Experiment_Launcher_code.ModuleConfiguration import __USE_VIDEO_STUB
 if __USE_VIDEO_SIM:
@@ -14,7 +14,7 @@ from modelling_opponent.FixedStrategyPrisoner import FixedStrategyPrisoner
 from Reward_manager.RewardManager import RewardManager
 from Experiment_Launcher_code.ExperimentManager import ExperimentManager
 from Experiment_Launcher_code.experimentgui import ExperimentGUI, OpponentType
-#from Data_analysis.DataAnalysisScript import DataAnalyzer
+
 import Data_analysis.FileUtilities as fUtile
 
 

@@ -54,7 +54,8 @@ class ExperimentGUI:
         self.populate_system_parameters_panel()
         self.populate_experiment_panel()
         self.create_opponent_options(self.first_opponent_panel, self.first_opponent_type, "Mouse")
-        self.create_opponent_options(self.second_opponent_panel, self.second_opponent_type, "Fixed Strategy")
+        self.create_opponent_options(self.second_opponent_panel, self.second_opponent_type, "Mouse")
+        #self.create_opponent_options(self.second_opponent_panel, self.second_opponent_type, "Fixed Strategy")
         self.create_mouseid_field(self.first_opponent_panel, self.mouse_1_id)
         self.create_mouseid_field(self.second_opponent_panel, self.mouse_2_id)
         self.create_strategy_option(self.first_opponent_panel, self.first_opponent_strategy, self.first_opponent_prob)
@@ -65,7 +66,6 @@ class ExperimentGUI:
         # Create a button to start the experiment
         start_button = tk.Button(self.window, text="Start Experiment", command=self.start_experiment)
         start_button.place(x = 225, y = 575)
-
         self.project_directory_var.set(fUtile.get_project_directory())
         self.window.mainloop()
 

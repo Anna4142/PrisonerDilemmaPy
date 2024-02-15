@@ -1,24 +1,27 @@
-from Data_analysis.DataAnalysisScript import DataAnalyzer
-import os
 from Experiment_Launcher_code.ModuleConfiguration import __USE_VIDEO_SIM
 from Experiment_Launcher_code.ModuleConfiguration import __USE_VIDEO_STUB
+from Experiment_Launcher_code.ModuleConfiguration import __DISABLE_DATA_ANALYZER
+
 if __USE_VIDEO_SIM:
     from Video_analyser_code.VideoAnalyzerSim import Video_Analyzer
 elif __USE_VIDEO_STUB:
     from Video_analyser_code.VideoAnalyzerStub import Video_Analyzer
-
 else:
     from Video_analyser_code.VideoAnalyser import Video_Analyzer
+
+if not __DISABLE_DATA_ANALYZER:
+    from Data_analysis.DataAnalysisScript import DataAnalyzer
+    from Data_analysis.EventComparison import EventComparator
+    from Data_analysis.Data_analysis_plots import DataPlotter
+
 from modelling_opponent.MouseMonitor import MouseMonitor
 from modelling_opponent.FixedStrategyPrisoner import FixedStrategyPrisoner
-#from modelling_opponent.Simulated_learner import Simulated_mouse
 from Reward_manager.RewardManager import RewardManager
 from Experiment_Launcher_code.ExperimentManager import ExperimentManager
 from Experiment_Launcher_code.experimentgui import ExperimentGUI, OpponentType
-
 import Data_analysis.FileUtilities as fUtile
-from  Data_analysis.EventComparison import EventComparator
-from  Data_analysis.Data_analysis_plots import DataPlotter
+
+
 def main():
     # Create an instance of the ExperimentGUI class
     experiment_gui = ExperimentGUI()

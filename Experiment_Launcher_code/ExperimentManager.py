@@ -72,16 +72,11 @@ class ExperimentManager:
         return time.time() - self.state_start_times.get(state, time.time())
 
     def StateActivity(self, state, mouse1, mouse2):
-
-
         if state == States.Start:
             self.visit_cen = False
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
 
-
         elif state == States.CenterReward:
-
-
             print(self.timestamps)
             self.center_cnt += 1
             self.visit_cen = True
@@ -89,12 +84,9 @@ class ExperimentManager:
             mouse1.DeliverReward(Locations.Center, self.center_reward_time)
             mouse2.DeliverReward(Locations.Center, self.center_reward_time)
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
-            # self.time_start = time.time()
 
         elif state == States.TrialStarted:
-
             Play(Sounds.Start)
-
             if self.numcompletedtrial > 0:
                 self.time_to_return_to_center = time.time() - self.start_return_time
                 self.trial_logger.log_data(self.numcompletedtrial, "Completed Trial", self.opponent_choice,
@@ -169,6 +161,7 @@ class ExperimentManager:
             # Increment the trial number counter
             self.numcompletedtrial += 1
             self.start_return_time = time.time()
+
             self.timestamps = {
                 'Start Time': self.time_start,
                 'Decision Time': self.time_to_make_decision,
@@ -205,7 +198,8 @@ class ExperimentManager:
 
         elif state == States.DecisionTimeOut:
             Play(Sounds.Abort)
-            # Handle DecisionAbort state
+            mouse1.DecisionAbort()
+            mouse2.DecisionAbort()
             print("IN DECISION ABORT")
             self.opponent_choice = "N/A"
             self.mouse_choice = "N/A"
@@ -239,6 +233,7 @@ class ExperimentManager:
         listener = Listener(on_press=self.on_press, on_release=self.on_release)
         listener.start()
         print(mouse1)
+
         while currentstate != States.End:
             self.trialevents = 0
             """""

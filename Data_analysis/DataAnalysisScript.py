@@ -9,64 +9,56 @@ class DataAnalyzer:
 
     def analyze_data(self):
         # Read the CSV file into a DataFrame
-
         df = pd.read_csv(self.data_file_path, delimiter=',')
 
-        # Perform analysis
-        num_trials = df['Trial Number'].max()  # Get the maximum value in 'Trial Number' column
+        # Ensure numeric conversion for specified columns
         columns_to_convert = ['Reward', 'Center Reward', 'Opponent Reward', 'Opponent Center Reward']
         for col in columns_to_convert:
             df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
 
-        # Initialize total_reward
-        total_reward = 0
+        # Filter the DataFrame to include only rows where "Trial Validity" is "Completed Trial"
+        df_completed_trials = df[df["Trial Validity"] == "Completed Trial"]
 
-        # Iterate through DataFrame and calculate total_reward for valid trials
-        for index, row in df.iterrows():
-            if row["Trial Validity"] == "Completed Trial":
-                total_reward += row["Reward"] + row["Center Reward"]
+        # Calculate total_reward for completed trials
+        total_reward = df_completed_trials[["Reward", "Center Reward"]].sum().sum()
 
-                # Count the number of 'C' and 'D' in the Mouse Choice column
-                num_c_choices = df[df['Mouse Choice'] == 'C'].shape[0]
-                num_d_choices = df[df['Mouse Choice'] == 'D'].shape[0]
+        # Count the number of 'C' and 'D' choices within completed trials
+        num_c_choices_completed = df_completed_trials[df_completed_trials['Mouse Choice'] == 'C'].shape[0]
+        num_d_choices_completed = df_completed_trials[df_completed_trials['Mouse Choice'] == 'D'].shape[0]
 
-        # Convert 'Reward' column to numeric and calculate mean reward
-        df['Reward'] = pd.to_numeric(df['Reward'], errors='coerce')
-        reward_mean = total_reward / num_trials
-        reward_to_be_delivered = 1.5 - total_reward
+        # The total number of completed trials for accurate percentage calculation
+        total_completed_trials = df_completed_trials.shape[0]
 
-        # Calculate mean reward by opponent choice
-        mean_reward_by_opponent_choice = df.groupby('Opponent Choice')['Reward'].mean()
+        # Calculate the percentages of 'C' and 'D' choices based on completed trials
+        percentage_c_completed = (
+                                             num_c_choices_completed / total_completed_trials) * 100 if total_completed_trials > 0 else 0
+        percentage_d_completed = (
+                                             num_d_choices_completed / total_completed_trials) * 100 if total_completed_trials > 0 else 0
 
-        # Calculate average times
-        average_time_to_make_decision = df['Time to Make Decision'].mean()
-        average_time_to_return_to_center = df['Time to Return to Center'].mean()
+        # Calculate mean reward and other metrics
+        reward_mean = total_reward / total_completed_trials if total_completed_trials > 0 else 0
+        reward_to_be_delivered = 1.5 * total_completed_trials - total_reward
+        mean_reward_by_opponent_choice = df_completed_trials.groupby('Opponent Choice')['Reward'].mean()
+        average_time_to_make_decision = df_completed_trials['Time to Make Decision'].mean()
+        average_time_to_return_to_center = df_completed_trials['Time to Return to Center'].mean()
 
-        # Calculate the percentage of 'C' and 'D' choices
+        # Current date for the analysis results
+        current_date = pd.Timestamp.now().strftime("%Y%m%d")
 
-        percentage_c = (num_c_choices / num_trials) * 100
-        percentage_d = (num_d_choices / num_trials) * 100
         # Return the analysis results as a dictionary
-
-        current_datetime = pd.Timestamp.now()
-
-        current_date =  current_datetime.strftime("%Y%m%d")
-
-
         analysis_results = {
             "Date": current_date,
-            "Num trials": num_trials,
+            "Num trials": total_completed_trials,
             "Mean Reward": reward_mean,
             "Total Reward": total_reward,
             "Water to be given": reward_to_be_delivered,
             "Mean Reward by Opponent": mean_reward_by_opponent_choice.to_dict(),
             "Average Time to Make Decision": average_time_to_make_decision,
             "Average Time to Return to Center": average_time_to_return_to_center,
-            "Number of C Choices": num_c_choices,
-            "Number of D Choices": num_d_choices,
-            "Percentage of C Choices": percentage_c,
-            "Percentage of D Choices": percentage_d,
-
+            "Number of C Choices": num_c_choices_completed,
+            "Number of D Choices": num_d_choices_completed,
+            "Percentage of C Choices": percentage_c_completed,
+            "Percentage of D Choices": percentage_d_completed,
         }
 
         return analysis_results

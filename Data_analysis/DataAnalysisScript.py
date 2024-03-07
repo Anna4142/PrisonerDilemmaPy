@@ -1,7 +1,5 @@
-
 import pandas as pd
 import os
-
 
 class DataAnalyzer:
     def __init__(self, filepath):
@@ -29,11 +27,11 @@ class DataAnalyzer:
         # The total number of completed trials for accurate percentage calculation
         total_completed_trials = df_completed_trials.shape[0]
 
-        # Calculate the percentages of 'C' and 'D' choices based on completed trials
-        percentage_c_completed = (
-                                             num_c_choices_completed / total_completed_trials) * 100 if total_completed_trials > 0 else 0
-        percentage_d_completed = (
-                                             num_d_choices_completed / total_completed_trials) * 100 if total_completed_trials > 0 else 0
+        # Calculate the percentages and ratios of 'C' and 'D' choices based on completed trials
+        percentage_c_completed = (num_c_choices_completed / total_completed_trials) * 100 if total_completed_trials > 0 else 0
+        percentage_d_completed = (num_d_choices_completed / total_completed_trials) * 100 if total_completed_trials > 0 else 0
+        ratio_c_to_d = num_c_choices_completed / num_d_choices_completed if num_d_choices_completed > 0 else float('inf')
+        ratio_d_to_c = num_d_choices_completed / num_c_choices_completed if num_c_choices_completed > 0 else float('inf')
 
         # Calculate mean reward and other metrics
         reward_mean = total_reward / total_completed_trials if total_completed_trials > 0 else 0
@@ -59,6 +57,8 @@ class DataAnalyzer:
             "Number of D Choices": num_d_choices_completed,
             "Percentage of C Choices": percentage_c_completed,
             "Percentage of D Choices": percentage_d_completed,
+            "Ratio of C to D Choices": ratio_c_to_d,
+            "Ratio of D to C Choices": ratio_d_to_c,
         }
 
         return analysis_results

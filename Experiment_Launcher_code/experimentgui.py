@@ -8,12 +8,12 @@ class ExperimentGUI:
     def __init__(self):
         self.window = tk.Tk()
         self.window.title("Prisoner's Dilemma Experiment setup")
-        self.window.geometry("550x610")
+        self.window.geometry("550x640")
 
         # create window layout
         self.system_panel = tk.Frame(self.window, width = 540, height = 90, relief = tk.RAISED, borderwidth = 2)
         tk.Label(self.system_panel, text = "System Parameters").place(x = 210, y = 2)
-        self.experiment_panel = tk.Frame(self.window, width=540, height=122, relief=tk.RAISED, borderwidth=2)
+        self.experiment_panel = tk.Frame(self.window, width=540, height=152, relief=tk.RAISED, borderwidth=2)
         tk.Label(self.experiment_panel, text ="Experiment Parameters").place(x = 200, y = 2)
         self.first_opponent_panel = tk.Frame(self.window, width=268, height=340, relief=tk.RAISED, borderwidth=2)
         tk.Label(self.first_opponent_panel, text ="First Opponent").place(x = 70, y = 2)
@@ -21,8 +21,8 @@ class ExperimentGUI:
         tk.Label(self.second_opponent_panel, text ="Second Opponent").place(x = 70, y = 2)
         self.system_panel.place(x = 5, y = 5)
         self.experiment_panel.place(x = 5, y = 100)
-        self.first_opponent_panel.place(x = 5, y = 227)
-        self.second_opponent_panel.place(x = 277, y = 227)
+        self.first_opponent_panel.place(x = 5, y = 257)
+        self.second_opponent_panel.place(x = 277, y = 257)
 
         # Initialize entry variables
         self.comport_name = tk.StringVar(value = "COM11")
@@ -30,7 +30,8 @@ class ExperimentGUI:
         self.experiment_name = tk.StringVar(value = "Experiment-1")
         self.session_type = tk.StringVar(value = "Session")
         self.session_num = tk.StringVar(value = "1")
-        self.num_trials_var = tk.StringVar(value = "50")
+        self.session_limit_value = tk.StringVar(value = "50")
+        self.session_limit_type = tk.StringVar(value = None)
         self.return_time_var = tk.StringVar(value = "20")
         self.decision_time_var = tk.StringVar(value = "20")
         self.mouse_1_id = tk.StringVar(value="1777")
@@ -65,7 +66,7 @@ class ExperimentGUI:
 
         # Create a button to start the experiment
         start_button = tk.Button(self.window, text="Start Experiment", command=self.start_experiment)
-        start_button.place(x = 225, y = 575)
+        start_button.place(x = 225, y = 605)
         self.project_directory_var.set(fUtile.get_project_directory())
         self.window.mainloop()
 
@@ -102,29 +103,37 @@ class ExperimentGUI:
         mouse_id_entry.place(x=120, y=75)
 
     def populate_experiment_panel(self):
-        tk.Label(self.experiment_panel, text="Experiment Name:").place(x = 5, y = 30)
+        tk.Label(self.experiment_panel, text="Experiment Name:").place(x = 130, y = 30)
         experiment_name_entry = tk.Entry(self.experiment_panel, textvariable = self.experiment_name)
-        experiment_name_entry.place(x = 130, y = 30)
+        experiment_name_entry.place(x = 250, y = 30)
 
         tk.Label(self.experiment_panel, text="Session Type:").place(x = 5, y = 60)
         st_entry = tk.Entry(self.experiment_panel, textvariable = self.session_type)
         st_entry.place(x = 130, y = 60)
 
-        tk.Label(self.experiment_panel, text="Session Number:").place(x = 5, y = 90)
+        tk.Label(self.experiment_panel, text="Session Number:").place(x = 270, y = 60)
         sn_entry = tk.Entry(self.experiment_panel, textvariable = self.session_num)
-        sn_entry.place(x = 130, y = 90)
+        sn_entry.place(x = 400, y = 60)
 
-        tk.Label(self.experiment_panel, text="Number of Trials:").place(x = 270, y = 30)
-        self.num_trials_entry = tk.Entry(self.experiment_panel, textvariable=self.num_trials_var)
-        self.num_trials_entry.place(x = 400, y = 30)
-
-        tk.Label(self.experiment_panel, text="Decision Time (sec):").place(x = 270, y = 60)
+        tk.Label(self.experiment_panel, text="Decision Time (sec):").place(x = 5, y = 90)
         self.decision_time_entry = tk.Entry(self.experiment_panel, textvariable=self.decision_time_var)
-        self.decision_time_entry.place(x = 400, y = 60)
+        self.decision_time_entry.place(x = 130, y = 90)
 
         tk.Label(self.experiment_panel, text="Return Time (sec):").place(x = 270, y = 90)
         self.decision_time_entry = tk.Entry(self.experiment_panel, textvariable=self.return_time_var)
         self.decision_time_entry.place(x = 400, y = 90)
+
+        tk.Label(self.experiment_panel, text="Terminate After :").place(x = 5, y = 120)
+        self.num_trials_entry = tk.Entry(self.experiment_panel, textvariable=self.session_limit_value)
+        self.num_trials_entry.place(x = 130, y = 120)
+
+        terminate_options = ["Minutes", "Trials"]
+        self.session_limit_type.set(terminate_options[0])  # Set default selection
+        radiobutton = tk.Radiobutton(self.experiment_panel, text=terminate_options[0], variable=self.session_limit_type, value=terminate_options[0])
+        radiobutton.place(x=300, y=120)
+        radiobutton = tk.Radiobutton(self.experiment_panel, text=terminate_options[1], variable=self.session_limit_type, value=terminate_options[1])
+        radiobutton.place(x=400, y=120)
+
 
     def create_strategy_option(self, panel, opvar, probvar):
         # Define strategy options
@@ -207,13 +216,13 @@ class ExperimentGUI:
             messagebox.showerror("Invalid Input", "Session Num must be a positive integer")
             return False
 
-        # Trials Num must be a positive integer
+        # Session Limit must be a positive integer
         try:
-            num = int(self.num_trials_var.get())
+            num = int(self.session_limit_value.get())
         except ValueError:
             num = -1
         if num <= 0:
-            messagebox.showerror("Invalid Input", "Trials Number must be a positive integer")
+            messagebox.showerror("Invalid Input", "Terminate-After must be a positive integer")
             return False
 
         # Return Time must be a positive integer
@@ -258,7 +267,8 @@ class ExperimentGUI:
     def get_experiment_parameters(self):
         settings = {
             'experiment_name' : self.experiment_name.get(),
-            'num_trials': int(self.num_trials_var.get()),
+            'termination_value': int(self.session_limit_value.get()),
+            'termination_type': self.session_limit_type.get(),
             'return_time': int(self.return_time_var.get()),
             'decision_time': int(self.decision_time_var.get()),
             'session_type': self.session_type.get(),

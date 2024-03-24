@@ -11,6 +11,7 @@ else:
 
 if not __DISABLE_DATA_ANALYZER:
     from Data_analysis.DataAnalysisScript import DataAnalyzer
+    from Data_analysis.event_logger import EventLogger
     from Data_analysis.EventComparison import EventComparator
     from Data_analysis.Data_analysis_plots import DataPlotter
 
@@ -39,6 +40,7 @@ def main():
         # Instantiate software components
         video_analyzer = Video_Analyzer()
         reward_manager = RewardManager(comport_name)
+        event_logger = EventLogger()
 
         # Configure Opponents
         if opponent_configuration.get("opponent1_type") == OpponentType.MOUSE:
@@ -72,6 +74,8 @@ def main():
 
         event_csv_path = fUtile.get_file_path(fUtile.FileType.EXPERIMENT_EVENT_LOG) + '.csv'
 
+
+    '''''
         ground_truth_directory="C:/Users/anush/Downloads/Experiment_Folder/Ground_Truth_Data/StrategyData"
         comparator = EventComparator(ground_truth_directory, event_csv_path)
         comparator.save_scores()
@@ -90,6 +94,7 @@ def main():
         del expManager
     else:
         print("No valid settings were provided.")
+    '''''
 
 
 def write_configuration_file(experiment_parameters, opponent_configuration):

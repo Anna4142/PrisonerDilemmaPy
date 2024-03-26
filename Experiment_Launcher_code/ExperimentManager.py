@@ -6,12 +6,8 @@ from State_manager_code.StateManager import States
 from State_manager_code.StateManager import Events
 from Data_analysis.logger import TrialLogger
 from Data_analysis.event_logger import EventLogger
-#from Data_analysis.DataAnalysisScript import DataAnalyzer
-from modelling_opponent.OpponentType import OpponentType
-from Reward_manager.RewardManager import RewardManager
+from Experiment_Launcher_code.RunTimeGui import RunTimeGUI
 import time
-from pynput.keyboard import Key, Listener
-from threading import Lock
 
 
 class ExperimentManager:
@@ -22,6 +18,7 @@ class ExperimentManager:
         self.stateManager = StateManager()
         self.trial_logger = TrialLogger()
         self.event_logger = EventLogger()
+        self.runTimeGui = None
 
         # Set default reward and punishment times
         self.reward_time = 0.15
@@ -32,11 +29,6 @@ class ExperimentManager:
 
         # initialize experiment control variables
         self.numcompletedtrial = 0
-        self.cc_cnt = 0
-        self.cd_cnt = 0
-        self.dc_cnt = 0
-        self.dd_cnt = 0
-        self.center_cnt = 0
         self.time_start = time.time()
         self.time_to_make_decision = 0
         self.time_to_return_to_center = 0
@@ -49,21 +41,22 @@ class ExperimentManager:
         self.time_start=0
         self.time_to_make_decision=0
         self.time_to_return_to_center=0
+        self.termination_parameter = 0
+        self.termination_condition = None
+        self.currentstate = None
+        self.state_history = []
+        self.sessionStartTime = 0
+        self.mouse1 = None
+        self.mouse2 = None
+        self.decisionTimeout = False
+        self.returnTimeout = False
 
         self.timestamps={}  ##for the video writer
-        self.event_lock = Lock()
-        self.trialevents=0
+        self.userStop = False
         self.state_start_times = {}  # Dictionary to store start times for each state
 
-    def on_press(self, key):
-        with self.event_lock:
-            if key == Key.esc:
-                print("Experiment stopped by user.")
-                self.trialevents = Events.ExperimentStopped.value
-                print("Trial events ending", self.trialevents)
-
-    def on_release(self, key):
-        print(f"Key released: {key}")
+    def stopExperiment(self):
+        self.userStop = True
 
     def start_state_timer(self, state):
         self.state_start_times[state] = time.time()
@@ -78,7 +71,6 @@ class ExperimentManager:
 
         elif state == States.CenterReward:
             print(self.timestamps)
-            self.center_cnt += 1
             self.visit_cen = True
             print("delivering reward in the center ")
             mouse1.DeliverReward(Locations.Center, self.center_reward_time)
@@ -109,7 +101,6 @@ class ExperimentManager:
             self.opponent_reward = "0.012"
             self.mouse_center_reward = "0.0"
             self.opponent_center_reward = "0.0"
-            self.cc_cnt += 1
             mouse1.DeliverReward(Locations.Cooperate, self.reward_time)
             mouse2.DeliverReward(Locations.Cooperate, self.reward_time)
             self.time_to_make_decision = time.time() - self.time_start
@@ -123,7 +114,6 @@ class ExperimentManager:
             self.opponent_reward = "0.024"
             self.mouse_center_reward = "0.0"
             self.opponent_center_reward = "0.0"
-            self.cd_cnt += 1
             mouse1.DeliverReward(Locations.Defect, self.sucker_time)
             mouse2.DeliverReward(Locations.Cooperate, self.temptation_time)
             self.time_to_make_decision = time.time() - self.time_start
@@ -137,7 +127,6 @@ class ExperimentManager:
             self.opponent_reward = "0"
             self.mouse_center_reward = "0.0"
             self.opponent_center_reward = "0.0"
-            self.dc_cnt += 1
             mouse1.DeliverReward(Locations.Cooperate, self.temptation_time)
             mouse2.DeliverReward(Locations.Defect, self.sucker_time)
             self.time_to_make_decision = time.time() - self.time_start
@@ -151,7 +140,6 @@ class ExperimentManager:
             self.opponent_reward = "0.006"
             self.mouse_center_reward = "0.0"
             self.opponent_center_reward = "0.0"
-            self.dd_cnt += 1
             mouse1.DeliverReward(Locations.Defect, self.punishment_time)
             mouse2.DeliverReward(Locations.Defect, self.punishment_time)
             self.time_to_make_decision = time.time() - self.time_start
@@ -177,14 +165,18 @@ class ExperimentManager:
             print("Trial Completed. Number of completed trials: ", self.numcompletedtrial)
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
 
+            # Update run time GUI
+            self.runTimeGui.UpdateTrialDisplay(self.numcompletedtrial)
+            self.runTimeGui.updateDecisionHistory(self.numcompletedtrial, 1, self.mouse_choice)
+            self.runTimeGui.updateDecisionHistory(self.numcompletedtrial, 2, self.opponent_choice)
+            self.runTimeGui.updateTimeoutHistory(self.numcompletedtrial, 1, self.returnTimeout, self.decisionTimeout)
+            self.returnTimeout = False
+            self.decisionTimeout = False
+
         elif state == States.ReturnTimeOut:
             Play(Sounds.Abort)
-            # Log that the trial has been aborted
             print("Trial has been aborted.")
-            # self.opponent_choice = "N/A"
-            # self.mouse_choice = "N/A"
-            # self.mouse_reward = "-"
-            # self.opponent_reward = "-"
+            self.returnTimeout = True
             self.opponent_center_reward = "0.00"
             self.mouse_center_reward = "0.00"
             self.start_return_time = time.time()
@@ -195,12 +187,12 @@ class ExperimentManager:
             self.visit_cen == False
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
 
-
         elif state == States.DecisionTimeOut:
             Play(Sounds.Abort)
             mouse1.DecisionAbort()
             mouse2.DecisionAbort()
             print("IN DECISION ABORT")
+            self.decisionTimeout = True
             self.opponent_choice = "N/A"
             self.mouse_choice = "N/A"
             self.mouse_reward = "0.00"
@@ -225,57 +217,72 @@ class ExperimentManager:
     def start_streaming_exp(self, experiment_parameters, mouse1, mouse2):
         self.trial_logger.start_logging()
         self.event_logger.start_logging()
-        num_trial = experiment_parameters.get("num_trials")
+        self.termination_condition = experiment_parameters.get("termination_type")
+        self.termination_parameter = experiment_parameters.get("termination_value")
+        if self.termination_condition == "Minutes":
+            self.termination_parameter *= 60    # convert to seconds
         self.stateManager.SetTimeOut(experiment_parameters.get("decision_time"), experiment_parameters.get("return_time"))
+        self.mouse1 = mouse1
+        self.mouse2 = mouse2
 
-        currentstate = None
-        state_history = []
-        listener = Listener(on_press=self.on_press, on_release=self.on_release)
-        listener.start()
-        print(mouse1)
+        #setup run time GUI
+        self.runTimeGui = RunTimeGUI()
+        self.sessionStartTime = time.time()
+        self.runTimeGui.StartMonitoring(self.experimentControl, self.stopExperiment)
 
-        while currentstate != States.End:
-            self.trialevents = 0
-            """""
-            if self.experimenter.check_for_start():
-                # If true, trigger the trial start event
-                print("Experimenter has initiated the trial.")
-                self.trialevents += Events.StartTrial.value
-            """
-            if self.numcompletedtrial == num_trial:
-                self.trialevents += Events.LastTrial.value
+    def experimentControl(self):
+        experimentended = False
+        self.runTimeGui.UpdateTimeDisplay(time.time() - self.sessionStartTime)
+        if self.currentstate != States.End:
+            trialevents = self.checkTerminationEvenets()
 
             if self.reward_manager.is_reward_delivered():
-                self.trialevents += Events.RewardDelivered.value
+                trialevents += Events.RewardDelivered.value
 
             zone_activations = self.videoAnalyser.process_single_frame(self.timestamps)
             # print("zone activations", zone_activations)  ##just for debugging purposes
 
-            first_opponent_choice = mouse1.getDecision(zone_activations)
-            Second_opponent_choice = mouse2.getDecision(zone_activations)
+            first_opponent_choice = self.mouse1.getDecision(zone_activations)
+            Second_opponent_choice = self.mouse2.getDecision(zone_activations)
 
             if first_opponent_choice == Locations.Center:
-                self.trialevents = self.trialevents + Events.Mouse1InCenter.value
+                trialevents = trialevents + Events.Mouse1InCenter.value
             elif first_opponent_choice == Locations.Cooperate:
-                self.trialevents = self.trialevents + Events.Mouse1Cooporated.value
+                trialevents = trialevents + Events.Mouse1Cooporated.value
             elif first_opponent_choice == Locations.Defect:
-                self.trialevents = self.trialevents + Events.Mouse1Defected.value
+                trialevents = trialevents + Events.Mouse1Defected.value
 
             if Second_opponent_choice == Locations.Center:
-                self.trialevents = self.trialevents + Events.Mouse2InCenter.value
+                trialevents = trialevents + Events.Mouse2InCenter.value
             elif Second_opponent_choice == Locations.Cooperate:
-                self.trialevents = self.trialevents + Events.Mouse2Cooporated.value
+                trialevents = trialevents + Events.Mouse2Cooporated.value
             elif Second_opponent_choice == Locations.Defect:
-                self.trialevents = self.trialevents + Events.Mouse2Defected.value
+                trialevents = trialevents + Events.Mouse2Defected.value
 
-            with self.event_lock:
-                if self.trialevents ==Events.ExperimentStopped.value:
-                    print("Stopping experiment due to user input.")
+            nextstate = self.stateManager.DetermineState(trialevents)
 
-            nextstate = self.stateManager.DetermineState(self.trialevents)
+            if nextstate != self.currentstate:
+                self.currentstate = nextstate
+                print(f"Current State: {self.currentstate}")
+                self.state_history.append(self.currentstate)
+                self.StateActivity(self.currentstate, self.mouse1, self.mouse2)
 
-            if nextstate != currentstate:
-                currentstate = nextstate
-                print(f"Current State: {currentstate}")
-                state_history.append(currentstate)
-                self.StateActivity(currentstate, mouse1, mouse2)
+        else:    # Experiment terminated
+            experimentended = True
+
+        return experimentended
+
+    def checkTerminationEvenets(self):
+        trialevents = 0
+
+        if self.userStop:
+            trialevents = Events.ExperimentStopped.value
+
+        if self.termination_condition == 'Minutes':
+            if time.time() - self.sessionStartTime > self.termination_parameter:
+                trialevents = Events.ExperimentStopped.value
+        else:
+            if self.numcompletedtrial == self.termination_parameter:
+                trialevents += Events.LastTrial.value
+
+        return trialevents

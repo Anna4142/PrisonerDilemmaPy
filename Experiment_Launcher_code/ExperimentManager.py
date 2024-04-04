@@ -231,6 +231,7 @@ class ExperimentManager:
         self.runTimeGui.StartMonitoring(self.experimentControl, self.stopExperiment)
 
     def experimentControl(self):
+        #mem_usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
         experimentended = False
         self.runTimeGui.UpdateTimeDisplay(time.time() - self.sessionStartTime)
         if self.currentstate != States.End:
@@ -286,3 +287,9 @@ class ExperimentManager:
                 trialevents += Events.LastTrial.value
 
         return trialevents
+'''
+    
+import resource
+    # Get the current memory usage (in bytes)
+    mem_usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+'''

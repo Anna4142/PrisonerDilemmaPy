@@ -2,7 +2,7 @@
 
 import time
 from enum import Enum
-from pynput.keyboard import Key, Listener
+#from pynput.keyboard import Key, Listener
 class States(Enum):
         Start = 1
         CenterReward = 2

@@ -9,7 +9,7 @@ import Data_analysis.FileUtilities as fUtile
 
 class Video_Analyzer:
     def __init__(self):
-        self.root = tk.Tk()
+       # self.root = tk.Tk()
 
         # Initialize the Vimba SDK and VideoAnalyzer
         with Vimba.get_instance() as vimba:

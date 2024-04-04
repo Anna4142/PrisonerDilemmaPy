@@ -20,6 +20,8 @@ from Reward_manager.RewardManager import RewardManager
 from Experiment_Launcher_code.ExperimentManager import ExperimentManager
 from Experiment_Launcher_code.experimentgui import ExperimentGUI, OpponentType
 import Data_analysis.FileUtilities as fUtile
+import cProfile
+
 
 
 def main():
@@ -125,5 +127,6 @@ def write_opponent_configuration(file, configuration, oppid):
 
 # Run the main function
 if __name__ == "__main__":
-    main()
+    #main()
+    cProfile.run('main()')
 

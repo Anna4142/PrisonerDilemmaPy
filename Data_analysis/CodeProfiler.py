@@ -62,14 +62,14 @@ def CalculateFunctionAverages(period):
     FunctionTime = [0] * topcount
 
     for function in FunctionEntries:
-        functionaverage = statistics.mean(FunctionEntries[function]) / period * 100
+        functionCpuTime = sum(FunctionEntries[function]) / period * 100
         for index in range(topcount):
-            if functionaverage > FunctionTime[index]:
+            if functionCpuTime > FunctionTime[index]:
                 for pushindex in range(topcount - 1, index, -1):
                     FunctionName[pushindex] = FunctionName[pushindex - 1]
                     FunctionTime[pushindex] = FunctionTime[pushindex - 1]
                 FunctionName[index] = function
-                FunctionTime[index] = functionaverage
+                FunctionTime[index] = functionCpuTime
                 break
 
     FunctionEntries = {}

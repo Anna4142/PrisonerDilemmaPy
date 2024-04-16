@@ -25,7 +25,7 @@ def NewFrame():
         print(f'Frame Rate= : {framerate:.2f}')
         FrameAveragePeriodStart = time.time()
         FrameCounter = 0
-        CalculateFunctionAverages(period)
+        CalculateFunctionUsage(period)
         for index in range(len(FunctionTime)):
             if FunctionTime[index] > 0:
                 print(f'CPU usage: {FunctionName[index]}, {FunctionTime[index]:.2e}%')
@@ -62,7 +62,7 @@ def CalculateFunctionAverages(period):
     FunctionTime = [0] * topcount
 
     for function in FunctionEntries:
-        functionCPUUsage = statistics.mean(FunctionEntries[function]) / period * 100
+        functionCPUUsage = sum(FunctionEntries[function]) / period * 100
         for index in range(topcount):
             if functionCPUUsage > FunctionTime[index]:
                 for pushindex in range(topcount - 1, index, -1):

@@ -21,7 +21,7 @@ def NewFrame():
     FrameCounter += 1
     period = time.time() - FrameAveragePeriodStart
     if period > 20:
-        framerate = FrameCounter/period
+        framerate = int(FrameCounter/period)
         print(f'Frame Rate= : {framerate:.2f}')
         FrameAveragePeriodStart = time.time()
         FrameCounter = 0
@@ -62,14 +62,14 @@ def CalculateFunctionAverages(period):
     FunctionTime = [0] * topcount
 
     for function in FunctionEntries:
-        functionCpuTime = sum(FunctionEntries[function]) / period * 100
+        functionCPUUsage = statistics.mean(FunctionEntries[function]) / period * 100
         for index in range(topcount):
-            if functionCpuTime > FunctionTime[index]:
+            if functionCPUUsage > FunctionTime[index]:
                 for pushindex in range(topcount - 1, index, -1):
                     FunctionName[pushindex] = FunctionName[pushindex - 1]
                     FunctionTime[pushindex] = FunctionTime[pushindex - 1]
                 FunctionName[index] = function
-                FunctionTime[index] = functionCpuTime
+                FunctionTime[index] = functionCPUUsage
                 break
 
     FunctionEntries = {}

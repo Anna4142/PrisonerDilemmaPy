@@ -22,7 +22,7 @@ def NewFrame():
     period = time.time() - FrameAveragePeriodStart
     if period > 20:
         framerate = int(FrameCounter/period)
-        print(f'Frame Rate= : {framerate}')
+        print(f'Frame Rate= : {framerate:.2f}')
         FrameAveragePeriodStart = time.time()
         FrameCounter = 0
         CalculateFunctionAverages(period)
@@ -53,7 +53,7 @@ def ExitFunction(name):
         print(f'Code Profiler Error. Function {name} missing an entry point')
 
 
-def CalculateFunctionAverages(period):
+def CalculateFunctionUsage(period):
     global FunctionEntries, CPUUsage
     global FunctionName, FunctionTime
 
@@ -62,14 +62,14 @@ def CalculateFunctionAverages(period):
     FunctionTime = [0] * topcount
 
     for function in FunctionEntries:
-        functionaverage = statistics.mean(FunctionEntries[function]) / period * 100
+        functionCPUUsage = statistics.mean(FunctionEntries[function]) / period * 100
         for index in range(topcount):
-            if functionaverage > FunctionTime[index]:
+            if functionCPUUsage > FunctionTime[index]:
                 for pushindex in range(topcount - 1, index, -1):
                     FunctionName[pushindex] = FunctionName[pushindex - 1]
                     FunctionTime[pushindex] = FunctionTime[pushindex - 1]
                 FunctionName[index] = function
-                FunctionTime[index] = functionaverage
+                FunctionTime[index] = functionCPUUsage
                 break
 
     FunctionEntries = {}

@@ -21,8 +21,8 @@ def NewFrame():
     FrameCounter += 1
     period = time.time() - FrameAveragePeriodStart
     if period > 20:
-        framerate = int(FrameCounter/period)
-        print(f'Frame Rate= : {framerate}')
+        framerate = FrameCounter/period
+        print(f'Frame Rate= : {framerate:.2f}')
         FrameAveragePeriodStart = time.time()
         FrameCounter = 0
         CalculateFunctionAverages(period)

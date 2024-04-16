@@ -2,10 +2,9 @@ from vimba import *
 import time
 import cv2
 import numpy as np
-import tkinter as tk
 from Video_analyser_code.VideoWriter import VideoWriter
-import pandas as pd
 import Data_analysis.FileUtilities as fUtile
+import Data_analysis.CodeProfiler as Profiler
 
 class Video_Analyzer:
     def __init__(self):
@@ -239,9 +238,14 @@ class Video_Analyzer:
     def process_single_frame(self, timestamps):
         with self.vimba:
             with self.cam:
+                Profiler.EnterFunction('Get Frame')
                 frame = self.cam.get_frame().as_opencv_image()
+                Profiler.ExitFunction('Get Frame')
 
+                Profiler.EnterFunction('Write Frame')
                 self.video_writer.write_frame(frame, timestamps)
+                Profiler.ExitFunction('Write Frame')
+
                 # Increment and display the frame number
                 self.frame_counter += 1
 

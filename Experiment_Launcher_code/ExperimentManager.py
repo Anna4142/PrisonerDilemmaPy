@@ -7,6 +7,7 @@ from State_manager_code.StateManager import Events
 from Data_analysis.logger import TrialLogger
 from Data_analysis.event_logger import EventLogger
 from Experiment_Launcher_code.RunTimeGui import RunTimeGUI
+import Data_analysis.CodeProfiler as Profiler
 import time
 
 
@@ -232,16 +233,23 @@ class ExperimentManager:
 
     def experimentControl(self):
         #mem_usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        Profiler.NewFrame()
         experimentended = False
+
+        Profiler.EnterFunction('Run Time GUI')
         self.runTimeGui.UpdateTimeDisplay(time.time() - self.sessionStartTime)
+        Profiler.ExitFunction('Run Time GUI')
+
         if self.currentstate != States.End:
             trialevents = self.checkTerminationEvenets()
 
             if self.reward_manager.is_reward_delivered():
                 trialevents += Events.RewardDelivered.value
 
+            Profiler.EnterFunction('Process Single Frame')
             zone_activations = self.videoAnalyser.process_single_frame(self.timestamps)
             # print("zone activations", zone_activations)  ##just for debugging purposes
+            Profiler.ExitFunction('Process Single Frame')
 
             first_opponent_choice = self.mouse1.getDecision(zone_activations)
             Second_opponent_choice = self.mouse2.getDecision(zone_activations)
@@ -260,13 +268,17 @@ class ExperimentManager:
             elif Second_opponent_choice == Locations.Defect:
                 trialevents = trialevents + Events.Mouse2Defected.value
 
+            Profiler.EnterFunction('Determine State')
             nextstate = self.stateManager.DetermineState(trialevents)
+            Profiler.ExitFunction('Determine State')
 
             if nextstate != self.currentstate:
                 self.currentstate = nextstate
                 print(f"Current State: {self.currentstate}")
                 self.state_history.append(self.currentstate)
+                Profiler.EnterFunction('State Activity')
                 self.StateActivity(self.currentstate, self.mouse1, self.mouse2)
+                Profiler.ExitFunction('State Activity')
 
         else:    # Experiment terminated
             experimentended = True

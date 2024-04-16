@@ -20,8 +20,7 @@ from Reward_manager.RewardManager import RewardManager
 from Experiment_Launcher_code.ExperimentManager import ExperimentManager
 from Experiment_Launcher_code.experimentgui import ExperimentGUI, OpponentType
 import Data_analysis.FileUtilities as fUtile
-import cProfile
-
+import Data_analysis.CodeProfiler
 
 
 def main():
@@ -35,6 +34,7 @@ def main():
         experiment_parameters = experiment_gui.get_experiment_parameters()
         opponent_configuration = experiment_gui.get_opponent_configuration()
 
+        # Initialize software modules
         fUtile.set_file_name(experiment_parameters.get('session_type'), experiment_parameters.get('session_num'))
         write_configuration_file(experiment_parameters, opponent_configuration)
 
@@ -127,6 +127,6 @@ def write_opponent_configuration(file, configuration, oppid):
 
 # Run the main function
 if __name__ == "__main__":
-    #main()
-    cProfile.run('main()')
+    main()
+    #cProfile.run('main()')
 

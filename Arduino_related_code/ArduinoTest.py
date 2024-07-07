@@ -6,7 +6,7 @@ else:
 
 ##### main
 opcode = -1
-comport = input("COM Port?: ")
+comport = input("11")
 arduino.openComPort(comport);
 
 while opcode != 0:

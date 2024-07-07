@@ -69,9 +69,12 @@ class Video_Analyzer:
                     opencv_formats = intersect_pixel_formats(formats, OPENCV_PIXEL_FORMATS)
                     cam.set_pixel_format(opencv_formats[0])
                     cam.AcquisitionMode = 'Continuous'
-                    cam.ExposureTime.set(7000)
+                    cam.ExposureTime.set(5000)
+                    print(f"Exposure Time: {cam.ExposureTime.get()}")
+                    print(f"Width: {cam.Width.get()}")
+                    print(f"Height: {cam.Height.get()}")
 
-
+                    print(f"Pixel Format: {cam.get_pixel_format()}")
 
     """""
     def define_regions(self):
@@ -92,12 +95,12 @@ class Video_Analyzer:
     def define_regions(self):
         # Define the regions of interest (ROI) for each mouse and their specific zones
         regions = {
-            'm1_c': [(445, 110), (480, 240)],  # Mouse 2 Cooperate Zone (Top Left)
-            'm1_cen': [(330, 260), (400, 330)],  # Mouse 2 Center Zone (Center Left)
-            'm1_d': [(425, 370), (470, 480)],  # Mouse 2 Defect Zone (Bottom Left)
-            'm2_c': [(525, 110), (565, 235)],  # Mouse 1 Cooperate Zone (Top Right)
-            'm2_cen': [(610, 260), (680, 330)],  # Mouse 1 Center Zone (Center Right)
-            'm2_d': [(515, 370), (550, 480)],  # Adjusted Mouse 1 Defect Zone (Bottom Right)
+            'm1_c': [(500, 130), (530, 215)],  # Mouse 2 Cooperate Zone (Top Left)
+            'm1_cen': [(370, 290), (420, 350)],  # Mouse 2 Center Zone (Center Left)
+            'm1_d': [(495,440),(530,515)],  # Mouse 2 Defect Zone (Bottom Left)
+            'm2_c': [(560, 130), (590, 215)],  # Mouse 1 Cooperate Zone (Top Right)
+            'm2_cen': [(650, 290), (705, 350)],  # Mouse 1 Center Zone (Center Right)
+            'm2_d': [(550, 440), (585, 515)]# Adjusted Mouse 1 Defect Zone (Bottom Right)
 
         }
         return regions
@@ -111,7 +114,7 @@ class Video_Analyzer:
             'm1_d': 130000,  # Threshold for Mouse 2 Defect Zone
             'm2_c': 39500,  # Threshold for Mouse 1 Cooperate Zone
             'm2_cen': 117000,  # Threshold for Mouse 1 Center Zone
-            'm2_d': 98941,  # Threshold for Mouse 1 Defect Zone
+            'm2_d': 130000,  # Threshold for Mouse 1 Defect Zone
 
 
         }
@@ -168,12 +171,12 @@ class Video_Analyzer:
                     contour_counts[region_key] += 1  # Increment count for this region
 
             # Activate zone only if more than 4 contours are detected in the region
-            if contour_counts[region_key] > 5:
+            if contour_counts[region_key] > 3:
                 zone_activation[idx] = 1
 
         # Optional: Print the number of contours detected in each region
-        #for region_key, count in contour_counts.items():
-            #print(f"{region_key}: Number of contours detected = {count}")
+        for region_key, count in contour_counts.items():
+            print(f"{region_key}: Number of contours detected = {count}")
 
         return zone_activation
 
@@ -271,11 +274,12 @@ class Video_Analyzer:
                 cv2.waitKey(1)
 
                 #zone_activations = self.check_zones(frame)
-
+                print(self.zone_activations)
                 return self.zone_activations
 
     def get_zone_activations(self):
         # Return the latest zone activations
+
         return self.zone_activations
     def close_resources(self):
         # Close the video writer and any other resources

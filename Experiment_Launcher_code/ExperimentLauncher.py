@@ -72,7 +72,7 @@ def main():
 
         event_csv_path = fUtile.get_file_path(fUtile.FileType.EXPERIMENT_EVENT_LOG) + '.csv'
 
-        ground_truth_directory="C:/Users/anush/Downloads/Experiment_Folder/Ground_Truth_Data/StrategyData"
+        ground_truth_directory="C:/Users/EngelHardBlab.MEDICINE/Downloads/PrisonerDilemmaPy_(4)/PrisonerDilemmaPy/Ground_Truth_Data/StrategyData"
         comparator = EventComparator(ground_truth_directory, event_csv_path)
         comparator.save_scores()
         # Initialize DataAnalyzer with the file path

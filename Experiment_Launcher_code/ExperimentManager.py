@@ -21,11 +21,11 @@ class ExperimentManager:
         self.runTimeGui = None
 
         # Set default reward and punishment times
-        self.reward_time = 0.15
-        self.sucker_time = 0
-        self.temptation_time = 0.3
-        self.punishment_time = 0.075
-        self.center_reward_time = 0.02
+        self.reward_time = [0.108, 0.114]
+        self.sucker_time = [0, 0]
+        self.temptation_time = [0.248, 0.144]
+        self.punishment_time = [0.047, 0.027]
+        self.center_reward_time = [0.02, 0.019]
 
         # initialize experiment control variables
         self.numcompletedtrial = 0
@@ -73,8 +73,8 @@ class ExperimentManager:
             print(self.timestamps)
             self.visit_cen = True
             print("delivering reward in the center ")
-            mouse1.DeliverReward(Locations.Center, self.center_reward_time)
-            mouse2.DeliverReward(Locations.Center, self.center_reward_time)
+            mouse1.DeliverReward(Locations.Center, self.center_reward_time[0])
+            mouse2.DeliverReward(Locations.Center, self.center_reward_time[1])
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
 
         elif state == States.TrialStarted:
@@ -101,8 +101,8 @@ class ExperimentManager:
             self.opponent_reward = "0.012"
             self.mouse_center_reward = "0.0"
             self.opponent_center_reward = "0.0"
-            mouse1.DeliverReward(Locations.Cooperate, self.reward_time)
-            mouse2.DeliverReward(Locations.Cooperate, self.reward_time)
+            mouse1.DeliverReward(Locations.Cooperate, self.reward_time[0])
+            mouse2.DeliverReward(Locations.Cooperate, self.reward_time[1])
             self.time_to_make_decision = time.time() - self.time_start
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
 
@@ -114,8 +114,8 @@ class ExperimentManager:
             self.opponent_reward = "0.024"
             self.mouse_center_reward = "0.0"
             self.opponent_center_reward = "0.0"
-            mouse1.DeliverReward(Locations.Defect, self.sucker_time)
-            mouse2.DeliverReward(Locations.Cooperate, self.temptation_time)
+            mouse1.DeliverReward(Locations.Defect, self.sucker_time[0])
+            mouse2.DeliverReward(Locations.Cooperate, self.temptation_time[1])
             self.time_to_make_decision = time.time() - self.time_start
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
 
@@ -127,8 +127,8 @@ class ExperimentManager:
             self.opponent_reward = "0"
             self.mouse_center_reward = "0.0"
             self.opponent_center_reward = "0.0"
-            mouse1.DeliverReward(Locations.Cooperate, self.temptation_time)
-            mouse2.DeliverReward(Locations.Defect, self.sucker_time)
+            mouse1.DeliverReward(Locations.Cooperate, self.temptation_time[0])
+            mouse2.DeliverReward(Locations.Defect, self.sucker_time[1])
             self.time_to_make_decision = time.time() - self.time_start
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
 
@@ -140,8 +140,8 @@ class ExperimentManager:
             self.opponent_reward = "0.006"
             self.mouse_center_reward = "0.0"
             self.opponent_center_reward = "0.0"
-            mouse1.DeliverReward(Locations.Defect, self.punishment_time)
-            mouse2.DeliverReward(Locations.Defect, self.punishment_time)
+            mouse1.DeliverReward(Locations.Defect, self.punishment_time[0])
+            mouse2.DeliverReward(Locations.Defect, self.punishment_time[1])
             self.time_to_make_decision = time.time() - self.time_start
             self.event_logger.log_data(self.numcompletedtrial, state, time.time())
 
@@ -240,11 +240,12 @@ class ExperimentManager:
                 trialevents += Events.RewardDelivered.value
 
             zone_activations = self.videoAnalyser.process_single_frame(self.timestamps)
-            # print("zone activations", zone_activations)  ##just for debugging purposes
+            print("zone activations", zone_activations)  ##just for debugging purposes
 
             first_opponent_choice = self.mouse1.getDecision(zone_activations)
             Second_opponent_choice = self.mouse2.getDecision(zone_activations)
-
+            print("1st choice",first_opponent_choice)
+            print("2nd choice", Second_opponent_choice)
             if first_opponent_choice == Locations.Center:
                 trialevents = trialevents + Events.Mouse1InCenter.value
             elif first_opponent_choice == Locations.Cooperate:

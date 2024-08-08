@@ -15,11 +15,10 @@ class FileType(Enum):
 
 
 
-project_directory = ""
-experiment_directory = ""
-mouse_directory = ""
-file_name = ""
-
+project_directory = ''
+experiment_directory = ''
+mouse_directory = ['','']
+file_name = ['','']
 
 def get_mouse_sub_directory(filetype):
     mapping = {
@@ -70,57 +69,66 @@ def set_experiment_directory(path):
             return False
 
 
-def set_mouse_directory(mouse):
+def set_mouse_directory(mouse, position):
     global experiment_directory, mouse_directory
-    if mouse == 'COMPUTER':
-        prefix = ''
-    else:
-        prefix = 'Mouse'
-    mouse_path = f'{experiment_directory}/{prefix}{mouse}'
+
+    prefix = 'Mouse'
+    suffix = ''
+
+    try:
+        num = int(mouse)
+    except ValueError:
+        prefix = mouse
+        mouse = ''
+        suffix = position
+
+    mouse_path = f'{experiment_directory}/{prefix}{mouse}{suffix}'
     if os.path.exists(mouse_path) and os.path.isdir(mouse_path):
-        mouse_directory = mouse_path
+        mouse_directory[position - 1] = mouse_path
         return True
     else:
-        result = messagebox.askquestion("Directory Warning", "Mouse directory does not exist. Create?", icon='warning')
+        result = messagebox.askquestion('Directory Warning', f'{prefix}{mouse}{suffix} directory does not exist. Create?', icon='warning')
         if result == "yes":
-            mouse_directory = mouse_path
-            os.makedirs(mouse_directory)
-            os.makedirs(mouse_directory + "/" + get_mouse_sub_directory(FileType.EXPERIMENT_CONFIGURATION))
-            os.makedirs(mouse_directory + "/" + get_mouse_sub_directory(FileType.EXPERIMENT_LOG))
-            os.makedirs(mouse_directory + "/" + get_mouse_sub_directory(FileType.VIDEO_CAPTURE))
-            os.makedirs(mouse_directory + "/" + get_mouse_sub_directory(FileType.EXPERIMENT_EVENT_LOG))
-            os.makedirs(mouse_directory + "/" + get_mouse_sub_directory(FileType.DATA_ANALYSIS))
-            os.makedirs(mouse_directory + "/" + get_mouse_sub_directory(FileType.COMPARISON_EVENT_LOG))
-            os.makedirs(mouse_directory + "/" + get_mouse_sub_directory(FileType.DATA_ANALYSIS_PLOTS))
-
+            mouse_directory[position - 1] = mouse_path
+            os.makedirs(mouse_path)
+            os.makedirs(mouse_path + "/" + get_mouse_sub_directory(FileType.EXPERIMENT_CONFIGURATION))
+            os.makedirs(mouse_path + "/" + get_mouse_sub_directory(FileType.EXPERIMENT_LOG))
+            os.makedirs(mouse_path + "/" + get_mouse_sub_directory(FileType.VIDEO_CAPTURE))
+            os.makedirs(mouse_path + "/" + get_mouse_sub_directory(FileType.EXPERIMENT_EVENT_LOG))
+            os.makedirs(mouse_path + "/" + get_mouse_sub_directory(FileType.DATA_ANALYSIS))
+            os.makedirs(mouse_path + "/" + get_mouse_sub_directory(FileType.COMPARISON_EVENT_LOG))
+            os.makedirs(mouse_path + "/" + get_mouse_sub_directory(FileType.DATA_ANALYSIS_PLOTS))
             return True
         else:
             return False
 
 
-def set_file_name(sessiontype, sessionnum):
+def set_file_name(sessiontype, sessionnum, opponent):
     global file_name
+
     current_datetime = datetime.now()
     datetime_string = current_datetime.strftime("%Y%m%d-%H%M%S")
-    splitindex = mouse_directory.rfind('/')
-    mouseid = mouse_directory[splitindex + 1 : ]
-    experiment = mouse_directory[:splitindex]
+
+    splitindex = mouse_directory[opponent - 1].rfind('/')
+    mouseid = mouse_directory[opponent - 1][splitindex + 1 : ]
+    experiment = mouse_directory[opponent - 1][:splitindex]
     splitindex = experiment.rfind('/')
     experiment = experiment[splitindex + 1 : ]
-    file_name = f'{datetime_string}_{experiment}_{mouseid}_{sessiontype}{sessionnum}'
+
+    file_name[opponent - 1] = f'{datetime_string}_{experiment}_{mouseid}_{sessiontype}{sessionnum}'
 
 
-def get_file_path(filetype):
+def get_file_path(filetype, opponent):
     global mouse_directory, file_name
     subdir = get_mouse_sub_directory(filetype)
 
     if filetype == FileType.DATA_ANALYSIS_PLOTS:
         # For DATA_ANALYSIS_PLOTS, return the directory path without setting a specific file name.
         # You might want to adjust this if you have a specific naming convention for plots.
-        return f'{mouse_directory}{subdir}/'
+        return f'{mouse_directory[opponent - 1]}{subdir}/'
     elif filetype in [FileType.DATA_ANALYSIS, FileType.MOUSE_PROFILE]:
         # For DATA_ANALYSIS and MOUSE_PROFILE, return the mouse_directory directly.
-        return mouse_directory
+        return mouse_directory[opponent - 1]
     else:
         # For other file types, return the full path including the directory and the file name.
-        return f'{mouse_directory}{subdir}/{file_name}'
+        return f'{mouse_directory[opponent - 1]}{subdir}/{file_name[opponent - 1]}'

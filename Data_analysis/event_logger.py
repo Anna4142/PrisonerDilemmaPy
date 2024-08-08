@@ -8,16 +8,16 @@ class EventLogger(BaseLogger):
     def __init__(self):
         super().__init__()
         self.event_number = 0  # Initialize event number
-
-    def start_logging(self):
-        self.csv_file_path = fUtile.get_file_path(fUtile.FileType.EXPERIMENT_EVENT_LOG) + '.csv'
-        header = ["Trial Number", "Event", "Time", "Event Number", "Time in State"]
-        self._create_file(self.csv_file_path, header)
+        self.csv_file_path = fUtile.get_file_path(fUtile.FileType.EXPERIMENT_EVENT_LOG, 1) + '.csv'
         self.temp_data = []  # Temporary storage for events to calculate Time in State later
 
+    def start_logging(self):
+        header = ["Trial Number", "Event", "Time", "Event Number", "Time in State"]
+        self._create_file(header)
+
     def log_data(self, trial_number, event, time):
-        # Update event number if the event is 'Startes.TrialStarted'
-        if event == 'Startes.TrialStarted':
+        # Update event number if the event is 'States.TrialStarted'
+        if event == 'States.TrialStarted':
             self.event_number += 1
 
         # Assuming 'time' is in a format that can be converted to datetime directly

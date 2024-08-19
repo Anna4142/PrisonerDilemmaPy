@@ -1,5 +1,5 @@
 # this module simulates the video analyzer. It uses arrow keys to signal mouse locations.
-# the mouse location is the last arrow pressed. Mouse 1's location is simulated by the arrow kyes
+# the mouse location is the last arrow pressed. Mouse 1's location is simulated by the arrow keys
 # mouse 2's location is simulated by holding down the left shift key and pressing one of the arrow keys.
 
 from pynput.keyboard import Key, Listener
@@ -15,19 +15,19 @@ class Video_Analyzer:
         if key == Key.shift:
             self.mouse = 2
         if key == Key.left:
-            self.updateLocations([1, 0, 0], self.mouse)
+            self.updateLocations([1, 0, 0])
         elif key == Key.right:
-            self.updateLocations([0, 0, 1], self.mouse)
+            self.updateLocations([0, 0, 1])
         elif key == Key.down:
-            self.updateLocations([0, 1, 0], self.mouse)
+            self.updateLocations([0, 1, 0])
         elif key == Key.up:
-            self.updateLocations([0, 0, 0], self.mouse)
+            self.updateLocations([0, 0, 0])
 
     def on_release(self, key):
         if key == Key.shift:
             self.mouse = 1
 
-    def updateLocations(self, locations, locationOffset):
+    def updateLocations(self, locations):
         if self.mouse == 1:
             self.mouseLocations = locations + self.mouseLocations[3:]
         else:

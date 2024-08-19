@@ -9,15 +9,15 @@ import Data_analysis.FileUtilities as fUtile
 
 class Video_Analyzer:
     def __init__(self):
-        self.root = tk.Tk()
+        # self.root = tk.Tk()  # probably not needed, line staged for deletion
 
         # Initialize the Vimba SDK and VideoAnalyzer
         with Vimba.get_instance() as vimba:
 
             self.vimba = vimba
 
-        self.video_file_loc=fUtile.get_file_path(fUtile.FileType.VIDEO_CAPTURE) + '.avi'
-        """""
+        self.video_file_loc = fUtile.get_file_path(fUtile.FileType.VIDEO_CAPTURE, 1) + '.avi'
+        """"" 
         # Formatting the date and time
         current_datetime = pd.Timestamp.now()
         datetime_string = current_datetime.strftime("%Y%m%d_%H%M%S")
@@ -95,13 +95,12 @@ class Video_Analyzer:
     def define_regions(self):
         # Define the regions of interest (ROI) for each mouse and their specific zones
         regions = {
-            'm1_c': [(500, 130), (530, 215)],  # Mouse 2 Cooperate Zone (Top Left)
-            'm1_cen': [(370, 290), (420, 350)],  # Mouse 2 Center Zone (Center Left)
-            'm1_d': [(495,440),(530,515)],  # Mouse 2 Defect Zone (Bottom Left)
-            'm2_c': [(560, 130), (590, 215)],  # Mouse 1 Cooperate Zone (Top Right)
-            'm2_cen': [(650, 290), (705, 350)],  # Mouse 1 Center Zone (Center Right)
-            'm2_d': [(550, 440), (585, 515)]# Adjusted Mouse 1 Defect Zone (Bottom Right)
-
+            'm1_c':   [(500, 150), (530, 215)],  # Mouse 2 Cooperate Zone (Top Left)
+            'm1_cen': [(370, 305), (420, 365)],  # Mouse 2 Center Zone (Center Left)
+            'm1_d':   [(495, 455), (525, 520)],  # Mouse 2 Defect Zone (Bottom Left)
+            'm2_c':   [(555, 150), (585, 215)],  # Mouse 1 Cooperate Zone (Top Right)
+            'm2_cen': [(650, 305), (700, 365)],  # Mouse 1 Center Zone (Center Right)
+            'm2_d':   [(550, 455), (580, 520)]   # Adjusted Mouse 1 Defect Zone (Bottom Right)
         }
         return regions
 
@@ -171,7 +170,7 @@ class Video_Analyzer:
                     contour_counts[region_key] += 1  # Increment count for this region
 
             # Activate zone only if more than 4 contours are detected in the region
-            if contour_counts[region_key] > 3:
+            if contour_counts[region_key] > 1:
                 zone_activation[idx] = 1
 
         # Optional: Print the number of contours detected in each region
@@ -279,8 +278,8 @@ class Video_Analyzer:
 
     def get_zone_activations(self):
         # Return the latest zone activations
-
         return self.zone_activations
+
     def close_resources(self):
         # Close the video writer and any other resources
         self.video_writer.close()

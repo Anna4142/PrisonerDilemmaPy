@@ -9,15 +9,15 @@ import Data_analysis.FileUtilities as fUtile
 
 class Video_Analyzer:
     def __init__(self):
-        self.root = tk.Tk()
+        # self.root = tk.Tk()  # probably not needed, line staged for deletion
 
         # Initialize the Vimba SDK and VideoAnalyzer
         with Vimba.get_instance() as vimba:
 
             self.vimba = vimba
 
-        self.video_file_loc=fUtile.get_file_path(fUtile.FileType.VIDEO_CAPTURE) + '.avi'
-        """""
+        self.video_file_loc = fUtile.get_file_path(fUtile.FileType.VIDEO_CAPTURE, 1) + '.avi'
+        """"" 
         # Formatting the date and time
         current_datetime = pd.Timestamp.now()
         datetime_string = current_datetime.strftime("%Y%m%d_%H%M%S")
@@ -279,8 +279,8 @@ class Video_Analyzer:
 
     def get_zone_activations(self):
         # Return the latest zone activations
-
         return self.zone_activations
+
     def close_resources(self):
         # Close the video writer and any other resources
         self.video_writer.close()

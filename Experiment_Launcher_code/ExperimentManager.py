@@ -141,7 +141,7 @@ class ExperimentManager:
             self.mouse1_choice = "C"
             self.mouse2_choice = "D"
             self.mouse1_reward = "0"
-            self.mouse2_reward = "0.024"
+            self.mouse2_reward = "0.016"
             self.mouse1_center_reward = "0.0"
             self.mouse2_center_reward = "0.0"
             mouse1.DeliverReward(Locations.Defect, self.sucker_time[0])
@@ -154,7 +154,7 @@ class ExperimentManager:
             mouse2.DeliverReward(Locations.Defect, self.sucker_time[1])
             self.mouse1_choice = "D"
             self.mouse2_choice = "C"
-            self.mouse1_reward = "0.024"
+            self.mouse1_reward = "0.016"
             self.mouse2_reward = "0"
             self.mouse1_center_reward = "0.0"
             self.mouse2_center_reward = "0.0"
@@ -168,8 +168,8 @@ class ExperimentManager:
             self.mouse2_decision_time = time.time() - self.trial_start_time
             self.mouse1_choice = "D"
             self.mouse2_choice = "D"
-            self.mouse1_reward = "0.006"
-            self.mouse2_reward = "0.006"
+            self.mouse1_reward = "0.003"
+            self.mouse2_reward = "0.003"
             self.mouse1_center_reward = "0.0"
             self.mouse2_center_reward = "0.0"
             mouse1.DeliverReward(Locations.Defect, self.punishment_time[0])

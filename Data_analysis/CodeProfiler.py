@@ -25,7 +25,7 @@ def NewFrame():
         print(f'Frame Rate= : {framerate:.2f}')
         FrameAveragePeriodStart = time.time()
         FrameCounter = 0
-        CalculateFunctionUsage(period)
+        CalculateFunctionAverages(period)
         for index in range(len(FunctionTime)):
             if FunctionTime[index] > 0:
                 print(f'CPU usage: {FunctionName[index]}, {FunctionTime[index]:.2e}%')
@@ -45,8 +45,8 @@ def ExitFunction(name):
         functiontime = time.time() - FunctionStartTime[name]
         FunctionStartTime[name] = 0
 
-        if not name in FunctionEntries:
-            #FunctionEntries[name] = [functiontime]
+        if name not in FunctionEntries:
+            # FunctionEntries[name] = [functiontime]
             FunctionEntries[name] = []
         FunctionEntries[name].append(functiontime)
     else:

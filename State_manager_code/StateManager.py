@@ -35,7 +35,7 @@ class StateManager:
             self.NextState = {
                         States.Start: [States.CenterReward, States.End],
                         States.CenterReward: [States.TrialStarted],
-                        States.TrialStarted: [States.M1CM2C, States.M1CM2D, States.M1DM2C, States.M1DM2D],
+                        States.TrialStarted: [States.M1CM2C, States.M1CM2D, States.M1DM2C, States.M1DM2D, States.End],
                         States.M1CM2C: [States.TrialCompleted, States.End],
                         States.M1CM2D: [States.TrialCompleted, States.End],
                         States.M1DM2C: [States.TrialCompleted, States.End],
@@ -57,7 +57,8 @@ class StateManager:
                         States.TrialStarted: [Events.Mouse1Cooporated.value + Events.Mouse2Cooporated.value,
                                               Events.Mouse1Cooporated.value + Events.Mouse2Defected.value,
                                               Events.Mouse1Defected.value + Events.Mouse2Cooporated.value,
-                                              Events.Mouse1Defected.value + Events.Mouse2Defected.value],
+                                              Events.Mouse1Defected.value + Events.Mouse2Defected.value,
+                                              Events.ExperimentStopped.value],
                         States.M1CM2C: [],
                         States.M1CM2D: [],
                         States.M1DM2C: [],

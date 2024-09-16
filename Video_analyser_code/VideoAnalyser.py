@@ -8,24 +8,8 @@ import Data_analysis.CodeProfiler as Profiler
 
 class Video_Analyzer:
     def __init__(self):
-       # self.root = tk.Tk()
-
         # Initialize the Vimba SDK and VideoAnalyzer
-        with Vimba.get_instance() as vimba:
-
-            self.vimba = vimba
-
         self.video_file_loc=fUtile.get_file_path(fUtile.FileType.VIDEO_CAPTURE) + '.avi'
-        """""
-        # Formatting the date and time
-        current_datetime = pd.Timestamp.now()
-        datetime_string = current_datetime.strftime("%Y%m%d_%H%M%S")
-        # Format the file path to include the filename and the date string
-        if opponenttype=="MOUSE_COMPUTER" :
-         self.video_file_loc = f'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/{opponenttype}/{filename}/video_captures/{datetime_string}.avi'
-        else:
-         self.video_file_loc = f'C:/Users/EngelHardBlab.MEDICINE/Desktop/experimentfolder/PILOT_RESULTS/{opponenttype}/video_captures/{datetime_string}.avi'
-        """""
         self.video_writer = VideoWriter(output_file=self.video_file_loc)
         self.regions = self.define_regions()
         self.thresholds = self.define_thresholds()
@@ -34,59 +18,42 @@ class Video_Analyzer:
         self.trial_start_time = time.time()  # Initialize start time
         self.trial_end_time = None  # Initialize end time
         self.exp_zone=0
+        self.vimba = Vimba.get_instance()
+        self.vimba.__enter__()
 
+        cams = self.vimba.get_all_cameras()
+        if not cams:
+            raise ValueError("No cameras found")
+        self.cam = cams[0]
+        self.cam.__enter__()
 
-        with Vimba.get_instance() as vimba:
+        for feature in self.cam.get_all_features():
+            try:
+                value = feature.get()
+            except:
+                (AttributeError, VimbaFeatureError)
+                value = None
 
-            cams = vimba.get_all_cameras()
-            if not cams:
-                raise ValueError("No cameras found")
-            with cams[0] as cam:
-                self.cam = cams[0]
-                for feature in cam.get_all_features():
-                    try:
-                        value = feature.get()
-                    except:
-                        (AttributeError, VimbaFeatureError)
-                        value = None
-                    cam.Height.set(1216)
-                    cam.Width.set(1936)
-                    cam.BinningHorizontal = 4
-                    cam.BinningVertical = 4
-                    cam.AcquisitionFrameRateEnable.set("True")
+            print(f"Feature name: {feature.get_name()}")
+            print(f"Display name: {feature.get_display_name()}")
+            if not value == None:
+                if not feature.get_unit() == '':
+                    print(f"Unit: {feature.get_unit()}", end=' ')
+                    print(f"value={value}")
+                else:
+                    print(f"Not set")
+                    print("--------------------------------------------")
 
-                    formats = cam.get_pixel_formats()
-                    print(f"Feature name: {feature.get_name()}")
-                    print(f"Display name: {feature.get_display_name()}")
-                    if not value == None:
-                        if not feature.get_unit() == '':
-                            print(f"Unit: {feature.get_unit()}", end=' ')
-                            print(f"value={value}")
-                        else:
-                            print(f"Not set")
-                            print("--------------------------------------------")
-                    opencv_formats = intersect_pixel_formats(formats, OPENCV_PIXEL_FORMATS)
-                    cam.set_pixel_format(opencv_formats[0])
-                    cam.AcquisitionMode = 'Continuous'
-                    cam.ExposureTime.set(7000)
-
-
-
-    """""
-    def define_regions(self):
-        # Define the regions of interest (ROI) for the mouse
-        regions = {
-             'r1': [(500, 310), (535, 380)],#bottom right
-            'r2': [(500, 110), (535, 180)],#top right
-            'r3': [(455, 310), (490, 380)],#bottom left
-
-            'r4': [(455, 110), (490, 180)],#top left
-
-            'r5': [(590, 220), (660, 280)],#center right
-            'r6': [(330, 220), (400, 280)],#center left
-        }
-        return regions
-    """
+        self.cam.Height.set(1216)
+        self.cam.Width.set(1936)
+        self.cam.BinningHorizontal = 4
+        self.cam.BinningVertical = 4
+        self.cam.AcquisitionFrameRateEnable.set("True")
+        formats = self.cam.get_pixel_formats()
+        opencv_formats = intersect_pixel_formats(formats, OPENCV_PIXEL_FORMATS)
+        self.cam.set_pixel_format(opencv_formats[0])
+        self.cam.AcquisitionMode = 'Continuous'
+        self.cam.ExposureTime.set(7000)
 
     def define_regions(self):
         # Define the regions of interest (ROI) for each mouse and their specific zones
@@ -97,10 +64,8 @@ class Video_Analyzer:
             'm2_c': [(525, 110), (565, 235)],  # Mouse 1 Cooperate Zone (Top Right)
             'm2_cen': [(610, 260), (680, 330)],  # Mouse 1 Center Zone (Center Right)
             'm2_d': [(515, 370), (550, 480)],  # Adjusted Mouse 1 Defect Zone (Bottom Right)
-
         }
         return regions
-
 
     def define_thresholds(self):
         # Define the thresholds for each region
@@ -111,10 +76,7 @@ class Video_Analyzer:
             'm2_c': 39500,  # Threshold for Mouse 1 Cooperate Zone
             'm2_cen': 117000,  # Threshold for Mouse 1 Center Zone
             'm2_d': 98941,  # Threshold for Mouse 1 Defect Zone
-
-
         }
-
         return self.thresholds
 
     def find_contours(self, frame):
@@ -135,24 +97,7 @@ class Video_Analyzer:
 
         return adjusted_contours
 
-    """""
-    def check_zones(self, frame):  #####    THRESHOLD BASED APPROACH
-        zone_activation = [0] * 6 # [0, 0, 0, 0, 0, 0]
 
-        for idx, region_key in enumerate(self.regions):
-            (y1, x1), (y2, x2) = self.regions[region_key]
-            #print(f"{region_key} coordinates: {(y1, x1)}, {(y2, x2)}")
-            region_pixels = frame[y1:y2, x1:x2]
-            sum_of_pixels = np.sum(frame[y1:y2, x1:x2])
-            self.pixel_sums[region_key] = sum_of_pixels  # Update the class attribute
-            print(f"{region_key}: Sum of pixels = {sum_of_pixels}, Region shape = {region_pixels.shape}")
-
-            if sum_of_pixels <= self.thresholds[region_key]:
-
-                zone_activation[idx] = 1
-        #print("zone activation",zone_activation)
-        return zone_activation
-    """""
 
     def check_zones(self, frame, mouse_contours):
         zone_activation = [0] * len(self.regions)
@@ -236,51 +181,146 @@ class Video_Analyzer:
         return frame
 
     def process_single_frame(self, timestamps):
-        with self.vimba:
-            with self.cam:
-                Profiler.EnterFunction('Get Frame')
-                frame = self.cam.get_frame().as_opencv_image()
-                Profiler.ExitFunction('Get Frame')
+        Profiler.EnterFunction('Get Frame')
+        frame = self.cam.get_frame().as_opencv_image()
+        Profiler.ExitFunction('Get Frame')
 
-                Profiler.EnterFunction('Write Frame')
-                self.video_writer.write_frame(frame, timestamps)
-                Profiler.ExitFunction('Write Frame')
+        Profiler.EnterFunction('Write Frame')
+        self.video_writer.write_frame(frame, timestamps)
+        Profiler.ExitFunction('Write Frame')
 
-                # Increment and display the frame number
-                self.frame_counter += 1
+        # Increment and display the frame number
+        self.frame_counter += 1
 
-                # Resize the frame
-                frame = cv2.resize(frame, (960, 700))
-                frame = self.draw_regions(frame, self.pixel_sums)
-                #self.zone_activations = self.check_zones(frame)  ##FOR THRESHOLD BASED APPROACH
-                contours = self.find_contours(frame)
-                #print("no of contours detected", len(contours))
-                cv2.drawContours(frame, contours, -1, (0, 0, 0), 5)
-                self.zone_activations = self.check_zones(frame,contours)
-                self.exp_zone = self.zone_activations[-1] if self.zone_activations else None
+        # Resize the frame
+        frame = cv2.resize(frame, (960, 700))
+        frame = self.draw_regions(frame, self.pixel_sums)
+        #self.zone_activations = self.check_zones(frame)  ##FOR THRESHOLD BASED APPROACH
 
+        Profiler.EnterFunction('Find Contours')
+        contours = self.find_contours(frame)
+        Profiler.ExitFunction('Find Contours')
 
-                time_since_trial_start = time.time() - self.trial_start_time
+        #print("no of contours detected", len(contours))
 
-                # Format and display trial information and elapsed time
-                #cv2.putText(frame, f"Trial: {trial_number}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-                cv2.putText(frame, f"Since Start: {self.format_time(time_since_trial_start)}", (10, 70),
-                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-                #cv2.putText(frame, f"Frame: {self.frame_counter}", (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        Profiler.EnterFunction('Draw Contours')
+        cv2.drawContours(frame, contours, -1, (0, 0, 0), 5)
+        Profiler.ExitFunction('Draw Contours')
 
-                #print(self.pixel_sums)
+        Profiler.EnterFunction('Check Zones')
+        self.zone_activations = self.check_zones(frame,contours)
+        Profiler.ExitFunction('Check Zones')
 
+        self.exp_zone = self.zone_activations[-1] if self.zone_activations else None
 
-                cv2.imshow('Frame', frame)
-                cv2.waitKey(1)
+        time_since_trial_start = time.time() - self.trial_start_time
 
-                #zone_activations = self.check_zones(frame)
+        # Format and display trial information and elapsed time
+        #cv2.putText(frame, f"Trial: {trial_number}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+        cv2.putText(frame, f"Since Start: {self.format_time(time_since_trial_start)}", (10, 70),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+        #cv2.putText(frame, f"Frame: {self.frame_counter}", (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
-                return self.zone_activations
+        #print(self.pixel_sums)
+
+        cv2.imshow('Frame', frame)
+        cv2.waitKey(1)
+
+        return self.zone_activations
 
     def get_zone_activations(self):
         # Return the latest zone activations
         return self.zone_activations
+
     def close_resources(self):
         # Close the video writer and any other resources
+        self.cam.__exit__()
+        self.vimba.__exit__()
         self.video_writer.close()
+
+
+
+'''
+    def check_zones(self, frame):  #####    THRESHOLD BASED APPROACH
+        zone_activation = [0] * 6 # [0, 0, 0, 0, 0, 0]
+
+        for idx, region_key in enumerate(self.regions):
+            (y1, x1), (y2, x2) = self.regions[region_key]
+            #print(f"{region_key} coordinates: {(y1, x1)}, {(y2, x2)}")
+            region_pixels = frame[y1:y2, x1:x2]
+            sum_of_pixels = np.sum(frame[y1:y2, x1:x2])
+            self.pixel_sums[region_key] = sum_of_pixels  # Update the class attribute
+            print(f"{region_key}: Sum of pixels = {sum_of_pixels}, Region shape = {region_pixels.shape}")
+
+            if sum_of_pixels <= self.thresholds[region_key]:
+
+                zone_activation[idx] = 1
+        #print("zone activation",zone_activation)
+        return zone_activation
+'''
+
+
+
+
+'''
+from vimba import Vimba, Frame
+import cv2
+import numpy as np
+
+class Video:
+    def __init__(self, camera_id=0):
+        self.camera_id = camera_id
+        self.vimba = Vimba.get_instance()
+        self.camera = None
+        self.streaming = False
+
+    def __enter__(self):
+        self.vimba.__enter__()
+        self.camera = self.vimba.get_camera_by_id(self.camera_id)
+        self.camera.open()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.streaming:
+            self.camera.stop_streaming()
+        self.camera.close()
+        self.vimba.__exit__(exc_type, exc_val, exc_tb)
+
+    def start_streaming(self):
+        self.camera.start_streaming()
+        self.streaming = True
+
+    def get_frame(self):
+        if not self.streaming:
+            raise RuntimeError("Streaming has not been started. Call start_streaming() first.")
+        
+        frame = self.camera.get_frame()
+        frame_data = frame.as_numpy_ndarray()
+        return frame_data
+
+    def stop_streaming(self):
+        if self.streaming:
+            self.camera.stop_streaming()
+            self.streaming = False
+
+    def save_video(self, duration, output_file='output.avi', fps=30):
+        width, height = self.camera.get_frame().as_numpy_ndarray().shape[1], self.camera.get_frame().as_numpy_ndarray().shape[0]
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        out = cv2.VideoWriter(output_file, fourcc, fps, (width, height))
+
+        self.start_streaming()
+
+        num_frames = int(duration * fps)
+        try:
+            for _ in range(num_frames):
+                frame_data = self.get_frame()
+                out.write(cv2.cvtColor(frame_data, cv2.COLOR_RGB2BGR))  # Convert frame to BGR for OpenCV
+        finally:
+            self.stop_streaming()
+            out.release()
+
+# Example usage:
+if __name__ == "__main__":
+    with Video(camera_id=0) as video:
+        video.save_video(duration=10, output_file='output.avi')
+'''

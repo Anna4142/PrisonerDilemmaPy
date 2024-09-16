@@ -1,5 +1,5 @@
-# this code profiler keeps track of frame rate and calculates the CPU usage of the 3 most
-# time consuming functions. It does not handle nested functions. Time spent in nested function
+# this code profiler keeps track of frame rate and calculates the CPU usage of the 5 most
+# time-consuming functions. It does not handle nested functions. Time spent in nested function
 # will be accrued both to the calling and nested function.
 
 import time
@@ -57,7 +57,7 @@ def CalculateFunctionAverages(period):
     global FunctionEntries, CPUUsage
     global FunctionName, FunctionTime
 
-    topcount = 3
+    topcount = 5
     FunctionName = [''] * topcount
     FunctionTime = [0] * topcount
 

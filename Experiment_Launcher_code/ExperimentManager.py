@@ -74,7 +74,7 @@ class ExperimentManager:
         if state == States.Start:
             # self.visit_cen = False
             self.event_logger_1.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
-            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
+            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse2_last_location, time.time() - self.sessionStartTime)
 
         elif state == States.CenterReward:
             print(self.timestamps)
@@ -88,7 +88,7 @@ class ExperimentManager:
             #    self.mouse1_center_reward = "0.002"
             #    self.mouse2_center_reward = "0.002"
             self.event_logger_1.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
-            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
+            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse2_last_location, time.time() - self.sessionStartTime)
 
         elif state == States.TrialStarted:
             if self.trial_number > 0:
@@ -124,7 +124,7 @@ class ExperimentManager:
             self.mouse2_center_reward = 0
 
             self.event_logger_1.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
-            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
+            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse2_last_location, time.time() - self.sessionStartTime)
 
         elif state == States.M1CM2C:
             # Actions for M1CM2C state
@@ -139,7 +139,7 @@ class ExperimentManager:
             mouse1.DeliverReward(Locations.Cooperate, self.reward_time[0])
             mouse2.DeliverReward(Locations.Cooperate, self.reward_time[1])
             self.event_logger_1.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
-            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
+            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse2_last_location, time.time() - self.sessionStartTime)
 
         elif state == States.M1CM2D:
             # Actions for M1CDM2D state
@@ -154,7 +154,7 @@ class ExperimentManager:
             mouse1.DeliverReward(Locations.Defect, self.sucker_time[0])
             mouse2.DeliverReward(Locations.Cooperate, self.temptation_time[1])
             self.event_logger_1.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
-            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
+            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse2_last_location, time.time() - self.sessionStartTime)
 
         elif state == States.M1DM2C:
             # Actions for M1DCM2C state
@@ -169,7 +169,7 @@ class ExperimentManager:
             self.mouse1_decision_time = time.time() - self.trial_start_time
             self.mouse2_decision_time = time.time() - self.trial_start_time
             self.event_logger_1.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
-            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
+            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse2_last_location, time.time() - self.sessionStartTime)
 
         elif state == States.M1DM2D:
             # Actions for M1DM2D state
@@ -184,7 +184,7 @@ class ExperimentManager:
             mouse1.DeliverReward(Locations.Defect, self.punishment_time[0])
             mouse2.DeliverReward(Locations.Defect, self.punishment_time[1])
             self.event_logger_1.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
-            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
+            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse2_last_location, time.time() - self.sessionStartTime)
 
         elif state == States.TrialCompleted:
             # Increment the trial number counter
@@ -199,7 +199,7 @@ class ExperimentManager:
 
             print("Trial Completed. Number of completed trials: ", self.trial_number)
             self.event_logger_1.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
-            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
+            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse2_last_location, time.time() - self.sessionStartTime)
 
             # Update run time GUI
             self.runTimeGui.UpdateTrialDisplay(self.trial_number)
@@ -213,7 +213,7 @@ class ExperimentManager:
             print("Delivering reward in M1 center ")
             mouse1.DeliverReward(Locations.Center, self.center_reward_time[0])
             self.event_logger_1.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
-            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
+            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse2_last_location, time.time() - self.sessionStartTime)
 
         elif state == States.M2SecondInCenter:
             self.mouse2_return_time = time.time() - self.start_return_timer
@@ -221,7 +221,7 @@ class ExperimentManager:
             print("Delivering reward in M2 center ")
             mouse2.DeliverReward(Locations.Center, self.center_reward_time[1])
             self.event_logger_1.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
-            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
+            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse2_last_location, time.time() - self.sessionStartTime)
 
         elif state == States.M2FirstInCenter:
             self.mouse2_return_time = time.time() - self.start_return_timer
@@ -238,7 +238,7 @@ class ExperimentManager:
             print("Delivering reward in M1 center ")
             mouse1.DeliverReward(Locations.Center, self.center_reward_time[0])
             self.event_logger_1.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
-            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
+            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse2_last_location, time.time() - self.sessionStartTime)
 
         elif state == States.ReturnTimeOut:
             if self.mouse1_return_time == 0:
@@ -248,7 +248,7 @@ class ExperimentManager:
             print("Trial has been aborted.")
             self.trial_status = 'Return Timeout'
             self.event_logger_1.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
-            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
+            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse2_last_location, time.time() - self.sessionStartTime)
             Play(Sounds.Abort)
 
         elif state == States.DecisionTimeOut:
@@ -261,7 +261,7 @@ class ExperimentManager:
             self.runTimeGui.updateTimeoutHistory(self.trial_number, 2, False, True)
             self.start_return_timer = time.time()
             self.event_logger_1.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
-            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
+            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse2_last_location, time.time() - self.sessionStartTime)
 
         elif state == States.End:
             # Stop recording, finalize logs, show end message, etc.
@@ -272,7 +272,7 @@ class ExperimentManager:
                                          self.mouse1_choice, self.mouse2_reward, self.mouse2_center_reward,
                                          self.trial_start_time - self.sessionStartTime, self.mouse2_decision_time, self.mouse2_return_time)
             self.event_logger_1.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
-            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
+            self.event_logger_2.log_data("State", self.trial_number, state, self.mouse2_last_location, time.time() - self.sessionStartTime)
             self.trial_logger_1.finalize_logging()
             self.trial_logger_2.finalize_logging()
             self.event_logger_1.finalize_logging()

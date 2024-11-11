@@ -316,7 +316,7 @@ class ExperimentManager:
                 self.event_logger_1.log_data('Location', self.trial_number, self.currentstate, mouse1_choice, time.time() - self.sessionStartTime)
             if mouse2_choice != self.mouse2_last_location:
                 self.mouse2_last_location = mouse2_choice
-                self.event_logger_2.log_data('Locatoon', self.trial_number, self.currentstate, mouse2_choice, time.time() - self.sessionStartTime)
+                self.event_logger_2.log_data('Location', self.trial_number, self.currentstate, mouse2_choice, time.time() - self.sessionStartTime)
 
             if mouse1_choice == Locations.Center:
                 trialevents = trialevents + Events.Mouse1InCenter.value

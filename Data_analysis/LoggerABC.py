@@ -18,9 +18,6 @@ class BaseLogger(ABC):
             self.csv_writer = csv.writer(csvfile)
             self.csv_writer.writerow(data)
 
-    #def get_csv_file_path(self):
-    #    return self.csv_file_path
-
     def _create_file(self, header):
         with open(self.csv_file_path, 'w', newline='') as csvfile:
             self.csv_writer = csv.writer(csvfile)
@@ -28,6 +25,5 @@ class BaseLogger(ABC):
         print(f"Logging started, file created at: {self.csv_file_path}")
 
     def finalize_logging(self):
-        #self.csv_file.close()
         pass
 

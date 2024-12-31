@@ -7,6 +7,7 @@ import time
 def calibrate_valve(pin, duration_ms,opening_number):
     valve_control = ValveControl(pin)
     duration_s = duration_ms / 1000  # Convert duration from milliseconds to seconds
+    time.sleep(4)
 
     for i in range(opening_number):
         print(f"Calibrating valve on pin {pin}: Iteration {i+1}")

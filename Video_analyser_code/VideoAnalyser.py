@@ -1,4 +1,4 @@
-from vimba import *
+from vmbpy import *
 import time
 import cv2
 import numpy as np
@@ -9,16 +9,18 @@ import Data_analysis.CodeProfiler as Profiler
 class Video_Analyzer:
     def __init__(self):
         # Initialize the Vimba SDK and VideoAnalyzer
-        self.video_file_loc=fUtile.get_file_path(fUtile.FileType.VIDEO_CAPTURE) + '.avi'
+        self.video_file_loc=fUtile.get_file_path(fUtile.FileType.VIDEO_CAPTURE, 1) + '.avi'
         self.video_writer = VideoWriter(output_file=self.video_file_loc)
         self.regions = self.define_regions()
         self.thresholds = self.define_thresholds()
         self.pixel_sums = {}
-        self.frame_counter = 0
+        self.captured_frame = None
+        self.processed_frame_id = 0
         self.trial_start_time = time.time()  # Initialize start time
         self.trial_end_time = None  # Initialize end time
         self.exp_zone=0
-        self.vimba = Vimba.get_instance()
+        #cv2.namedWindow('MouseCam', cv2.WINDOW_NORMAL)
+        self.vimba = VmbSystem.get_instance()
         self.vimba.__enter__()
 
         cams = self.vimba.get_all_cameras()
@@ -27,33 +29,37 @@ class Video_Analyzer:
         self.cam = cams[0]
         self.cam.__enter__()
 
-        for feature in self.cam.get_all_features():
-            try:
-                value = feature.get()
-            except:
-                (AttributeError, VimbaFeatureError)
-                value = None
-
-            print(f"Feature name: {feature.get_name()}")
-            print(f"Display name: {feature.get_display_name()}")
-            if not value == None:
-                if not feature.get_unit() == '':
-                    print(f"Unit: {feature.get_unit()}", end=' ')
-                    print(f"value={value}")
-                else:
-                    print(f"Not set")
-                    print("--------------------------------------------")
+        #self.display_features()  # for debug only
 
         self.cam.Height.set(1216)
         self.cam.Width.set(1936)
-        self.cam.BinningHorizontal = 4
-        self.cam.BinningVertical = 4
+        #self.cam.BinningHorizontal.set(4)
+        #self.cam.BinningVertical.set(4)
         self.cam.AcquisitionFrameRateEnable.set("True")
+
+        #self.cam.AcquisitionFrameRate.set(10)
+        current_frame_rate = self.cam.AcquisitionFrameRate.get()
+        print(f"Camera Frame Rate: {current_frame_rate} FPS")
+
+
         formats = self.cam.get_pixel_formats()
         opencv_formats = intersect_pixel_formats(formats, OPENCV_PIXEL_FORMATS)
         self.cam.set_pixel_format(opencv_formats[0])
-        self.cam.AcquisitionMode = 'Continuous'
-        self.cam.ExposureTime.set(7000)
+        self.cam.AcquisitionMode.set('Continuous')
+        self.cam.ExposureTime.set(50000)
+        self.cam.start_streaming(handler = self.frame_handler)
+
+    def frame_handler(self, cam: Camera, stream: Stream, frame: Frame):
+        #print ('frame handler')
+        if self.captured_frame is not None:
+            dropped_frames = frame.get_id() - self.captured_frame.get_id() - 1
+        else:
+            dropped_frames = 0
+
+        self.captured_frame = frame
+        self.cam.queue_frame(frame)   #return the buffer to the API
+        if dropped_frames != 0:
+            print (f' {dropped_frames} frames dropped' )
 
     def define_regions(self):
         # Define the regions of interest (ROI) for each mouse and their specific zones
@@ -180,35 +186,41 @@ class Video_Analyzer:
 
         return frame
 
-    def process_single_frame(self, timestamps):
-        Profiler.EnterFunction('Get Frame')
-        frame = self.cam.get_frame().as_opencv_image()
-        Profiler.ExitFunction('Get Frame')
+    def new_frame_captured(self):
+        return_value = False
+        if self.captured_frame is not None:
+            if self.captured_frame.get_id() != self.processed_frame_id:
+                return_value =  True
+        return return_value
 
+    def process_single_frame(self, timestamps):
+        frameimage = self.captured_frame.as_opencv_image()
+        self.processed_frame_id = self.captured_frame.get_id()
+        #print(f' Frame ID = {self.processed_frame_id}')
         Profiler.EnterFunction('Write Frame')
-        self.video_writer.write_frame(frame, timestamps)
+        self.video_writer.write_frame(frameimage, timestamps)
         Profiler.ExitFunction('Write Frame')
 
         # Increment and display the frame number
-        self.frame_counter += 1
+        #self.frame_counter += 1
 
         # Resize the frame
-        frame = cv2.resize(frame, (960, 700))
-        frame = self.draw_regions(frame, self.pixel_sums)
+        frameimage = cv2.resize(frameimage, (960, 700))
+        frameimage = self.draw_regions(frameimage, self.pixel_sums)
         #self.zone_activations = self.check_zones(frame)  ##FOR THRESHOLD BASED APPROACH
 
         Profiler.EnterFunction('Find Contours')
-        contours = self.find_contours(frame)
+        contours = self.find_contours(frameimage)
         Profiler.ExitFunction('Find Contours')
 
         #print("no of contours detected", len(contours))
 
         Profiler.EnterFunction('Draw Contours')
-        cv2.drawContours(frame, contours, -1, (0, 0, 0), 5)
+        cv2.drawContours(frameimage, contours, -1, (0, 0, 0), 5)
         Profiler.ExitFunction('Draw Contours')
 
         Profiler.EnterFunction('Check Zones')
-        self.zone_activations = self.check_zones(frame,contours)
+        self.zone_activations = self.check_zones(frameimage,contours)
         Profiler.ExitFunction('Check Zones')
 
         self.exp_zone = self.zone_activations[-1] if self.zone_activations else None
@@ -217,14 +229,14 @@ class Video_Analyzer:
 
         # Format and display trial information and elapsed time
         #cv2.putText(frame, f"Trial: {trial_number}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-        cv2.putText(frame, f"Since Start: {self.format_time(time_since_trial_start)}", (10, 70),
+        cv2.putText(frameimage, f"Since Start: {self.format_time(time_since_trial_start)}", (10, 70),
                     cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
         #cv2.putText(frame, f"Frame: {self.frame_counter}", (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
         #print(self.pixel_sums)
 
-        cv2.imshow('Frame', frame)
-        cv2.waitKey(1)
+        cv2.imshow('MouseCam', frameimage)
+        #cv2.waitKey(1)
 
         return self.zone_activations
 
@@ -234,10 +246,30 @@ class Video_Analyzer:
 
     def close_resources(self):
         # Close the video writer and any other resources
-        self.cam.__exit__()
-        self.vimba.__exit__()
+        self.cam.stop_streaming()
+        #self.cam.close()
+        self.cam.__exit__(None, None, None)
+        self.vimba.__exit__(None, None, None)
         self.video_writer.close()
+        cv2.destroyAllWindows()
 
+    def display_features(self):
+        for feature in self.cam.get_all_features():
+            try:
+                value = feature.get()
+            except:
+                #(AttributeError, VimbaFeatureError)
+                value = None
+
+            print(f"Feature name: {feature.get_name()}")
+            print(f"Display name: {feature.get_display_name()}")
+            if not value is None:
+                if not feature.get_unit() == '':
+                    print(f"Unit: {feature.get_unit()}", end=' ')
+                    print(f"value={value}")
+                else:
+                    print(f"Not set")
+                    print("--------------------------------------------")
 
 
 '''

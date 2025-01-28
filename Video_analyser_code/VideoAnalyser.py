@@ -1,4 +1,4 @@
-from vimba import *
+from vmbpy import *
 import time
 import cv2
 import numpy as np
@@ -12,7 +12,7 @@ class Video_Analyzer:
         # self.root = tk.Tk()  # probably not needed, line staged for deletion
 
         # Initialize the Vimba SDK and VideoAnalyzer
-        with Vimba.get_instance() as vimba:
+        with VmbSystem.get_instance() as vimba:
 
             self.vimba = vimba
 
@@ -37,7 +37,7 @@ class Video_Analyzer:
         self.exp_zone=0
 
 
-        with Vimba.get_instance() as vimba:
+        with VmbSystem.get_instance() as vimba:
 
             cams = vimba.get_all_cameras()
             if not cams:
@@ -48,7 +48,7 @@ class Video_Analyzer:
                     try:
                         value = feature.get()
                     except:
-                        (AttributeError, VimbaFeatureError)
+                        #(AttributeError, VimbaFeatureError)
                         value = None
                     cam.Height.set(1216)
                     cam.Width.set(1936)

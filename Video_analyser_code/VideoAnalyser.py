@@ -46,8 +46,8 @@ class Video_Analyzer:
         opencv_formats = intersect_pixel_formats(formats, OPENCV_PIXEL_FORMATS)
         self.cam.set_pixel_format(opencv_formats[0])
         self.cam.AcquisitionMode.set('Continuous')
-        self.cam.Gain.set(23)
-        self.cam.ExposureTime.set(4000)
+        self.cam.Gain.set(20)
+        self.cam.ExposureTime.set(2000)
         self.cam.start_streaming(handler = self.frame_handler)
 
     def frame_handler(self, cam: Camera, stream: Stream, frame: Frame):

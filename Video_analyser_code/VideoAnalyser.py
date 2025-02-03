@@ -31,13 +31,13 @@ class Video_Analyzer:
 
         #self.display_features()  # for debug only
 
-        self.cam.Height.set(1216)
-        self.cam.Width.set(1936)
-        #self.cam.BinningHorizontal.set(4)
-        #self.cam.BinningVertical.set(4)
+        self.cam.Height.set(608)  #1216)
+        self.cam.Width.set(968) #1936)
+        self.cam.BinningHorizontal.set(2)
+        self.cam.BinningVertical.set(2)
         self.cam.AcquisitionFrameRateEnable.set("True")
 
-        #self.cam.AcquisitionFrameRate.set(10)
+        self.cam.AcquisitionFrameRate.set(80)
         current_frame_rate = self.cam.AcquisitionFrameRate.get()
         print(f"Camera Frame Rate: {current_frame_rate} FPS")
 
@@ -46,7 +46,8 @@ class Video_Analyzer:
         opencv_formats = intersect_pixel_formats(formats, OPENCV_PIXEL_FORMATS)
         self.cam.set_pixel_format(opencv_formats[0])
         self.cam.AcquisitionMode.set('Continuous')
-        self.cam.ExposureTime.set(50000)
+        self.cam.Gain.set(23)
+        self.cam.ExposureTime.set(4000)
         self.cam.start_streaming(handler = self.frame_handler)
 
     def frame_handler(self, cam: Camera, stream: Stream, frame: Frame):
@@ -205,7 +206,7 @@ class Video_Analyzer:
         #self.frame_counter += 1
 
         # Resize the frame
-        frameimage = cv2.resize(frameimage, (960, 700))
+        #frameimage = cv2.resize(frameimage, (960, 700))
         frameimage = self.draw_regions(frameimage, self.pixel_sums)
         #self.zone_activations = self.check_zones(frame)  ##FOR THRESHOLD BASED APPROACH
 

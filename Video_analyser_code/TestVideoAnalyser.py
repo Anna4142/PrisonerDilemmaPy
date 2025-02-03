@@ -33,7 +33,7 @@ def start_test():
 
     fUtile.set_file_name('VideoTest1', '1', 1)
     video_analyzer = Video_Analyzer()
-    start_button.after(10, timer_event)
+    start_button.after(3, timer_event)
 
 def process_frame():
     global video_analyzer

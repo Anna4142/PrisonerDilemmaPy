@@ -23,11 +23,11 @@ class ExperimentManager:
         self.runTimeGui = None
 
         # Set default reward and punishment times
-        self.reward_time = [0.108, 0.114]
+        self.reward_time = [0.105, 0.102]
         self.sucker_time = [0, 0]
-        self.temptation_time = [0.248, 0.144]
-        self.punishment_time = [0.047, 0.027]
-        self.center_reward_time = [0.02, 0.019]
+        self.temptation_time = [0.164, 0.152]
+        self.punishment_time = [0.031, 0.028]
+        self.center_reward_time = [0.016, 0.017]
 
         # initialize experiment control variables
         self.trial_number = 0

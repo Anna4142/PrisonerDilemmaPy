@@ -20,8 +20,6 @@ from Reward_manager.RewardManager import RewardManager
 from Experiment_Launcher_code.ExperimentManager import ExperimentManager
 from Experiment_Launcher_code.experimentgui import ExperimentGUI, OpponentType
 import Data_analysis.FileUtilities as fUtile
-import Data_analysis.CodeProfiler
-
 
 def main():
     # Create an instance of the ExperimentGUI class

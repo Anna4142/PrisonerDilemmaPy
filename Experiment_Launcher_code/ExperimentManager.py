@@ -260,6 +260,7 @@ class ExperimentManager:
         self.trial_logger_1.start_logging()
         self.trial_logger_2.start_logging()
         self.event_logger.start_logging()
+        self.videoAnalyser.start_video()
         self.termination_condition = experiment_parameters.get("termination_type")
         self.termination_parameter = experiment_parameters.get("termination_value")
         if self.termination_condition == "Minutes":
@@ -290,7 +291,7 @@ class ExperimentManager:
                 trialevents += Events.RewardDelivered.value
 
             Profiler.EnterFunction('Process Single Frame')
-            zone_activations = self.videoAnalyser.process_single_frame(self.timestamps)
+            zone_activations = self.videoAnalyser.process_single_frame()
 
             # print("zone activations", zone_activations)  ##just for debugging purposes
             Profiler.ExitFunction('Process Single Frame')

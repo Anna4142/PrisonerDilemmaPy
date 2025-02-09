@@ -2,9 +2,12 @@ from vmbpy import *
 import time
 import cv2
 import numpy as np
+from queue import Queue
 from Video_analyser_code.VideoWriter import VideoWriter
 import Data_analysis.FileUtilities as fUtile
 import Data_analysis.CodeProfiler as Profiler
+
+import traceback
 
 class Video_Analyzer:
     def __init__(self):
@@ -12,14 +15,14 @@ class Video_Analyzer:
         self.video_file_loc=fUtile.get_file_path(fUtile.FileType.VIDEO_CAPTURE, 1) + '.avi'
         self.video_writer = VideoWriter(output_file=self.video_file_loc)
         self.regions = self.define_regions()
-        self.thresholds = self.define_thresholds()
+        self.zone_activation = [0] * len(self.regions)
         self.pixel_sums = {}
-        self.captured_frame = None
-        self.processed_frame_id = 0
-        self.trial_start_time = time.time()  # Initialize start time
+        self.frame_queue = Queue(10)  # queue depth is 10, the vimba buffer is 5. no need to monitor queue full
+        self.previous_frame_id = None
+        self.trial_start_time = 0
         self.trial_end_time = None  # Initialize end time
-        self.exp_zone=0
-        #cv2.namedWindow('MouseCam', cv2.WINDOW_NORMAL)
+        #self.exp_zone=0
+        cv2.namedWindow('MouseCam', cv2.WINDOW_NORMAL)
         self.vimba = VmbSystem.get_instance()
         self.vimba.__enter__()
 
@@ -36,31 +39,33 @@ class Video_Analyzer:
         self.cam.BinningHorizontal.set(2)
         self.cam.BinningVertical.set(2)
         self.cam.AcquisitionFrameRateEnable.set("True")
-
-        self.cam.AcquisitionFrameRate.set(80)
+        self.cam.AcquisitionFrameRate.set(30)
         current_frame_rate = self.cam.AcquisitionFrameRate.get()
         print(f"Camera Frame Rate: {current_frame_rate} FPS")
-
-
         formats = self.cam.get_pixel_formats()
         opencv_formats = intersect_pixel_formats(formats, OPENCV_PIXEL_FORMATS)
         self.cam.set_pixel_format(opencv_formats[0])
         self.cam.AcquisitionMode.set('Continuous')
         self.cam.Gain.set(20)
-        self.cam.ExposureTime.set(2000)
+        self.cam.ExposureTime.set(5000)
+
+    def start_video(self):
+        self.trial_start_time = time.time()  # Initialize start time
         self.cam.start_streaming(handler = self.frame_handler)
 
     def frame_handler(self, cam: Camera, stream: Stream, frame: Frame):
         #print ('frame handler')
-        if self.captured_frame is not None:
-            dropped_frames = frame.get_id() - self.captured_frame.get_id() - 1
+        self.frame_queue.put(frame)
+        #if self.frame_queue.empty():
+        #    print ('Frame was not added to queue')
+        if self.previous_frame_id is not None:
+            dropped_frames = frame.get_id() - self.previous_frame_id - 1
         else:
             dropped_frames = 0
-
-        self.captured_frame = frame
-        self.cam.queue_frame(frame)   #return the buffer to the API
+        self.previous_frame_id = frame.get_id()
         if dropped_frames != 0:
             print (f' {dropped_frames} frames dropped' )
+        #print ('frame handler completed')
 
     def define_regions(self):
         # Define the regions of interest (ROI) for each mouse and their specific zones
@@ -74,18 +79,6 @@ class Video_Analyzer:
         }
         return regions
 
-    def define_thresholds(self):
-        # Define the thresholds for each region
-        self.thresholds = {
-            'm1_c': 39800,  # Threshold for Mouse 2 Cooperate Zone
-            'm1_cen': 300000,  # Threshold for Mouse 2 Center Zone
-            'm1_d': 130000,  # Threshold for Mouse 2 Defect Zone
-            'm2_c': 39500,  # Threshold for Mouse 1 Cooperate Zone
-            'm2_cen': 117000,  # Threshold for Mouse 1 Center Zone
-            'm2_d': 98941,  # Threshold for Mouse 1 Defect Zone
-        }
-        return self.thresholds
-
     def find_contours(self, frame):
         # Define the region (x1, y1, x2, y2)
         x1, y1, x2, y2 = 300, 90, 700, 510
@@ -96,15 +89,13 @@ class Video_Analyzer:
         # Apply thresholding on the cropped frame
         ret, thresh = cv2.threshold(roi_frame, 25, 255, cv2.THRESH_BINARY_INV)
 
-        # Find contours in the thresholded image
+        # Find contours in the threshold image
         contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
         # Adjust the contour coordinates to be relative to the original frame
         adjusted_contours = [contour + np.array([[x1, y1]]) for contour in contours]
 
         return adjusted_contours
-
-
 
     def check_zones(self, frame, mouse_contours):
         zone_activation = [0] * len(self.regions)
@@ -119,7 +110,7 @@ class Video_Analyzer:
                     contour_counts[region_key] += 1  # Increment count for this region
 
             # Activate zone only if more than 4 contours are detected in the region
-            if contour_counts[region_key] > 5:
+            if contour_counts[region_key] > 1:
                 zone_activation[idx] = 1
 
         # Optional: Print the number of contours detected in each region
@@ -128,7 +119,7 @@ class Video_Analyzer:
 
         return zone_activation
 
-    def is_contour_in_region(self, contour, region_rect,region_key):
+    def is_contour_in_region(self, contour, region_rect, region_key):
         #x1, y1, w1, h1 = region_rect
         #x2, y2 = x1 + w1, y1 + h1  # Calculate bottom-right corner of the region
         y1,x1, y2, x2 = region_rect
@@ -147,17 +138,13 @@ class Video_Analyzer:
                 val=False
         return val
 
-
-
-
-
     def format_time(self,seconds):
         # Helper function to format seconds into H:M:S format
         m, s = divmod(seconds, 60)
         h, m = divmod(m, 60)
         return "{:02d}:{:02d}:{:02d}".format(int(h), int(m), int(s))
 
-    def draw_rectangle_with_lines(self,frame, top_left, bottom_right, color, thickness):
+    def draw_rectangle_with_lines(self, frame, top_left, bottom_right, color, thickness):
         # Unpack the top left and bottom right coordinates
         x1, y1 = top_left
         x2, y2 = bottom_right
@@ -168,16 +155,18 @@ class Video_Analyzer:
         cv2.line(frame, (x1, y1), (x1, y2), color, thickness)  # Left edge
         cv2.line(frame, (x2, y1), (x2, y2), color, thickness)  # Right edge
 
-    def draw_regions(self, frame, pixel_sums):
+    def draw_regions(self, frame, zone_activations):
         for region_key in self.regions:
             top_left, bottom_right = self.regions[region_key]
 
-            self.draw_rectangle_with_lines(frame, top_left, bottom_right, (255, 255, 255),2)
+            # set region color based on its activation status
+            index = list(self.regions.keys()).index(region_key)
+            color = 0 if zone_activations[index] == 1 else 255  # black if zone activated white if not
+            self.draw_rectangle_with_lines(frame, top_left, bottom_right, color,2)
 
-            # Prepare text for region name and sum of pixels
+            # Prepare text for region name
             region_name = region_key
-            sum_of_pixels = pixel_sums.get(region_key, 0)
-            text = f"{region_name}"
+            text = f'{region_name}'
 
             # Calculate position for the text (slightly inside the top-left corner of the rectangle)
             text_pos = (top_left[0] + 5, top_left[1] + 20)
@@ -187,63 +176,48 @@ class Video_Analyzer:
 
         return frame
 
-    def new_frame_captured(self):
-        return_value = False
-        if self.captured_frame is not None:
-            if self.captured_frame.get_id() != self.processed_frame_id:
-                return_value =  True
-        return return_value
+    def process_single_frame(self):
+        # get frame from queue, if available, and process; otherwise, skip.
+        if not self.frame_queue.empty():
+            frame = self.frame_queue.get(False)
+            frameimage = frame.as_opencv_image()
 
-    def process_single_frame(self, timestamps):
-        frameimage = self.captured_frame.as_opencv_image()
-        self.processed_frame_id = self.captured_frame.get_id()
-        #print(f' Frame ID = {self.processed_frame_id}')
-        Profiler.EnterFunction('Write Frame')
-        self.video_writer.write_frame(frameimage, timestamps)
-        Profiler.ExitFunction('Write Frame')
+            Profiler.EnterFunction('Find Contours')
+            contours = self.find_contours(frameimage)
+            Profiler.ExitFunction('Find Contours')
 
-        # Increment and display the frame number
-        #self.frame_counter += 1
+            #if len(contours) > 0:
+            #    print("no of contours detected", len(contours))
 
-        # Resize the frame
-        #frameimage = cv2.resize(frameimage, (960, 700))
-        frameimage = self.draw_regions(frameimage, self.pixel_sums)
-        #self.zone_activations = self.check_zones(frame)  ##FOR THRESHOLD BASED APPROACH
+            #Profiler.EnterFunction('Draw Contours')
+            #cv2.drawContours(frameimage, contours, -1, (0, 0, 0), 5)
+            #Profiler.ExitFunction('Draw Contours')
 
-        Profiler.EnterFunction('Find Contours')
-        contours = self.find_contours(frameimage)
-        Profiler.ExitFunction('Find Contours')
+            Profiler.EnterFunction('Check Zones')
+            self.zone_activations = self.check_zones(frameimage, contours)
+            Profiler.ExitFunction('Check Zones')
 
-        #print("no of contours detected", len(contours))
+            #self.exp_zone = self.zone_activations[-1] if self.zone_activations else None
 
-        Profiler.EnterFunction('Draw Contours')
-        cv2.drawContours(frameimage, contours, -1, (0, 0, 0), 5)
-        Profiler.ExitFunction('Draw Contours')
+            time_since_trial_start = time.time() - self.trial_start_time
 
-        Profiler.EnterFunction('Check Zones')
-        self.zone_activations = self.check_zones(frameimage,contours)
-        Profiler.ExitFunction('Check Zones')
+            # Format and display trial information and elapsed time
+            frameimage = self.draw_regions(frameimage, self.zone_activations)
+            cv2.putText(frameimage, f"Since Start: {self.format_time(time_since_trial_start)}", (10, 70),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
-        self.exp_zone = self.zone_activations[-1] if self.zone_activations else None
+            Profiler.EnterFunction('Write Frame')
+            self.video_writer.write_frame(frameimage)
+            Profiler.ExitFunction('Write Frame')
 
-        time_since_trial_start = time.time() - self.trial_start_time
-
-        # Format and display trial information and elapsed time
-        #cv2.putText(frame, f"Trial: {trial_number}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-        cv2.putText(frameimage, f"Since Start: {self.format_time(time_since_trial_start)}", (10, 70),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-        #cv2.putText(frame, f"Frame: {self.frame_counter}", (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-
-        #print(self.pixel_sums)
-
-        cv2.imshow('MouseCam', frameimage)
-        #cv2.waitKey(1)
+            cv2.imshow('MouseCam', frameimage)
+            self.cam.queue_frame(frame)   #return the buffer to the API
 
         return self.zone_activations
 
-    def get_zone_activations(self):
+    #def get_zone_activations(self):
         # Return the latest zone activations
-        return self.zone_activations
+        #return self.zone_activations
 
     def close_resources(self):
         # Close the video writer and any other resources
@@ -290,6 +264,19 @@ class Video_Analyzer:
                 zone_activation[idx] = 1
         #print("zone activation",zone_activation)
         return zone_activation
+        
+        
+    def define_thresholds(self):
+        # Define the thresholds for each region
+        self.thresholds = {
+            'm1_c': 39800,  # Threshold for Mouse 2 Cooperate Zone
+            'm1_cen': 300000,  # Threshold for Mouse 2 Center Zone
+            'm1_d': 130000,  # Threshold for Mouse 2 Defect Zone
+            'm2_c': 39500,  # Threshold for Mouse 1 Cooperate Zone
+            'm2_cen': 117000,  # Threshold for Mouse 1 Center Zone
+            'm2_d': 98941,  # Threshold for Mouse 1 Defect Zone
+        }
+        return self.thresholds
 '''
 
 

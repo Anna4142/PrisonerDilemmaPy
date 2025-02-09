@@ -33,6 +33,7 @@ def start_test():
 
     fUtile.set_file_name('VideoTest1', '1', 1)
     video_analyzer = Video_Analyzer()
+    video_analyzer.start_video()
     start_button.after(3, timer_event)
 
 def process_frame():
@@ -42,17 +43,11 @@ def process_frame():
 
     if stop_test_clicked:
         window.destroy()
-    elif video_analyzer.new_frame_captured():
+    else:
         Profiler.NewFrame()
         try:
-            # Start the stream and process method
-            timestamps = {
-                'Start Time': time.time(),
-                'Decision Time': time.time(),
-                'Return Time': time.time() }
-
             Profiler.EnterFunction('Process Single Frame')
-            video_analyzer.process_single_frame(timestamps)
+            video_analyzer.process_single_frame()
             Profiler.ExitFunction('Process Single Frame')
 
         except Exception as e:

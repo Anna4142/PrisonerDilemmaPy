@@ -3,7 +3,7 @@
 # will be accrued both to the calling and nested function.
 
 import time
-import statistics
+from Experiment_Launcher_code.ModuleConfiguration import __FRAME_RATE_ONLY
 
 
 FunctionEntries = {}
@@ -54,23 +54,25 @@ def ExitFunction(name):
 
 
 def CalculateFunctionAverages(period):
-    global FunctionEntries, CPUUsage
-    global FunctionName, FunctionTime
+    global FunctionEntries, FunctionName, FunctionTime
 
-    topcount = 5
-    FunctionName = [''] * topcount
-    FunctionTime = [0] * topcount
+    if __FRAME_RATE_ONLY:
+        FunctionEntries = {}
+    else:
+        topcount = 5
+        FunctionName = [''] * topcount
+        FunctionTime = [0] * topcount
 
-    for function in FunctionEntries:
-        functionCPUUsage = sum(FunctionEntries[function]) / period * 100
-        for index in range(topcount):
-            if functionCPUUsage > FunctionTime[index]:
-                for pushindex in range(topcount - 1, index, -1):
-                    FunctionName[pushindex] = FunctionName[pushindex - 1]
-                    FunctionTime[pushindex] = FunctionTime[pushindex - 1]
-                FunctionName[index] = function
-                FunctionTime[index] = functionCPUUsage
-                break
+        for function in FunctionEntries:
+            functionCPUUsage = sum(FunctionEntries[function]) / period * 100
+            for index in range(topcount):
+                if functionCPUUsage > FunctionTime[index]:
+                    for pushindex in range(topcount - 1, index, -1):
+                        FunctionName[pushindex] = FunctionName[pushindex - 1]
+                        FunctionTime[pushindex] = FunctionTime[pushindex - 1]
+                    FunctionName[index] = function
+                    FunctionTime[index] = functionCPUUsage
+                    break
 
-    FunctionEntries = {}
+        FunctionEntries = {}
 

@@ -5,21 +5,25 @@ import pandas as pd
 
 
 class EventLogger(BaseLogger):
-    def __init__(self):
+    def __init__(self, oppid):
         super().__init__()
         self.event_number = 0  # Initialize event number
-        self.csv_file_path = fUtile.get_file_path(fUtile.FileType.EXPERIMENT_EVENT_LOG, 1) + '.csv'
+        self.csv_file_path = fUtile.get_file_path(fUtile.FileType.EXPERIMENT_EVENT_LOG, oppid) + '.csv'
         self.temp_data = []  # Temporary storage for events to calculate Time in State later
 
     def start_logging(self):
-        header = ["Trial Number", "Event", "Time", "Event Number", "Time in State"]
+        header = ["Trigger", "Trial Number", "State", "Location", "Time"]
         self._create_file(header)
 
-    def log_data(self, trial_number, event, time):
-        # Update event number if the event is 'States.TrialStarted'
-        if event == 'States.TrialStarted':
-            self.event_number += 1
+    def log_data(self, trigger, trial_number, state, location, time):
+        data = [trigger, trial_number, state, location, time]
+        self._log_data(data)
 
+
+'''
+        Anushka's old code
+        ------------------
+        
         # Assuming 'time' is in a format that can be converted to datetime directly
         time = pd.to_datetime(time)
 
@@ -42,3 +46,4 @@ class EventLogger(BaseLogger):
         df.to_csv(self.csv_file_path, index=False)
 
         print(f"Event logging finalized and saved to {self.csv_file_path}")
+'''

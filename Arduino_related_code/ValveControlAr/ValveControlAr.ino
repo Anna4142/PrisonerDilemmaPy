@@ -32,7 +32,15 @@ void setup()
     pinMode(i, OUTPUT);
     digitalWrite(i, HIGH);
   }
-  
+
+  //temp ben
+  //for (int i = 3; i <= 6; i++)
+  //{
+  //  pinMode(i, OUTPUT);
+  //  digitalWrite(i, HIGH);
+  //}
+  // end temp ben
+
   // Serial port initialization
   Serial.begin(baud_rate);
   

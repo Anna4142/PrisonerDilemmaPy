@@ -21,7 +21,6 @@ from Experiment_Launcher_code.ExperimentManager import ExperimentManager
 from Experiment_Launcher_code.experimentgui import ExperimentGUI, OpponentType
 import Data_analysis.FileUtilities as fUtile
 
-
 def main():
     # Create an instance of the ExperimentGUI class
     experiment_gui = ExperimentGUI()
@@ -128,4 +127,5 @@ def write_opponent_configuration(file, configuration, oppid):
 # Run the main function
 if __name__ == "__main__":
     main()
+    #cProfile.run('main()')
 

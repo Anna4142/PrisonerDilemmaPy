@@ -1,4 +1,5 @@
 import os
+import json
 from tkinter import messagebox
 from enum import Enum
 from datetime import datetime
@@ -132,3 +133,22 @@ def get_file_path(filetype, opponent):
     else:
         # For other file types, return the full path including the directory and the file name.
         return f'{mouse_directory[opponent - 1]}{subdir}/{file_name[opponent - 1]}'
+
+def load_detection_regions():
+    global project_directory
+
+    filepath = project_directory + '/DetectionRegions.json'
+    try:
+        with open(filepath, 'r') as file:
+            regions = json.load(file)
+    except FileNotFoundError:
+        regions = None
+    return regions
+
+def save_detection_regions(regions):
+    global project_directory
+
+    filepath = project_directory + '/DetectionRegions.json'
+    with open(filepath, 'w') as file:
+        json.dump(regions, file, indent=4)
+

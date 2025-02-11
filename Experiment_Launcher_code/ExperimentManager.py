@@ -7,6 +7,7 @@ from State_manager_code.StateManager import Events
 from Data_analysis.logger import TrialLogger
 from Data_analysis.event_logger import EventLogger
 from Experiment_Launcher_code.RunTimeGui import RunTimeGUI
+import Data_analysis.CodeProfiler as Profiler
 import time
 
 
@@ -283,6 +284,7 @@ class ExperimentManager:
         self.trial_logger_2.start_logging()
         self.event_logger_1.start_logging()
         self.event_logger_2.start_logging()
+        self.videoAnalyser.start_video()
         self.termination_condition = experiment_parameters.get("termination_type")
         self.termination_parameter = experiment_parameters.get("termination_value")
         if self.termination_condition == "Minutes":
@@ -298,16 +300,25 @@ class ExperimentManager:
         self.runTimeGui.StartMonitoring(self.experimentControl, self.stopExperiment)
 
     def experimentControl(self):
+        #mem_usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        Profiler.NewFrame()
         experimentended = False
+
+        Profiler.EnterFunction('Run Time GUI')
         self.runTimeGui.UpdateTimeDisplay(time.time() - self.sessionStartTime)
+        Profiler.ExitFunction('Run Time GUI')
+
         if self.currentstate != States.End:
             trialevents = self.checkTerminationEvenets()
 
             if self.reward_manager.is_reward_delivered():
                 trialevents += Events.RewardDelivered.value
 
-            zone_activations = self.videoAnalyser.process_single_frame(self.timestamps)
-            #print("zone activations", zone_activations)  ##just for debugging purposes
+            Profiler.EnterFunction('Process Single Frame')
+            zone_activations = self.videoAnalyser.process_single_frame()
+
+            # print("zone activations", zone_activations)  ##just for debugging purposes
+            Profiler.ExitFunction('Process Single Frame')
 
             mouse1_choice = self.mouse1.getDecision(zone_activations)
             mouse2_choice = self.mouse2.getDecision(zone_activations)
@@ -332,13 +343,17 @@ class ExperimentManager:
             elif mouse2_choice == Locations.Defect:
                 trialevents = trialevents + Events.Mouse2Defected.value
 
+            Profiler.EnterFunction('Determine State')
             nextstate = self.stateManager.DetermineState(trialevents)
+            Profiler.ExitFunction('Determine State')
 
             if nextstate != self.currentstate:
                 self.currentstate = nextstate
                 print(f"Current State: {self.currentstate}")
                 self.state_history.append(self.currentstate)
+                Profiler.EnterFunction('State Activity')
                 self.StateActivity(self.currentstate, self.mouse1, self.mouse2)
+                Profiler.ExitFunction('State Activity')
 
         else:    # Experiment terminated
             experimentended = True
@@ -359,3 +374,9 @@ class ExperimentManager:
                 trialevents += Events.LastTrial.value
 
         return trialevents
+'''
+    
+import resource
+    # Get the current memory usage (in bytes)
+    mem_usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+'''

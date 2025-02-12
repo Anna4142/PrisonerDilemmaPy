@@ -66,7 +66,7 @@ class RunTimeGUI:
         if self.mainLoopCallback():
             self.window.destroy()
         else:
-            self.timeDisplay.after(10, self.timerEvent)
+            self.timeDisplay.after(5, self.timerEvent)
 
     def drawTrialSummeryGrid(self, extentionfactor):
         x0 = 5 + extentionfactor * 560

@@ -33,6 +33,8 @@ class Video_Analyzer:
         else:
             self.mouseLocations = self.mouseLocations[:3] + locations
 
-    def process_single_frame(self, timestamp):
+    def process_single_frame(self):
         return self.mouseLocations
 
+    def start_video(self):
+        pass

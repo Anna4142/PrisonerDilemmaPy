@@ -4,7 +4,7 @@ from Data_analysis.LoggerABC import BaseLogger
 class TrialLogger(BaseLogger):
     def __init__(self, oppid):
         super().__init__()
-        self.csv_file_path = fUtile.get_file_path(fUtile.FileType.EXPERIMENT_LOG, oppid) + '.csv'
+        self.csv_file_path = fUtile.get_file_path(fUtile.FileType.EXPERIMENT_LOG, oppid) + '_triallog.csv'
 
     def start_logging(self):
         header = ["Trial Number", "Trial Validity", "Self Decision", "Opponent Decision", "Reward",

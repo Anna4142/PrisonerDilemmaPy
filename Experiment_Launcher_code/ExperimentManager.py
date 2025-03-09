@@ -83,24 +83,25 @@ class ExperimentManager:
             print("delivering reward in the center ")
             mouse1.DeliverReward(Locations.Center, self.center_reward_time[0])
             mouse2.DeliverReward(Locations.Center, self.center_reward_time[1])
-            #if self.trial_number > 0:
-            #    self.mouse1_return_time = time.time() - self.start_return_timer
-            #    self.mouse2_return_time = time.time() - self.start_return_timer
-            #    self.mouse1_center_reward = "0.002"
-            #    self.mouse2_center_reward = "0.002"
             self.event_logger_1.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)
             self.event_logger_2.log_data("State", self.trial_number, state, self.mouse2_last_location, time.time() - self.sessionStartTime)
 
         elif state == States.TrialStarted:
             if self.trial_number > 0:
                 if self.mouse1_return_time == 0:
+                    mouse1_status = self.trial_status
                     self.mouse1_return_time = time.time() - self.start_return_timer
+                else:
+                    mouse1_status = 'Completed'
                 if self.mouse2_return_time == 0:
+                    mouse2_status = self.trial_status
                     self.mouse2_return_time = time.time() - self.start_return_timer
-                self.trial_logger_1.log_data(self.trial_number, self.trial_status, self.mouse1_choice,
+                else:
+                    mouse2_status = 'Completed'
+                self.trial_logger_1.log_data(self.trial_number, mouse1_status, self.mouse1_choice,
                                              self.mouse2_choice, self.mouse1_reward, self.mouse1_center_reward,
                                              self.trial_start_time - self.sessionStartTime, self.mouse1_decision_time, self.mouse1_return_time)
-                self.trial_logger_2.log_data(self.trial_number, self.trial_status, self.mouse2_choice,
+                self.trial_logger_2.log_data(self.trial_number, mouse2_status, self.mouse2_choice,
                                              self.mouse1_choice, self.mouse2_reward, self.mouse2_center_reward,
                                              self.trial_start_time - self.sessionStartTime, self.mouse2_decision_time, self.mouse2_return_time)
 
@@ -114,14 +115,14 @@ class ExperimentManager:
 
             self.mouse1_decision_time = 0
             self.mouse1_return_time = 0
-            self.mouse1_choice = "N/A"
-            self.mouse1_reward = 0
+            self.mouse1_choice = 'N/A'
+            self.mouse1_reward = 'N/A'
             self.mouse1_center_reward = 0
 
             self.mouse2_decision_time = 0
             self.mouse2_return_time = 0
-            self.mouse2_choice = "N/A"
-            self.mouse2_reward = 0
+            self.mouse2_choice = 'N/A'
+            self.mouse2_reward = 'N/A'
             self.mouse2_center_reward = 0
 
             self.event_logger_1.log_data("State", self.trial_number, state, self.mouse1_last_location, time.time() - self.sessionStartTime)

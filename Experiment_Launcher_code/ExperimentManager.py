@@ -23,12 +23,15 @@ class ExperimentManager:
         self.event_logger_2 = EventLogger(2)
         self.runTimeGui = None
 
+
         # Set default reward and punishment times
         self.reward_time = [0.105, 0.102]
         self.sucker_time = [0, 0]
         self.temptation_time = [0.164, 0.152]
         self.punishment_time = [0.031, 0.028]
         self.center_reward_time = [0.016, 0.017]
+
+
 
         # initialize experiment control variables
         self.trial_number = 0

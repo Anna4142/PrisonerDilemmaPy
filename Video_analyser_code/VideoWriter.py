@@ -8,7 +8,7 @@ class VideoWriter:
         self.frame_size = frame_size
         self.fps = fps
         self.writer = WriteGear(output=self.output_file)
-        self.frame_time = 1/30
+        self.frame_time = 1/50
         self.time_to_next_frame = 0
 
     def write_frame(self, frame):

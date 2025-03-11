@@ -39,15 +39,15 @@ class Video_Analyzer:
         self.cam.BinningHorizontal.set(2)
         self.cam.BinningVertical.set(2)
         self.cam.AcquisitionFrameRateEnable.set("True")
-        self.cam.AcquisitionFrameRate.set(30)
+        self.cam.AcquisitionFrameRate.set(50)
         current_frame_rate = self.cam.AcquisitionFrameRate.get()
         print(f"Camera Frame Rate: {current_frame_rate} FPS")
         formats = self.cam.get_pixel_formats()
         opencv_formats = intersect_pixel_formats(formats, OPENCV_PIXEL_FORMATS)
         self.cam.set_pixel_format(opencv_formats[0])
         self.cam.AcquisitionMode.set('Continuous')
-        self.cam.Gain.set(20)
-        self.cam.ExposureTime.set(5000)
+        self.cam.Gain.set(15)
+        self.cam.ExposureTime.set(3000)
 
     def start_video(self):
         self.trial_start_time = time.time()  # Initialize start time
@@ -70,12 +70,12 @@ class Video_Analyzer:
     def define_regions(self):
         # Define the regions of interest (ROI) for each mouse and their specific zones
         regions = {
-            'm1_c': [(445, 110), (480, 240)],  # Mouse 2 Cooperate Zone (Top Left)
-            'm1_cen': [(330, 260), (400, 330)],  # Mouse 2 Center Zone (Center Left)
-            'm1_d': [(425, 370), (470, 480)],  # Mouse 2 Defect Zone (Bottom Left)
-            'm2_c': [(525, 110), (565, 235)],  # Mouse 1 Cooperate Zone (Top Right)
-            'm2_cen': [(610, 260), (680, 330)],  # Mouse 1 Center Zone (Center Right)
-            'm2_d': [(515, 370), (550, 480)],  # Adjusted Mouse 1 Defect Zone (Bottom Right)
+            'm1_c': [(455, 155), (485, 230)],  # Mouse 2 Cooperate Zone (Top Left)
+            'm1_cen': [(320, 300), (380, 355)],  # Mouse 2 Center Zone (Center Left)
+            'm1_d': [(450, 420), (480, 495)],  # Mouse 2 Defect Zone (Bottom Left)
+            'm2_c': [(505, 155), (535, 230)],  # Mouse 1 Cooperate Zone (Top Right)
+            'm2_cen': [(615, 300), (675, 355)],  # Mouse 1 Center Zone (Center Right)
+            'm2_d': [(505, 420), (535, 495)],  # Adjusted Mouse 1 Defect Zone (Bottom Right)
         }
         return regions
 
@@ -110,7 +110,7 @@ class Video_Analyzer:
                     contour_counts[region_key] += 1  # Increment count for this region
 
             # Activate zone only if more than 4 contours are detected in the region
-            if contour_counts[region_key] > 1:
+            if contour_counts[region_key] > 0:
                 zone_activation[idx] = 1
 
         # Optional: Print the number of contours detected in each region

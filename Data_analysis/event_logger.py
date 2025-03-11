@@ -8,7 +8,7 @@ class EventLogger(BaseLogger):
     def __init__(self, oppid):
         super().__init__()
         self.event_number = 0  # Initialize event number
-        self.csv_file_path = fUtile.get_file_path(fUtile.FileType.EXPERIMENT_EVENT_LOG, oppid) + '.csv'
+        self.csv_file_path = fUtile.get_file_path(fUtile.FileType.EXPERIMENT_EVENT_LOG, oppid) + '_eventlog.csv'
         self.temp_data = []  # Temporary storage for events to calculate Time in State later
 
     def start_logging(self):

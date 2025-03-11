@@ -60,34 +60,8 @@ def main():
         expManager = ExperimentManager(video_analyzer, reward_manager)
         print("Experiment manager now running")
         expManager.start_streaming_exp(experiment_parameters, first_opponent, second_opponent)
-    
-        data_file_path =fUtile.get_file_path(fUtile.FileType.EXPERIMENT_LOG, 1) + '.csv'  # Get the path of the logged data
 
-        data_analyzer = DataAnalyzer(data_file_path)
-        # Perform data analysis
-        analysis_results = data_analyzer.analyze_data()
-        # Save analysis results
-        data_analysis_file_path = fUtile.get_file_path(fUtile.FileType.DATA_ANALYSIS, 1) + '.csv'  # Get the path of the logged data
-        result_file_path = data_analyzer.save_results_to_file(analysis_results)
-
-
-        event_csv_path = fUtile.get_file_path(fUtile.FileType.EXPERIMENT_EVENT_LOG, 1) + '.csv'
-
-        ground_truth_directory="C:/Users/EngelHardBlab.MEDICINE/Downloads/PrisonerDilemmaPy_(4)/PrisonerDilemmaPy/Ground_Truth_Data/StrategyData"
-        comparator = EventComparator(ground_truth_directory, event_csv_path)
-        comparator.save_scores()
-        # Initialize DataAnalyzer with the file path
-
-
-        save_directory = fUtile.get_file_path(fUtile.FileType.DATA_ANALYSIS_PLOTS, 1) # Specify your custom save directory here
-
-        plotter = DataPlotter(data_file_path, save_directory)
-        plotter.load_data()
-        plotter.filter_completed_trials()
-        plotter.plot_decision_time()  # This will now save to the specified directory
-        plotter.plot_return_time()
-
-        print(f"Analysis results saved to {result_file_path}")
+        # experiment manager terminated.
         del expManager
     else:
         print("No valid settings were provided.")
@@ -124,8 +98,39 @@ def write_opponent_configuration(file, configuration, oppid):
         file.write(f'Opponent: Learner. \n')
 
 
+'''     #Anushka old data analysis code
+
+        data_file_path =fUtile.get_file_path(fUtile.FileType.EXPERIMENT_LOG, 1) + '.csv'  # Get the path of the logged data
+
+        data_analyzer = DataAnalyzer(data_file_path)
+        # Perform data analysis
+        analysis_results = data_analyzer.analyze_data()
+        # Save analysis results
+        data_analysis_file_path = fUtile.get_file_path(fUtile.FileType.DATA_ANALYSIS, 1) + '.csv'  # Get the path of the logged data
+        result_file_path = data_analyzer.save_results_to_file(analysis_results)
+
+
+        event_csv_path = fUtile.get_file_path(fUtile.FileType.EXPERIMENT_EVENT_LOG, 1) + '.csv'
+
+        ground_truth_directory="C:/Users/EngelHardBlab.MEDICINE/Downloads/PrisonerDilemmaPy_(4)/PrisonerDilemmaPy/Ground_Truth_Data/StrategyData"
+        comparator = EventComparator(ground_truth_directory, event_csv_path)
+        comparator.save_scores()
+        # Initialize DataAnalyzer with the file path
+
+
+        save_directory = fUtile.get_file_path(fUtile.FileType.DATA_ANALYSIS_PLOTS, 1) # Specify your custom save directory here
+
+        plotter = DataPlotter(data_file_path, save_directory)
+        plotter.load_data()
+        plotter.filter_completed_trials()
+        plotter.plot_decision_time()  # This will now save to the specified directory
+        plotter.plot_return_time()
+
+        print(f"Analysis results saved to {result_file_path}")       
+'''
+
 # Run the main function
 if __name__ == "__main__":
     main()
-    #cProfile.run('main()')
+
 

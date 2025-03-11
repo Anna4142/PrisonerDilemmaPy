@@ -16,7 +16,8 @@ class States(Enum):
         M2SecondInCenter = 12
         M2FirstInCenter = 13
         M1SecondInCenter = 14
-        End = 15
+        Abort = 15
+        End = 16
 
 class Events(Enum):
         Mouse1InCenter = 1
@@ -41,12 +42,13 @@ class StateManager:
                         States.M1DM2C: [States.TrialCompleted, States.End],
                         States.M1DM2D: [States.TrialCompleted, States.End],
                         States.TrialCompleted: [States.End, States.M1FirstInCenter, States.M2FirstInCenter, States.End],
-                        States.ReturnTimeOut: [States.TrialStarted, States.End],
-                        States.DecisionTimeOut: [States.TrialStarted, States.End],
+                        States.ReturnTimeOut: [States.End],
+                        States.DecisionTimeOut: [States.End],
                         States.M1FirstInCenter: [States.M2SecondInCenter],
                         States.M2SecondInCenter: [States.TrialStarted, States.End],
                         States.M2FirstInCenter: [States.M1SecondInCenter],
                         States.M1SecondInCenter: [States.TrialStarted, States.End],
+                        States.Abort: [States.TrialStarted, States.End],
                         States.End: [States.End]
                     }
 
@@ -66,16 +68,16 @@ class StateManager:
                         States.TrialCompleted: [Events.LastTrial.value,
                                                 Events.Mouse1InCenter.value, Events.Mouse2InCenter.value,
                                                 Events.ExperimentStopped.value],
-                        States.ReturnTimeOut: [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value,
-                                               Events.ExperimentStopped.value],
-                        States.DecisionTimeOut: [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value,
-                                                 Events.ExperimentStopped.value],
+                        States.ReturnTimeOut: [Events.ExperimentStopped.value],
+                        States.DecisionTimeOut: [Events.ExperimentStopped.value],
                         States.M1FirstInCenter: [Events.Mouse2InCenter.value],
                         States.M2SecondInCenter: [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value,
                                                   Events.ExperimentStopped.value],
                         States.M2FirstInCenter: [Events.Mouse1InCenter.value],
                         States.M1SecondInCenter: [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value,
                                                   Events.ExperimentStopped.value],
+                        States.Abort: [Events.Mouse1InCenter.value + Events.Mouse2InCenter.value,
+                                      Events.ExperimentStopped.value],
                         States.End: []
                     }
 
@@ -88,30 +90,32 @@ class StateManager:
                 States.M1DM2C: States.TrialCompleted,
                 States.M1DM2D: States.TrialCompleted,
                 States.TrialCompleted: States.ReturnTimeOut,
-                States.ReturnTimeOut: None,
-                States.DecisionTimeOut: None,
+                States.ReturnTimeOut: States.Abort,
+                States.DecisionTimeOut: States.Abort,
                 States.M1FirstInCenter: States.ReturnTimeOut,
                 States.M2SecondInCenter: None,
                 States.M2FirstInCenter: States.ReturnTimeOut,
                 States.M1SecondInCenter: None,
+                States.Abort: None,
                 States.End: None
             }
 
             self.TransitionTimeOut = {
                 States.Start: None,
-                States.CenterReward: 2,
+                States.CenterReward: 1,
                 States.TrialStarted: 10,  # 10 seconds is a default value. It is replaced by the SetTimeOut functions.
-                States.M1CM2C: 2,
-                States.M1CM2D: 2,
-                States.M1DM2C: 2,
-                States.M1DM2D: 2,
+                States.M1CM2C: 0,
+                States.M1CM2D: 0,
+                States.M1DM2C: 0,
+                States.M1DM2D: 0,
                 States.TrialCompleted: 10,  # 10 seconds is a default value. It is replaced by the SetTimeOut functions.
-                States.ReturnTimeOut: None,
-                States.DecisionTimeOut: None,
+                States.ReturnTimeOut: 1,
+                States.DecisionTimeOut: 1,
                 States.M1FirstInCenter: 10, # 10 seconds is a default value. It is replaced by the SetTimeOut functions.
                 States.M2SecondInCenter: None,
                 States.M2FirstInCenter: 10, # 10 seconds is a default value. It is replaced by the SetTimeOut functions.
                 States.M1SecondInCenter: None,
+                States.Abort: None,
                 States.End:None
             }
 

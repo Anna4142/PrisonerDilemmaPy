@@ -8,6 +8,7 @@ from Data_analysis.logger import TrialLogger
 from Data_analysis.event_logger import EventLogger
 from Experiment_Launcher_code.RunTimeGui import RunTimeGUI
 import Data_analysis.CodeProfiler as Profiler
+from Data_analysis.RunTimeAnalysis import RunTimeAnalysis
 import time
 
 
@@ -22,7 +23,7 @@ class ExperimentManager:
         self.event_logger_1 = EventLogger(1)
         self.event_logger_2 = EventLogger(2)
         self.runTimeGui = None
-
+        self.run_time_analysis = RunTimeAnalysis(30, 2, 60)
 
         # Set default reward and punishment times
         self.reward_time = [0.105, 0.102]
@@ -30,8 +31,6 @@ class ExperimentManager:
         self.temptation_time = [0.164, 0.152]
         self.punishment_time = [0.031, 0.028]
         self.center_reward_time = [0.016, 0.017]
-
-
 
         # initialize experiment control variables
         self.trial_number = 0
@@ -46,6 +45,7 @@ class ExperimentManager:
         self.return_max_time = 0
         self.trial_status = 'Incomplete'
         self.start_return_timer = 0
+        self.session_progress_percent = 0
 
         self.timestamps = {}  # for the video writer
         self.userStop = False
@@ -109,6 +109,7 @@ class ExperimentManager:
                                              self.trial_start_time - self.sessionStartTime, self.mouse2_decision_time, self.mouse2_return_time)
 
             self.trial_number += 1
+            self.run_time_analysis.new_trial()
             self.trial_start_time = time.time()
             self.trial_status = 'Incomplete'
             mouse1.NewTrial()
@@ -298,10 +299,11 @@ class ExperimentManager:
         self.mouse1 = mouse1
         self.mouse2 = mouse2
 
-        # setup run time GUI
+        # setup run time GUI and Event Analyser
         self.runTimeGui = RunTimeGUI()
         self.sessionStartTime = time.time()
         self.runTimeGui.StartMonitoring(self.experimentControl, self.stopExperiment)
+        self.run_time_analysis.reset_analysis_timers()
 
     def experimentControl(self):
         #mem_usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
@@ -314,6 +316,10 @@ class ExperimentManager:
 
         if self.currentstate != States.End:
             trialevents = self.checkTerminationEvenets()
+            session_progress = self.calculateSessionProgress()
+            if session_progress - self.session_progress_percent > 1:
+                self.session_progress_percent = session_progress
+                self.runTimeGui.UpdateProgress(session_progress)
 
             if self.reward_manager.is_reward_delivered():
                 trialevents += Events.RewardDelivered.value
@@ -329,9 +335,11 @@ class ExperimentManager:
             if mouse1_choice != self.mouse1_last_location:
                 self.mouse1_last_location = mouse1_choice
                 self.event_logger_1.log_data('Location', self.trial_number, self.currentstate, mouse1_choice, time.time() - self.sessionStartTime)
+                self.run_time_analysis.new_mouse_position(1)
             if mouse2_choice != self.mouse2_last_location:
                 self.mouse2_last_location = mouse2_choice
                 self.event_logger_2.log_data('Location', self.trial_number, self.currentstate, mouse2_choice, time.time() - self.sessionStartTime)
+                self.run_time_analysis.new_mouse_position(2)
 
             if mouse1_choice == Locations.Center:
                 trialevents = trialevents + Events.Mouse1InCenter.value
@@ -347,6 +355,7 @@ class ExperimentManager:
             elif mouse2_choice == Locations.Defect:
                 trialevents = trialevents + Events.Mouse2Defected.value
 
+            self.run_time_analysis.event_analysis(self.runTimeGui.UpdateEventLog)
             Profiler.EnterFunction('Determine State')
             nextstate = self.stateManager.DetermineState(trialevents)
             Profiler.ExitFunction('Determine State')
@@ -363,6 +372,13 @@ class ExperimentManager:
             experimentended = True
 
         return experimentended
+
+    def calculateSessionProgress(self):
+        if self.termination_condition == 'Minutes':
+            percent = int((time.time() - self.sessionStartTime) / self.termination_parameter * 100)
+        else:
+            percent = int(self.trial_number / self.termination_parameter * 100)
+        return percent
 
     def checkTerminationEvenets(self):
         trialevents = 0

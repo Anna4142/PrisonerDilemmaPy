@@ -9,6 +9,7 @@ from Data_analysis.event_logger import EventLogger
 from Experiment_Launcher_code.RunTimeGui import RunTimeGUI
 import Data_analysis.CodeProfiler as Profiler
 from Data_analysis.RunTimeAnalysis import RunTimeAnalysis
+from Data_analysis.HeartBeat import HeartBeat
 import time
 
 
@@ -24,6 +25,7 @@ class ExperimentManager:
         self.event_logger_2 = EventLogger(2)
         self.runTimeGui = None
         self.run_time_analysis = RunTimeAnalysis(30, 2, 60)
+        self.heartbeat = HeartBeat(4, 30)
 
         # Set default reward and punishment times
         self.reward_time = [0.105, 0.102]
@@ -354,6 +356,11 @@ class ExperimentManager:
                 trialevents = trialevents + Events.Mouse2Cooporated.value
             elif mouse2_choice == Locations.Defect:
                 trialevents = trialevents + Events.Mouse2Defected.value
+
+            pulse_time = self.heartbeat.generate_heartbeat()
+            if pulse_time > 0:
+                self.event_logger_1.log_data('Heart Beat', self.trial_number, self.currentstate, mouse1_choice, pulse_time - self.sessionStartTime)
+                self.event_logger_2.log_data('Heart Beat', self.trial_number, self.currentstate, mouse2_choice, pulse_time - self.sessionStartTime)
 
             self.run_time_analysis.event_analysis(self.runTimeGui.UpdateEventLog)
             Profiler.EnterFunction('Determine State')

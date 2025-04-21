@@ -15,6 +15,8 @@ def mainloop():
         runtimegui.UpdateTrialDisplay(trialNum)
         trialSummery(1, trialNum)
         trialSummery(2, trialNum)
+        runtimegui.UpdateProgress(random.random() * 100)
+        runtimegui.UpdateEventLog(f'new termination event {random.random() * 100:.2f}')
 
     return experimentEnded
 

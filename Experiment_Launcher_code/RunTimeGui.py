@@ -1,6 +1,7 @@
 import tkinter as tk
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import matplotlib.pyplot as plt
+from tkinter import ttk
+
+from pandas.core.arrays import period_array
 
 
 class RunTimeGUI:
@@ -36,8 +37,23 @@ class RunTimeGUI:
         self.TCanvas = tk.Canvas(self.TPanel, width=590, height=70)
         self.TCanvas.place(x=0, y=2)
         self.drawTrialSummeryGrid(0)
+        self.event_log = tk.Text(self.window, height=5, width=60)
+        self.event_log.place(x=155, y=400)
+        #self.event_log.config(state="disabled")
+        scrollbar = tk.Scrollbar(self.window, command=self.event_log.yview)
+        scrollbar.place(x=630, y=400, height=85)
+        self.event_log.config(yscrollcommand=scrollbar.set)
+        tk.Label(self.window, text='Termination Event Log:', font=("Arial", 12)).place(x=155, y=375)
+        self.progress = ttk.Progressbar(self.window, orient="horizontal", length=400, mode="determinate")
+        self.progress.place(x=200, y=550)
+        tk.Label(self.window, text='Session Progress', font=("Arial", 8)).place(x=100, y=550)
+        divisions = 3
+        for lc in range(divisions):
+            percentage = int(100 / (divisions + 1) * (lc + 1))
+            offset = 200 + int(400 * percentage / 100)
+            tk.Label(self.window, text=f'{percentage}', font=("Arial", 8)).place(x=offset, y=530)
         self.stop_button = tk.Button(self.window, text="Stop Experiment")
-        self.stop_button.place(x = 300, y = 600)
+        self.stop_button.place(x = 320, y = 600)
         self.stop_button.config(font=("Arial", 12))
 
         self.scrollOffset = 0
@@ -57,6 +73,12 @@ class RunTimeGUI:
             self.TCanvas.config(width=590 * (extentionfactor + 1), height=70)
             self.drawTrialSummeryGrid(extentionfactor)
 
+    def UpdateProgress(self, per):
+        self.progress["value"] = per
+
+    def UpdateEventLog(self, message):
+        self.event_log.insert("end", message + '\n')
+
     def UpdateTimeDisplay(self, time):
         minutes = int(time / 60)
         seconds = int(time) % 60
@@ -66,7 +88,8 @@ class RunTimeGUI:
         if self.mainLoopCallback():
             self.window.destroy()
         else:
-            self.timeDisplay.after(5, self.timerEvent)
+            self.timeDisplay.after(3, self.timerEvent)
+
 
     def drawTrialSummeryGrid(self, extentionfactor):
         x0 = 5 + extentionfactor * 560

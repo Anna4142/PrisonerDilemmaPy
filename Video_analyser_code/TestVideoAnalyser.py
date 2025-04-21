@@ -1,5 +1,4 @@
 import tkinter as tk
-import time
 from tkinter import filedialog
 from tkinter import messagebox
 from Video_analyser_code.VideoAnalyser import Video_Analyzer
@@ -75,7 +74,7 @@ stop_button.place(x=300, y=120)
 
 project_directory_var.set(fUtile.get_project_directory())
 stop_test_clicked = False
-video_analyzer = None
+video_analyzer : Video_Analyzer | None = None
 
 window.mainloop()
 

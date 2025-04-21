@@ -1,4 +1,3 @@
-
 import time
 import cv2
 import numpy as np
@@ -78,9 +77,9 @@ class Video_Analyzer:
             Profiler.ExitFunction('Write Frame')
 
             cv2.imshow('MouseCam', frame_image)
-            self.cam.queue_frame(frame)   #return the buffer to the API
+            self.cam.release_frame(frame)
 
-        return self.zone_activations
+        return self.zone_activation
 
     #def get_zone_activations(self):
         # Return the latest zone activations

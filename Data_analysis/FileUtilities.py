@@ -13,6 +13,7 @@ class FileType(Enum):
     MOUSE_PROFILE               = 6
     COMPARISON_EVENT_LOG        = 7
     DATA_ANALYSIS_PLOTS         = 8
+    HEART_BEAT                  = 9
 
 
 
@@ -29,7 +30,8 @@ def get_mouse_sub_directory(filetype):
         FileType.EXPERIMENT_EVENT_LOG:      "/event_data_from_trials",
         FileType.DATA_ANALYSIS:             "/data_analysis",
         FileType.COMPARISON_EVENT_LOG:      "/comparison_event_data",
-        FileType.DATA_ANALYSIS_PLOTS:       "/data_analysis_plots"
+        FileType.DATA_ANALYSIS_PLOTS:       "/data_analysis_plots",
+        FileType.HEART_BEAT:                "/video_captures"
     }
     return mapping.get(filetype)
 

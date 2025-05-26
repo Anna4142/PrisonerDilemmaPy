@@ -357,10 +357,7 @@ class ExperimentManager:
             elif mouse2_choice == Locations.Defect:
                 trialevents = trialevents + Events.Mouse2Defected.value
 
-            pulse_time = self.heartbeat.generate_heartbeat()
-            if pulse_time > 0:
-                self.event_logger_1.log_data('Heart Beat', self.trial_number, self.currentstate, mouse1_choice, pulse_time - self.sessionStartTime)
-                self.event_logger_2.log_data('Heart Beat', self.trial_number, self.currentstate, mouse2_choice, pulse_time - self.sessionStartTime)
+            self.heartbeat.generate_heartbeat()
 
             self.run_time_analysis.event_analysis(self.runTimeGui.UpdateEventLog)
             Profiler.EnterFunction('Determine State')

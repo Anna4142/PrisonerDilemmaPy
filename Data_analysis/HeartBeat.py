@@ -6,21 +6,23 @@ else:
     import Arduino_related_code.ArduinoDigital as Arduino
 import time
 import numpy as np
+from Data_analysis.HeartBeatLogger import HeartBeatLogger
 
 class HeartBeat:
     def __init__(self, DigitalChannel, mean_period_milliSec):
         self.arduino_pin = DigitalChannel
         self.mean_period_milliSec = mean_period_milliSec
         self.next_heartbeat_time = HeartBeat.time_of_next_event(self.mean_period_milliSec, 10, 150)
-
+        self.logger = HeartBeatLogger(1)
+        self.logger.start_logging()
+        self.start_time = time.time()
 
     def generate_heartbeat(self):
-        heartbeat_time = 0
         if time.time() - self.next_heartbeat_time > 0:
-            heartbeat_time = time.time()
-            Arduino.DigitalHighPulse(self.arduino_pin, int(3))  # Start Low pulse, time is given in mSec
+            time_stamp = time.time() - self.start_time
+            Arduino.DigitalHighPulse(self.arduino_pin, int(3))  # Start High pulse, time is given in mSec
+            self.logger.log_data(time_stamp)
             self.next_heartbeat_time = HeartBeat.time_of_next_event(self.mean_period_milliSec, 10, 150)
-        return heartbeat_time
 
     @staticmethod
     def time_of_next_event(mean, low, high):

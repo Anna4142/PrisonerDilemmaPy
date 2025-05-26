@@ -4,6 +4,12 @@
 
 import time
 from Experiment_Launcher_code.ModuleConfiguration import __FRAME_RATE_ONLY
+from Experiment_Launcher_code.ModuleConfiguration import __EXPANDED_PROFILING
+if __EXPANDED_PROFILING:
+    import psutil
+    import os
+    import threading
+from Video_analyser_code.VideoAnalyzerSim import Video_Analyzer
 
 
 FunctionEntries = {}
@@ -29,6 +35,7 @@ def NewFrame():
         for index in range(len(FunctionTime)):
             if FunctionTime[index] > 0:
                 print(f'CPU usage: {FunctionName[index]}, {FunctionTime[index]:.2e}%')
+        list_processes()
 
 def EnterFunction(name):
     global FunctionStartTime
@@ -76,3 +83,18 @@ def CalculateFunctionAverages(period):
 
         FunctionEntries = {}
 
+def list_processes():
+    if __EXPANDED_PROFILING:
+        current_process = psutil.Process(os.getpid())
+        children = current_process.children(recursive=True)
+        print(f"{len(children)} child processes are running.")
+
+        threads = current_process.threads()
+        for t in threads:
+            print(f"Thread ID: {t.id}, User time: {t.user_time}, System time: {t.system_time}")
+
+        print("Current threads:")
+        for t in threading.enumerate():
+            print(t.name)
+    else:
+        pass

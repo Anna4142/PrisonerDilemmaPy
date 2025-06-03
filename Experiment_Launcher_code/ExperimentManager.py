@@ -28,10 +28,10 @@ class ExperimentManager:
         self.heartbeat = HeartBeat(4, 30)
 
         # Set default reward and punishment times
-        self.reward_time = [0.105, 0.102]
+        self.reward_time = [0.114, 0.108]
         self.sucker_time = [0, 0]
-        self.temptation_time = [0.164, 0.152]
-        self.punishment_time = [0.031, 0.028]
+        self.temptation_time = [0.160, 0.152]
+        self.punishment_time = [0.03, 0.028]
         self.center_reward_time = [0.016, 0.017]
 
         # initialize experiment control variables

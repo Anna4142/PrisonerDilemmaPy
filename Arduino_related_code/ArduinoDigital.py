@@ -46,7 +46,7 @@ def serialout(outbyte):
 
     try:
         comport.write(outbyte)
-        time.sleep(0.01)
+        time.sleep(0.001)
     except Exception  as e:
         print (f'Serial port exception: {e}')
         raise Exception('Serial port crash, restart program')

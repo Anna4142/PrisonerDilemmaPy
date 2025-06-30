@@ -6,7 +6,7 @@ import pandas as pd
 
 class EventLogger(BaseLogger):
     def __init__(self, oppid):
-        super().__init__()
+        super().__init__(5)
         self.event_number = 0  # Initialize event number
         self.csv_file_path = fUtile.get_file_path(fUtile.FileType.EXPERIMENT_EVENT_LOG, oppid) + '_eventlog.csv'
         self.temp_data = []  # Temporary storage for events to calculate Time in State later

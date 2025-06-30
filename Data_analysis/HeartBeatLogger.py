@@ -2,8 +2,8 @@ import Data_analysis.FileUtilities as fUtile
 from Data_analysis.LoggerABC import BaseLogger
 
 class HeartBeatLogger(BaseLogger):
-    def __init__(self, oppid):
-        super().__init__()
+    def __init__(self):
+        super().__init__(300)
         self.csv_file_path = fUtile.get_file_path(fUtile.FileType.HEART_BEAT, 1) + '.csv'
 
     def start_logging(self):

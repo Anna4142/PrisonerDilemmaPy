@@ -70,12 +70,12 @@ class Video_Analyzer:
     def define_regions(self):
         # Define the regions of interest (ROI) for each mouse and their specific zones
         regions = {
-            'm1_c': [(455, 145), (485, 215)],  # Mouse 2 Cooperate Zone (Top Left)
-            'm1_cen': [(325, 290), (380, 335)],  # Mouse 2 Center Zone (Center Left)
-            'm1_d': [(450, 410), (480, 480)],  # Mouse 2 Defect Zone (Bottom Left)
-            'm2_c': [(505, 145), (535, 215)],  # Mouse 1 Cooperate Zone (Top Right)
-            'm2_cen': [(615, 290), (670, 335)],  # Mouse 1 Center Zone (Center Right)
-            'm2_d': [(505, 410), (535, 480)],  # Adjusted Mouse 1 Defect Zone (Bottom Right)
+            'm1_c': [(485, 145), (515, 215)],  # Mouse 2 Cooperate Zone (Top Left)
+            'm1_cen': [(355, 290), (410, 335)],  # Mouse 2 Center Zone (Center Left)
+            'm1_d': [(485, 410), (515, 480)],  # Mouse 2 Defect Zone (Bottom Left)
+            'm2_c': [(540, 145), (570, 215)],  # Mouse 1 Cooperate Zone (Top Right)
+            'm2_cen': [(635, 290), (690, 335)],  # Mouse 1 Center Zone (Center Right)
+            'm2_d': [(540, 410), (570, 480)],  # Adjusted Mouse 1 Defect Zone (Bottom Right)
         }
         return regions
 

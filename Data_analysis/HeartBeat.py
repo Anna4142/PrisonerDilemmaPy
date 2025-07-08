@@ -13,9 +13,15 @@ class HeartBeat:
         self.arduino_pin = DigitalChannel
         self.mean_period_milliSec = mean_period_milliSec
         self.next_heartbeat_time = HeartBeat.time_of_next_event(self.mean_period_milliSec, 10, 150)
-        self.logger = HeartBeatLogger(1)
+        self.logger = HeartBeatLogger()
         self.logger.start_logging()
-        self.start_time = time.time()
+        self.start_time = 0
+
+    def start(self, session_start_time):
+        self.start_time = session_start_time
+
+    def stop(self):
+        self.logger.finalize_logging()
 
     def generate_heartbeat(self):
         if time.time() - self.next_heartbeat_time > 0:

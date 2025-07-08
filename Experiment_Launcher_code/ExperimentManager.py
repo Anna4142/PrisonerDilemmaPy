@@ -285,6 +285,7 @@ class ExperimentManager:
             self.trial_logger_2.finalize_logging()
             self.event_logger_1.finalize_logging()
             self.event_logger_2.finalize_logging()
+            self.heartbeat.stop()
 
     def start_streaming_exp(self, experiment_parameters, mouse1, mouse2):
         self.trial_logger_1.start_logging()
@@ -304,6 +305,7 @@ class ExperimentManager:
         # setup run time GUI and Event Analyser
         self.runTimeGui = RunTimeGUI()
         self.sessionStartTime = time.time()
+        self.heartbeat.start(self.sessionStartTime)
         self.runTimeGui.StartMonitoring(self.experimentControl, self.stopExperiment)
         self.run_time_analysis.reset_analysis_timers()
 

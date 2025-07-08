@@ -3,7 +3,7 @@ from Data_analysis.LoggerABC import BaseLogger
 
 class TrialLogger(BaseLogger):
     def __init__(self, oppid):
-        super().__init__()
+        super().__init__(1)
         self.csv_file_path = fUtile.get_file_path(fUtile.FileType.EXPERIMENT_LOG, oppid) + '_triallog.csv'
 
     def start_logging(self):

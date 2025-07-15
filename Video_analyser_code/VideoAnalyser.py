@@ -21,7 +21,6 @@ class Video_Analyzer:
         self.previous_frame_id = None
         self.trial_start_time = 0
         self.trial_end_time = None  # Initialize end time
-        #self.exp_zone=0
         cv2.namedWindow('MouseCam', cv2.WINDOW_NORMAL)
         self.vimba = VmbSystem.get_instance()
         self.vimba.__enter__()
@@ -40,6 +39,9 @@ class Video_Analyzer:
         self.cam.BinningVertical.set(2)
         self.cam.AcquisitionFrameRateEnable.set("True")
         self.cam.AcquisitionFrameRate.set(50)
+        self.cam.LineSelector.set('Line1')      # Set Line 1 as output
+        self.cam.LineMode.set('Output')
+        self.cam.LineSource.set('ExposureActive')
         current_frame_rate = self.cam.AcquisitionFrameRate.get()
         print(f"Camera Frame Rate: {current_frame_rate} FPS")
         formats = self.cam.get_pixel_formats()

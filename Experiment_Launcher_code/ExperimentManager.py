@@ -292,7 +292,6 @@ class ExperimentManager:
         self.trial_logger_2.start_logging()
         self.event_logger_1.start_logging()
         self.event_logger_2.start_logging()
-        self.videoAnalyser.start_video()
         self.termination_condition = experiment_parameters.get("termination_type")
         self.termination_parameter = experiment_parameters.get("termination_value")
         if self.termination_condition == "Minutes":
@@ -305,6 +304,7 @@ class ExperimentManager:
         # setup run time GUI and Event Analyser
         self.runTimeGui = RunTimeGUI()
         self.sessionStartTime = time.time()
+        self.videoAnalyser.start_video()
         self.heartbeat.start(self.sessionStartTime)
         self.runTimeGui.StartMonitoring(self.experimentControl, self.stopExperiment)
         self.run_time_analysis.reset_analysis_timers()

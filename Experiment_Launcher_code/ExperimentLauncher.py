@@ -38,8 +38,8 @@ def main():
         write_configuration_file(experiment_parameters, opponent_configuration, 2)
 
         # Instantiate software components
-        video_analyzer = Video_Analyzer()
         reward_manager = RewardManager(comport_name)
+        video_analyzer = Video_Analyzer()
 
         # Configure Opponents
         if opponent_configuration.get("opponent1_type") == OpponentType.MOUSE:

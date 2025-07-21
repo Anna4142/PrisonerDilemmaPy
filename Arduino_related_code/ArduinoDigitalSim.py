@@ -1,8 +1,9 @@
 import datetime
+import time
 
 def openComPort(portname):
     ct = datetime.datetime.now().strftime("%M:%S.%f")
-    print(f'COM port {portname} created.');
+    print(f'COM port {portname} created.')
 
 def DigitalHigh(pin):
     ct = datetime.datetime.now().strftime("%M:%S.%f")

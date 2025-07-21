@@ -137,8 +137,38 @@ class HWConfGUI:
 
     def init_window(self):
         self.project_directory_var.set(fUtile.get_project_directory())
+        fUtile.set_project_directory(self.project_directory_var.get())
         sys_par = fUtile.load_system_configuration()
-        pass
+        self.comport_name.set(sys_par.get('Com Port'))
+        self.heart_beat_channel.set(sys_par.get('Hear Beat Channel'))
+
+        '''
+        'M1 Coo Channel': '1',
+        'M1 Coo flow unit': '1',
+        'M1 Cen Channel': '1',
+        'M1 Cen flow unit': '1',
+        'M1 Def Channel': '1',
+        'M1 Def flow unit': '1',
+        'M2 Coo Channel': '1',
+        'M2 Coo flow unit': '1',
+        'M2 Cen Channel': '1',
+        'M2 Cen flow unit': '1',
+        'M2 Def Channel': '1',
+        'M2 Def flow unit': '1',
+        'Cal Open Time': '40',
+        'Cal Open Iteration': '25',
+        'Cal Volume': '100',
+        'M1 CC Reward': '12',
+        'M1 CD Reward': '0',
+        'M1 DC Reward': '16',
+        'M1 DD Reward': '3',
+        'M1 CN Reward': '2',
+        'M2 CC Reward': '12',
+        'M2 CD Reward': '0',
+        'M2 DC Reward': '16',
+        'M2 DD Reward': '3',
+        'M2 CN Reward': '2'}
+        '''
 
     def populate_system_parameters_panel(self):
         tk.Label(self.system_panel, text="Project Directory:").place(x=5, y=30)

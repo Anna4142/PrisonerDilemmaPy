@@ -310,7 +310,6 @@ class ExperimentManager:
         self.run_time_analysis.reset_analysis_timers()
 
     def experimentControl(self):
-        #mem_usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
         Profiler.NewFrame()
         experimentended = False
 

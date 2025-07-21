@@ -35,18 +35,9 @@ def serialout(outbyte):
     if not comport.isOpen():
         print('Arduino Com port is not open')
 
-    '''
-    try:
-        numbytes = comport.out_waiting
-        if numbytes > 0:
-            print(f'Arduino out buffer not empty ({numbytes})')
-    except Exception as e:
-        print (f'check buffer error {e}')
-    '''
-
     try:
         comport.write(outbyte)
-        time.sleep(0.001)
+        #time.sleep(0.001)   # a delay is recommended, but it kills the frame rate.
     except Exception  as e:
         print (f'Serial port exception: {e}')
         raise Exception('Serial port crash, restart program')

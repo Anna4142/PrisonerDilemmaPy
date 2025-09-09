@@ -38,8 +38,8 @@ def main():
         write_configuration_file(experiment_parameters, opponent_configuration, 2)
 
         # Instantiate software components
-        video_analyzer = Video_Analyzer()
         reward_manager = RewardManager(comport_name)
+        video_analyzer = Video_Analyzer()
 
         # Configure Opponents
         if opponent_configuration.get("opponent1_type") == OpponentType.MOUSE:
@@ -61,8 +61,12 @@ def main():
         print("Experiment manager now running")
         expManager.start_streaming_exp(experiment_parameters, first_opponent, second_opponent)
 
-        # experiment manager terminated.
+        # experiment terminated.
+        del experiment_gui
         del expManager
+        video_analyzer.close_resources()
+        del video_analyzer
+        del reward_manager
     else:
         print("No valid settings were provided.")
 

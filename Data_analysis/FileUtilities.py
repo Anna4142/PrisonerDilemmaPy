@@ -35,7 +35,6 @@ def get_mouse_sub_directory(filetype):
     }
     return mapping.get(filetype)
 
-
 def set_project_directory(path):
     global project_directory
     if os.path.exists(path) and os.path.isdir(path):
@@ -46,15 +45,19 @@ def set_project_directory(path):
     else:
         return False
 
-
 def get_project_directory():
+    path = 'Error'
     try:
         with open("./ProjectDirectory.txt", 'r') as file:
             path = file.read()
     except FileNotFoundError:
-        path = ""
-    return path
-
+        messagebox.showerror('Directory Error', 'Project directory undefined')
+    else:
+        if not (os.path.exists(path) and os.path.isdir(path)):
+            messagebox.showerror('Directory Error', 'Project directory does not exist')
+            path = 'Error'
+    finally:
+        return path
 
 def set_experiment_directory(path):
     global experiment_directory, project_directory
@@ -154,9 +157,10 @@ def save_detection_regions(regions):
     with open(filepath, 'w') as file:
         json.dump(regions, file, indent=4)
 
-def load_system_configuration():
+def load_system_configuration(version):
     global project_directory
 
+    sys_par = {'version': 'Error'}
     filepath = project_directory + '/SystemParameters.json'
     try:
         with open(filepath, 'r') as file:
@@ -166,11 +170,18 @@ def load_system_configuration():
                                         "System Parameters File does not exist. Create?",
                                         icon='warning')
         if result == "yes":
-            sys_par = init_system_parameters()
-            save_system_configuration(sys_par)
-        else:
-            sys_par = None
-    return sys_par
+            sys_par = {'version': 'Init'}
+    else:
+        if not sys_par.get('version') == version:
+            result = messagebox.askquestion("File Warning",
+                                            "System Parameters File is obsolete. Create?",
+                                            icon='warning')
+            if result == "yes":
+                sys_par = {'version': 'Init'}
+            else:
+                sys_par = {'version': 'Error'}
+    finally:
+        return sys_par
 
 def save_system_configuration(sys_par):
     global project_directory
@@ -179,31 +190,3 @@ def save_system_configuration(sys_par):
     with open(filepath, 'w') as file:
         json.dump(sys_par, file, indent=4)
 
-def init_system_parameters():
-    return {'Com Port': 'COM11',
-            'Hear Beat Channel' : '4',
-            'M1 Coo Channel': '1',
-            'M1 Coo flow unit': '1',
-            'M1 Cen Channel': '1',
-            'M1 Cen flow unit': '1',
-            'M1 Def Channel': '1',
-            'M1 Def flow unit': '1',
-            'M2 Coo Channel': '1',
-            'M2 Coo flow unit': '1',
-            'M2 Cen Channel': '1',
-            'M2 Cen flow unit': '1',
-            'M2 Def Channel': '1',
-            'M2 Def flow unit': '1',
-            'Cal Open Time': '40',
-            'Cal Open Iteration': '25',
-            'Cal Volume': '100',
-            'M1 CC Reward' : '12',
-            'M1 CD Reward': '0',
-            'M1 DC Reward' : '16',
-            'M1 DD Reward': '3',
-            'M1 CN Reward': '2',
-            'M2 CC Reward': '12',
-            'M2 CD Reward': '0',
-            'M2 DC Reward': '16',
-            'M2 DD Reward': '3',
-            'M2 CN Reward': '2'}

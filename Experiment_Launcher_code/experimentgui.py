@@ -189,7 +189,7 @@ class ExperimentGUI:
                 messagebox.showerror("Invalid Input", "First opponent is a mouse. Mouse ID must be defined")
                 return False
         else:
-            mouse1 = 'Computer'
+            mouse1 = 'Computer1'
 
         # if opponent2 is a mouse mouse_2_id must be defined. else mouse_2_id is set to "Computer"
         if self.get_opponent_type(self.second_opponent_type.get()) == OpponentType.MOUSE:
@@ -198,7 +198,7 @@ class ExperimentGUI:
                 messagebox.showerror("Invalid Input", "Second opponent is a mouse. Mouse ID must be defined")
                 return False
         else:
-            mouse2 = 'Computer'
+            mouse2 = 'Computer2'
 
         # mouse pair directory must exist
         if not fUtile.set_mouse_pair_directory(mouse1, mouse2):

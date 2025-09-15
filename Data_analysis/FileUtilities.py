@@ -52,12 +52,12 @@ def set_experiment_directory(experiment_name):
 def set_mouse_pair_directory(mouse1, mouse2):
     global experiment, mouse_pair, mouse_id, project_directory
 
-    if mouse2 == 'Computer':
+    if mouse2 == 'Computer2':
         mouse_id[1] = mouse2
     else:
         mouse_id[1] = f'm{mouse2}'
 
-    if mouse1 == 'Computer':
+    if mouse1 == 'Computer1':
         mouse_id[0] = mouse1
         mouse_pair = f'{mouse_id[1]}_{mouse_id[0]}'
     else:

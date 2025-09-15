@@ -182,31 +182,27 @@ class ExperimentGUI:
         if not fUtile.set_experiment_directory(ed):
             return False
 
-        # if opponent1 is a mouse mouse_1_id must be defined and mouse directory must exist.
-        # else mouse_1_id is set to "Computer1" and directory must exist.
+        # if opponent1 is a mouse mouse_1_id must be defined. else mouse_1_id is set to "Computer"
         if self.get_opponent_type(self.first_opponent_type.get()) == OpponentType.MOUSE:
-            mouse = self.mouse_1_id.get()
-            if mouse == "":
+            mouse1 = self.mouse_1_id.get()
+            if mouse1 == "":
                 messagebox.showerror("Invalid Input", "First opponent is a mouse. Mouse ID must be defined")
                 return False
-            if not fUtile.set_mouse_directory(mouse, 1):
-                return False
         else:
-            if not fUtile.set_mouse_directory("Computer", 1):
-                return False
+            mouse1 = 'Computer'
 
-        # if opponent2 is a mouse mouse_2_id must be defined and mouse directory must exist.
-        # else mouse_2_id is set to "Computer2" and directory must exist.
+        # if opponent2 is a mouse mouse_2_id must be defined. else mouse_2_id is set to "Computer"
         if self.get_opponent_type(self.second_opponent_type.get()) == OpponentType.MOUSE:
-            mouse = self.mouse_2_id.get()
-            if mouse == "":
+            mouse2 = self.mouse_2_id.get()
+            if mouse2 == "":
                 messagebox.showerror("Invalid Input", "Second opponent is a mouse. Mouse ID must be defined")
                 return False
-            if not fUtile.set_mouse_directory(mouse, 2):
-                return False
         else:
-            if not fUtile.set_mouse_directory("Computer", 2):
-                return False
+            mouse2 = 'Computer'
+
+        # mouse pair directory must exist
+        if not fUtile.set_mouse_pair_directory(mouse1, mouse2):
+            return False
 
         # Session type must be defined
         if self.session_type.get() == "":
@@ -220,6 +216,10 @@ class ExperimentGUI:
             num = -1
         if num <= 0:
             messagebox.showerror("Invalid Input", "Session Num must be a positive integer")
+            return False
+
+        # session Directory must exist
+        if not fUtile.set_session_directory(self.session_type.get(), self.session_num.get()):
             return False
 
         # Session Limit must be a positive integer

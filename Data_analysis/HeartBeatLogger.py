@@ -4,7 +4,7 @@ from Data_analysis.LoggerABC import BaseLogger
 class HeartBeatLogger(BaseLogger):
     def __init__(self):
         super().__init__(300)
-        self.csv_file_path = fUtile.get_file_path(fUtile.FileType.HEART_BEAT, 1) + '.csv'
+        self.csv_file_path = fUtile.get_file_path(0) + '_heartbeat.csv'
 
     def start_logging(self):
         header = ["Time Stamp"]

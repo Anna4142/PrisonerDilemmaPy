@@ -7,15 +7,12 @@ from Video_analyser_code.VideoWriter import VideoWriter
 import Data_analysis.FileUtilities as fUtile
 import Data_analysis.CodeProfiler as Profiler
 
-import traceback
-
 class Video_Analyzer:
     def __init__(self):
         # Initialize the Vimba SDK and VideoAnalyzer
-        self.video_file_loc=fUtile.get_file_path(fUtile.FileType.VIDEO_CAPTURE, 1) + '.avi'
+        self.video_file_loc=fUtile.get_file_path(0) + '_video.avi'
         self.video_writer = VideoWriter(output_file=self.video_file_loc)
         self.regions = self.define_regions()
-        self.zone_activation = [0] * len(self.regions)
         self.pixel_sums = {}
         self.frame_queue = Queue(10)  # queue depth is 10, the vimba buffer is 5. no need to monitor queue full
         self.previous_frame_id = None
@@ -179,6 +176,8 @@ class Video_Analyzer:
         return frame
 
     def process_single_frame(self):
+        zone_activation = [0] * len(self.regions)
+
         # get frame from queue, if available, and process; otherwise, skip.
         if not self.frame_queue.empty():
             frame = self.frame_queue.get(False)
@@ -196,7 +195,7 @@ class Video_Analyzer:
             #Profiler.ExitFunction('Draw Contours')
 
             Profiler.EnterFunction('Check Zones')
-            self.zone_activations = self.check_zones(frameimage, contours)
+            zone_activation = self.check_zones(frameimage, contours)
             Profiler.ExitFunction('Check Zones')
 
             #self.exp_zone = self.zone_activations[-1] if self.zone_activations else None
@@ -204,7 +203,7 @@ class Video_Analyzer:
             time_since_trial_start = time.time() - self.trial_start_time
 
             # Format and display trial information and elapsed time
-            frameimage = self.draw_regions(frameimage, self.zone_activations)
+            frameimage = self.draw_regions(frameimage, zone_activation)
             cv2.putText(frameimage, f"Since Start: {self.format_time(time_since_trial_start)}", (10, 70),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
@@ -215,7 +214,7 @@ class Video_Analyzer:
             cv2.imshow('MouseCam', frameimage)
             self.cam.queue_frame(frame)   #return the buffer to the API
 
-        return self.zone_activations
+        return zone_activation
 
     #def get_zone_activations(self):
         # Return the latest zone activations

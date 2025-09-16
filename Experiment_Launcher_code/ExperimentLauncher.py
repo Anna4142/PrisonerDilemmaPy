@@ -1,18 +1,9 @@
 from Experiment_Launcher_code.ModuleConfiguration import __USE_VIDEO_SIM
-from Experiment_Launcher_code.ModuleConfiguration import __USE_VIDEO_STUB
-from Experiment_Launcher_code.ModuleConfiguration import __DISABLE_DATA_ANALYZER
 
 if __USE_VIDEO_SIM:
     from Video_analyser_code.VideoAnalyzerSim import Video_Analyzer
-elif __USE_VIDEO_STUB:
-    from Video_analyser_code.VideoAnalyzerStub import Video_Analyzer
 else:
     from Video_analyser_code.VideoAnalyser import Video_Analyzer
-
-if not __DISABLE_DATA_ANALYZER:
-    from Data_analysis.DataAnalysisScript import DataAnalyzer
-    from Data_analysis.EventComparison import EventComparator
-    from Data_analysis.Data_analysis_plots import DataPlotter
 
 from modelling_opponent.MouseMonitor import MouseMonitor
 from modelling_opponent.FixedStrategyPrisoner import FixedStrategyPrisoner
@@ -84,20 +75,19 @@ def main():
         print("No valid settings were provided.")
 
 
-def write_configuration_file(experiment_parameters, opponent_configuration, oppid):
-    # write First opponent configuration
-    filepath = fUtile.get_file_path(fUtile.FileType.EXPERIMENT_CONFIGURATION, oppid) + ".txt"
+def write_configuration_file(experiment_parameters, opponent_configuration):
+    filepath = fUtile.get_file_path(0) + "_configuration.txt"
     with open(filepath, 'w') as file:
         file.write('Experiment name: ' + experiment_parameters.get('experiment_name') + '\n')
         file.write('Session Type & number: ' + experiment_parameters.get('session_type') + ', ' + experiment_parameters.get('session_num') + '\n')
         file.write('Termination Condition: ' + experiment_parameters.get('termination_type') + ', Limit: ' + str(experiment_parameters.get('termination_value')) + '\n')
         file.write('Decision and Return Time limits: ' + str(experiment_parameters.get('decision_time')) + ', ' + str(experiment_parameters.get('return_time')) + '\n')
-        file.write(f'Arena Location: {oppid}\n')
-        write_opponent_configuration(file, opponent_configuration, 1 + oppid % 2)
+        write_opponent_configuration(file, opponent_configuration, 'First')
+        write_opponent_configuration(file, opponent_configuration, 'Second')
 
-def write_opponent_configuration(file, configuration, oppid):
+def write_opponent_configuration(file, configuration, who):
     oppnum = '1'
-    if oppid == 2:
+    if who == 'Second':
         oppnum = '2'
     otype = 'opponent1_type'.replace('1', oppnum)
     mouseid = 'mouse_1_id'.replace('1', oppnum)
@@ -105,14 +95,14 @@ def write_opponent_configuration(file, configuration, oppid):
     oprobability = 'opponent1_probability'.replace('1', oppnum)
 
     if configuration.get(otype) == OpponentType.MOUSE:
-        file.write(f'Opponent: Mouse, Mouse ID: {configuration.get(mouseid)}\n')
+        file.write(f'{who} Opponent: Mouse, Mouse ID: {configuration.get(mouseid)}\n')
     elif configuration.get(otype) == OpponentType.FIXED_STRATEGY:
         if configuration.get(ostrategy) == 'Probability Cooperator':
-            file.write(f'Opponent: Fixed Strategy: {configuration.get(ostrategy)}, Probability: {str(configuration.get(oprobability))}\n')
+            file.write(f'{who} Opponent: Fixed Strategy: {configuration.get(ostrategy)}, Probability: {str(configuration.get(oprobability))}\n')
         else:
-            file.write(f'Opponent: Fixed Strategy: {configuration.get(ostrategy)}\n')
+            file.write(f'{who} Opponent: Fixed Strategy: {configuration.get(ostrategy)}\n')
     else:
-        file.write(f'Opponent: Learner. \n')
+        file.write(f'{who} Opponent: Learner. \n')
 
 
 '''     #Anushka old data analysis code

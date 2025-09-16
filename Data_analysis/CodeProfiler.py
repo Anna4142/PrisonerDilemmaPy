@@ -7,7 +7,7 @@ from Experiment_Launcher_code.ModuleConfiguration import __FRAME_RATE_ONLY
 
 
 FunctionEntries = {}
-FrameAveragePeriodStart = time.time()
+FrameAveragePeriodStart = 0
 FrameCounter = 0
 FunctionStartTime = {}
 FunctionName = []
@@ -17,6 +17,9 @@ FunctionTime = []
 def NewFrame():
     global FrameCounter, FrameAveragePeriodStart
     global FunctionName, FunctionTime
+
+    if FrameAveragePeriodStart == 0:   # first period starts on first frame
+        FrameAveragePeriodStart = time.time()
 
     FrameCounter += 1
     period = time.time() - FrameAveragePeriodStart

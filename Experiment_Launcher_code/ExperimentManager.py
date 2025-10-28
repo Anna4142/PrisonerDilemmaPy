@@ -375,7 +375,7 @@ class ExperimentManager:
 
         else:    # Experiment terminated
             experimentended = True
-
+            print(f' Total number of dropped frames= {self.videoAnalyser.get_dropped_frames()}')
         return experimentended
 
     def calculateSessionProgress(self):

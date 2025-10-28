@@ -30,7 +30,7 @@ class HeartBeat:
             self.logged_dropped_frames = dropped_frames
             time_stamp = time.time() - self.start_time
             Arduino.DigitalHighPulse(self.arduino_pin, int(3))  # Start High pulse, time is given in mSec
-            self.logger.log_data([time_stamp, new_dropped_frames])
+            self.logger.log_data(time_stamp, new_dropped_frames)
             self.next_heartbeat_time = HeartBeat.time_of_next_event(self.mean_period_milliSec, 10, 150)
 
     @staticmethod

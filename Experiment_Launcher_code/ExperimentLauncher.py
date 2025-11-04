@@ -35,10 +35,11 @@ def main():
     # After the GUI is closed, get the settings using the appropriate methods
     if experiment_gui.experiment_started():
         sys_param = fUtile.load_system_configuration('1.0')
-        if sys_param.get('version') == '1/0':
+        if sys_param.get('version') == '1.0':
             comport_name = sys_param.get('Com Port')
             experiment_parameters = experiment_gui.get_experiment_parameters()
             opponent_configuration = experiment_gui.get_opponent_configuration()
+
 
             fUtile.set_file_name(experiment_parameters.get('session_type'), experiment_parameters.get('session_num'), 1)
             fUtile.set_file_name(experiment_parameters.get('session_type'), experiment_parameters.get('session_num'), 2)
@@ -71,8 +72,11 @@ def main():
 
             # experiment manager terminated.
             del expManager
+
+        else:
+            print('Wrong version of system parameter file. Plausibly a SW error. Call Micky :-)')
     else:
-        print("No valid settings were provided.")
+        print('Experiment was not started')
 
 
 def write_configuration_file(experiment_parameters, opponent_configuration):

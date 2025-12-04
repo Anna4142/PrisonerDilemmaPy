@@ -188,7 +188,7 @@ class Video_Analyzer:
             Profiler.ExitFunction('Find Contours')
 
             #if len(contours) > 0:
-            #    print("no of contours detected", len(contours))
+            #    print("no of contours detected", len(contours))   # Debug print
 
             #Profiler.EnterFunction('Draw Contours')
             #cv2.drawContours(frameimage, contours, -1, (0, 0, 0), 5)
@@ -212,7 +212,8 @@ class Video_Analyzer:
             Profiler.ExitFunction('Write Frame')
 
             cv2.imshow('MouseCam', frameimage)
-            self.cam.queue_frame(frame)   #return the buffer to the API
+            #cv2.waitKey(1)  # allow imshow() to manage the window. -> Looks like TK is covering for it.
+            self.cam.queue_frame(frame)   #return the buffer to the camera controller
 
         return zone_activation
 

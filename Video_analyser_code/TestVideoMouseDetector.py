@@ -93,13 +93,13 @@ def timer_event():
     global regions
     global zone_activation
 
-    Profiler.NewFrame()
     frame = cam.get_frame()
     if frame is not None:
+        Profiler.NewFrame()
         Profiler.EnterFunction('Frame Handling')
         Profiler.EnterFunction('CV2 Get Image')
-        frame_image = frame.as_opencv_image().copy()
-        cam.free_frame(frame)  # return the buffer to the camera controller
+        frame_image = frame.as_opencv_image() #.copy()
+        #cam.free_frame(frame)  # return the buffer to the camera controller
         Profiler.ExitFunction('CV2 Get Image')
 
         Profiler.EnterFunction('Region Handling')
@@ -120,13 +120,15 @@ def timer_event():
         cv2.imshow('MouseCam', frame_image)
         Profiler.ExitFunction('Image Show')
         #cv2.waitKey(1)  # allow imshow() to manage the window. -> looks like TK is covering for it
-        #cam.free_frame(frame)  # return the buffer to the camera controller
+        cam.free_frame(frame)  # return the buffer to the camera controller
         Profiler.ExitFunction('Frame Handling')
+    else:
+        Profiler.IdleLoop()
 
     start_button.after(1, timer_event)
 
 # main program level
-algorithm = 2     # 1 - frame average color, 2 - contour detection
+algorithm = 1     # 1 - frame average color, 2 - contour detection
 cam = VimbaCameraController()
 regions = define_regions()
 zone_activation = [0] * 6

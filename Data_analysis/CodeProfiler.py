@@ -9,14 +9,19 @@ from Experiment_Launcher_code.ModuleConfiguration import __FRAME_RATE_ONLY
 FunctionEntries = {}
 FrameAveragePeriodStart = 0
 FrameCounter = 0
+IdleLoopsCounter = 0
 FunctionStartTime = {}
 FunctionName = []
 FunctionTime = []
 
+def IdleLoop():
+    global IdleLoopsCounter
+
+    IdleLoopsCounter += 1
 
 def NewFrame():
     global FrameCounter, FrameAveragePeriodStart
-    global FunctionName, FunctionTime
+    global FunctionName, FunctionTime, IdleLoopsCounter
 
     if FrameAveragePeriodStart == 0:   # first period starts on first frame
         FrameAveragePeriodStart = time.time()
@@ -25,9 +30,12 @@ def NewFrame():
     period = time.time() - FrameAveragePeriodStart
     if period > 20:
         framerate = FrameCounter/period
+        idleloops = IdleLoopsCounter/period
         print(f'Frame Rate= : {framerate:.2f}')
+        print(f'Idle Loops= : {idleloops:.2f}')
         FrameAveragePeriodStart = time.time()
         FrameCounter = 0
+        IdleLoopsCounter = 0
         CalculateFunctionAverages(period)
         for index in range(len(FunctionTime)):
             if FunctionTime[index] > 0:

@@ -25,7 +25,10 @@ class VimbaCameraController:
         self.cam.BinningHorizontal.set(2)
         self.cam.BinningVertical.set(2)
         self.cam.AcquisitionFrameRateEnable.set("True")
-        self.cam.AcquisitionFrameRate.set(50)
+        self.cam.Gain.set(15)
+        self.cam.ExposureTime.set(3000)
+        self.cam.DeviceLinkThroughputLimit.set(400000000)
+        self.cam.AcquisitionFrameRate.set(120)
         self.cam.LineSelector.set('Line1')      # Set Line 1 as output
         self.cam.LineMode.set('Output')
         self.cam.LineSource.set('ExposureActive')
@@ -35,8 +38,6 @@ class VimbaCameraController:
         opencv_formats = intersect_pixel_formats(formats, OPENCV_PIXEL_FORMATS)
         self.cam.set_pixel_format(opencv_formats[0])
         self.cam.AcquisitionMode.set('Continuous')
-        self.cam.Gain.set(15)
-        self.cam.ExposureTime.set(3000)
 
     def start_video(self):
         self.trial_start_time = time.time()  # Initialize start time

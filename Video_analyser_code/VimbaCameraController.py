@@ -28,7 +28,7 @@ class VimbaCameraController:
         self.cam.Gain.set(15)
         self.cam.ExposureTime.set(3000)
         self.cam.DeviceLinkThroughputLimit.set(400000000)
-        self.cam.AcquisitionFrameRate.set(120)
+        self.cam.AcquisitionFrameRate.set(100)
         self.cam.LineSelector.set('Line1')      # Set Line 1 as output
         self.cam.LineMode.set('Output')
         self.cam.LineSource.set('ExposureActive')

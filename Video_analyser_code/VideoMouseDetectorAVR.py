@@ -16,7 +16,7 @@ from Video_analyser_code.VideoMouseDetectorABC import VideoMouseDetector
 #    min_range: the min difference between min and max frame average that will enable detection
 
 class VideoMouseDetectorAVR(VideoMouseDetector):
-    def __init__(self, hysteresis=10, margin=20, buffer_depth=10, min_range=50):
+    def __init__(self, hysteresis=10, margin=30, buffer_depth=10, min_range=50):
         self.frames_color_buffer = [0] * buffer_depth
         self.frames_pointer = 0
         self.first_wrap = True

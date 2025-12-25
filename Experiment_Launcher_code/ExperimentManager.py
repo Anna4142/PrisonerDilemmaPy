@@ -310,7 +310,7 @@ class ExperimentManager:
         self.run_time_analysis.reset_analysis_timers()
 
     def experimentControl(self):
-        Profiler.NewFrame()
+        Profiler.EnterMainLoop()
         experimentended = False
 
         Profiler.EnterFunction('Run Time GUI')
@@ -376,6 +376,7 @@ class ExperimentManager:
         else:    # Experiment terminated
             experimentended = True
 
+        Profiler.ExitMainLoop()
         return experimentended
 
     def calculateSessionProgress(self):
@@ -399,9 +400,3 @@ class ExperimentManager:
                 trialevents += Events.LastTrial.value
 
         return trialevents
-'''
-    
-import resource
-    # Get the current memory usage (in bytes)
-    mem_usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-'''

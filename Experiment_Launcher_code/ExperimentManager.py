@@ -358,7 +358,7 @@ class ExperimentManager:
             elif mouse2_choice == Locations.Defect:
                 trialevents = trialevents + Events.Mouse2Defected.value
 
-            self.heartbeat.generate_heartbeat()
+            self.heartbeat.generate_heartbeat(self.videoAnalyser.get_dropped_frames())
 
             self.run_time_analysis.event_analysis(self.runTimeGui.UpdateEventLog)
             Profiler.EnterFunction('Determine State')
@@ -375,7 +375,7 @@ class ExperimentManager:
 
         else:    # Experiment terminated
             experimentended = True
-
+            print(f' Total number of dropped frames= {self.videoAnalyser.get_dropped_frames()}')
         return experimentended
 
     def calculateSessionProgress(self):

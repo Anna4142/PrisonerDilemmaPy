@@ -310,7 +310,7 @@ class ExperimentManager:
         self.run_time_analysis.reset_analysis_timers()
 
     def experimentControl(self):
-        Profiler.NewFrame()
+        Profiler.EnterMainLoop()
         experimentended = False
 
         Profiler.EnterFunction('Run Time GUI')

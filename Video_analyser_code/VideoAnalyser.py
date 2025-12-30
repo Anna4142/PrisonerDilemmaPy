@@ -19,7 +19,6 @@ class Video_Analyzer:
         #self.pixel_sums = {}
         self.trial_start_time = 0
         self.trial_end_time = None  # Initialize end time
-        self.dropped_frames_counter = 0
 
         cv2.namedWindow('MouseCam', cv2.WINDOW_NORMAL)
         self.mouse_detector = [VideoMouseDetectorMOD() for _ in range(len(self.regions))]
@@ -29,7 +28,7 @@ class Video_Analyzer:
         self.cam.start_video()
 
     def get_dropped_frames(self):
-        return self.dropped_frames_counter
+        return self.cam.get_dropped_frames()
 
     def define_regions(self):
         # Define the regions of interest (ROI) for each mouse and their specific zones

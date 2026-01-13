@@ -18,6 +18,8 @@ class Video_Analyzer:
         self.previous_frame_id = None
         self.trial_start_time = 0
         self.trial_end_time = None  # Initialize end time
+        self.dropped_frames_counter = 0
+
         cv2.namedWindow('MouseCam', cv2.WINDOW_NORMAL)
         self.vimba = VmbSystem.get_instance()
         self.vimba.__enter__()
@@ -64,7 +66,11 @@ class Video_Analyzer:
         self.previous_frame_id = frame.get_id()
         if dropped_frames != 0:
             print (f' {dropped_frames} frames dropped' )
+            self.dropped_frames_counter += dropped_frames
         #print ('frame handler completed')
+
+    def get_dropped_frames(self):
+        return self.dropped_frames_counter
 
     def define_regions(self):
         # Define the regions of interest (ROI) for each mouse and their specific zones

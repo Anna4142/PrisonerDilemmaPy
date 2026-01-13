@@ -62,7 +62,7 @@ class RunTimeGUI:
         self.mainLoopCallback = loopcallback
         self.stop_button.config(font=("Arial", 12))
         self.stop_button.config(command=stopcallback)
-        self.timeDisplay.after(10, self.timerEvent)
+        self.timeDisplay.after(1, self.timerEvent)
         self.window.mainloop()
 
     def UpdateTrialDisplay(self, trial):
@@ -88,7 +88,7 @@ class RunTimeGUI:
         if self.mainLoopCallback():
             self.window.destroy()
         else:
-            self.timeDisplay.after(3, self.timerEvent)
+            self.timeDisplay.after(1, self.timerEvent)
 
     def drawTrialSummeryGrid(self, extentionfactor):
         x0 = 5 + extentionfactor * 560

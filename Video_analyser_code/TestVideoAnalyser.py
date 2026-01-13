@@ -28,10 +28,10 @@ def start_test():
     if not fUtile.set_experiment_directory('VideoTest'):
         return
 
-    if not fUtile.set_mouse_directory("Computer", 1):
-        return
+    fUtile.set_experiment_directory('Exp1')
+    fUtile.set_mouse_pair_directory('m1', 'm2')
+    fUtile.set_session_directory('session', '1')
 
-    fUtile.set_file_name('VideoTest1', '1', 1)
     video_analyzer = Video_Analyzer()
     video_analyzer.start_video()
     start_button.after(3, timer_event)
@@ -74,6 +74,7 @@ stop_button = tk.Button(window, text="Stop Experiment", command=stop_test)
 stop_button.place(x=300, y=120)
 
 project_directory_var.set(fUtile.get_project_directory())
+
 stop_test_clicked = False
 video_analyzer = None
 

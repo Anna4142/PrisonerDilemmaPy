@@ -1,4 +1,5 @@
 from Experiment_Launcher_code.ModuleConfiguration import __USE_VIDEO_SIM
+from Experiment_Launcher_code.ModuleConfiguration import __SOFTWARE_VERSION
 
 if __USE_VIDEO_SIM:
     from Video_analyser_code.VideoAnalyzerSim import Video_Analyzer
@@ -82,6 +83,7 @@ def main():
 def write_configuration_file(experiment_parameters, opponent_configuration):
     filepath = fUtile.get_file_path(0) + "_configuration.txt"
     with open(filepath, 'w') as file:
+        file.write(f'Software Version: {__SOFTWARE_VERSION}' + '\n')
         file.write('Experiment name: ' + experiment_parameters.get('experiment_name') + '\n')
         file.write('Session Type & number: ' + experiment_parameters.get('session_type') + ', ' + experiment_parameters.get('session_num') + '\n')
         file.write('Termination Condition: ' + experiment_parameters.get('termination_type') + ', Limit: ' + str(experiment_parameters.get('termination_value')) + '\n')

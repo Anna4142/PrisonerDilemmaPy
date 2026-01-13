@@ -16,8 +16,8 @@ def DigitalLow(pin):
 
 def DigitalHighPulse(pin, width):
     ct = datetime.datetime.now().strftime("%M:%S.%f")
-    print(f"Arduino Digital channel {pin} set to high pulse. Width {width}, Time Stamp= {ct}")
+    #print(f"Arduino Digital channel {pin} set to high pulse. Width {width}, Time Stamp= {ct}")
 
 def DigitalLowPulse(pin, width):
     ct = datetime.datetime.now().strftime("%M:%S.%f")
-    print(f"Arduino Digital channel {pin} set to low pulse. Width {width}, Time Stamp= {ct}")
+    #print(f"Arduino Digital channel {pin} set to low pulse. Width {width}, Time Stamp= {ct}")

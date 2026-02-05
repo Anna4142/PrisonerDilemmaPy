@@ -33,6 +33,10 @@ void setup()
     digitalWrite(i, HIGH);
   }
 
+  // set heartbeat low
+    pinMode(4, OUTPUT);
+    digitalWrite(4, Low);
+  
   //temp ben
   //for (int i = 3; i <= 6; i++)
   //{
@@ -243,4 +247,3 @@ void twitch(int count)
     delay (200);
   }
 }
-

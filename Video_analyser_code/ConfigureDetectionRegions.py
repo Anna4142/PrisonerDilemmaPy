@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
 import Data_analysis.FileUtilities as fUtile
+from Video_analyser_code.VimbaCameraController import VimbaCameraController
 
 
 def populate_system_parameters_panel(panel, pdVar):
@@ -148,6 +149,10 @@ def verify_detection_regions():
 # main program
 ##############
 
+cam = VimbaCameraController()
+cam.start_video()
+
+
 window = tk.Tk()
 window.title("Prisoner's Dilemma - Detection Regions")
 window.geometry("555x595")
@@ -157,6 +162,16 @@ system_panel = tk.Frame(window, width=545, height=40, relief=tk.RAISED, borderwi
 system_panel.place(x=5, y=5)
 configuration_panel = tk.Frame(window, width=545, height=505, relief=tk.RAISED, borderwidth=2)
 configuration_panel.place(x=5, y=50)
+
+video_canvas = tk.Canvas(window, width=640, height=480)
+video_canvas.place(x=5, y=55)
+
+frame = cam.get_frame()
+frame_image = frame.as_opencv_image()
+img_id = video_canvas.create_image(0, 0, anchor="nw")
+video_canvas.img = frame_image
+video_canvas.itemconfig(img_id, image=frame_image)
+
 
 # Create entry variables
 project_directory_var = tk.StringVar(value=None)

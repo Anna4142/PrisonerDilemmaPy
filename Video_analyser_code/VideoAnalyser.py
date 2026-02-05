@@ -1,8 +1,6 @@
 #from vmbpy import *
 import time
 import cv2
-import numpy as np
-from queue import Queue
 from Video_analyser_code.VideoWriter import VideoWriter
 from Video_analyser_code.VideoMouseDetectorMOD import VideoMouseDetectorMOD
 from Video_analyser_code.VimbaCameraController import VimbaCameraController
@@ -16,7 +14,6 @@ class Video_Analyzer:
         self.video_writer = VideoWriter(output_file=self.video_file_loc)
         self.cam = VimbaCameraController()
         self.regions = self.define_regions()
-        #self.pixel_sums = {}
         self.trial_start_time = 0
         self.trial_end_time = None  # Initialize end time
 

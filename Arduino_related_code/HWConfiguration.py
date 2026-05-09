@@ -1,4 +1,6 @@
 from Experiment_Launcher_code.ModuleConfiguration import __USE_ARDUINO_SIM
+from Reward_manager.TestRewardManager import m1_rewards
+
 if __USE_ARDUINO_SIM:
     import Arduino_related_code.ArduinoDigitalSim as Arduino
 else:
@@ -12,153 +14,168 @@ import Data_analysis.FileUtilities as fUtile
 from Arduino_related_code.ValveControl import ValveControl
 import time
 
-class Mouse_Valve:
-    def __init__(self, location_id):
-        self.location_id = location_id
-        self.digital_pin_num = tk.StringVar(value=None)
-        self.time_unit = tk.StringVar(value=None)
+class Mouse_Reward:
+    def __init__(self):
+        self.opening_time = tk.StringVar(value=None)
+        self.water_volume = tk.StringVar(value=None)
 
 class HWConfGUI:
     def __init__(self):
         self.window = tk.Tk()
         self.window.title("Prisoner's Dilemma, HW Configuration screen")
-        self.window.geometry("555x576")
+        self.window.geometry("555x581")
 
         # create window layout
         self.system_panel = tk.Frame(self.window, width=545, height=90, relief=tk.RAISED, borderwidth=2)
         tk.Label(self.system_panel, text="System Parameters").place(x=210, y=2)
-        self.M1Panel = tk.Frame(self.window, width=270, height=285, relief=tk.RAISED, borderwidth=2)
-        tk.Label(self.M1Panel, text='Mouse 1 - Valves', font=("Arial", 8)).place(x=80, y=2)
-        self.M2Panel = tk.Frame(self.window, width=270, height=285, relief=tk.RAISED, borderwidth=2)
-        tk.Label(self.M2Panel, text='Mouse 2 - Valves', font=("Arial", 8)).place(x=80, y=2)
-        self.CalibrationPanel = tk.Frame(self.window, width=220, height=180, relief=tk.RAISED, borderwidth=2)
-        tk.Label(self.CalibrationPanel, text='Valve Calibration', font=("Arial", 8)).place(x=50, y=2)
-        self.RewardPanel = tk.Frame(self.window, width=220, height=180, relief=tk.RAISED, borderwidth=2)
-        tk.Label(self.RewardPanel, text='Reward Matrix [uLiter]', font=("Arial", 8)).place(x=50, y=2)
+        self.M1Panel = tk.Frame(self.window, width=270, height=335, relief=tk.RAISED, borderwidth=2)
+        tk.Label(self.M1Panel, text='Mouse 1', font=("Arial", 8)).place(x=30, y=2)
+        self.M1ValvesPanel = tk.Frame(self.M1Panel, width=257, height=85, relief=tk.RAISED, borderwidth=2)
+        tk.Label(self.M1ValvesPanel, text='Valves', font=("Arial", 8)).place(x=100, y=2)
+        self.M1RewardsPanel = tk.Frame(self.M1Panel, width=257, height=210, relief=tk.RAISED, borderwidth=2)
+        tk.Label(self.M1RewardsPanel, text='Rewards', font=("Arial", 8)).place(x=100, y=2)
+        self.M2Panel = tk.Frame(self.window, width=270, height=335, relief=tk.RAISED, borderwidth=2)
+        tk.Label(self.M2Panel, text='Mouse 2', font=("Arial", 8)).place(x=30, y=2)
+        self.M2ValvesPanel = tk.Frame(self.M2Panel, width=257, height=85, relief=tk.RAISED, borderwidth=2)
+        tk.Label(self.M2ValvesPanel, text='Valves', font=("Arial", 8)).place(x=100, y=2)
+        self.M2RewardsPanel = tk.Frame(self.M2Panel, width=257, height=210, relief=tk.RAISED, borderwidth=2)
+        tk.Label(self.M2RewardsPanel, text='Valves', font=("Arial", 8)).place(x=100, y=2)
+        self.CalibrationPanel = tk.Frame(self.window, width=327, height=100, relief=tk.RAISED, borderwidth=2)
+        tk.Label(self.CalibrationPanel, text='Valve Calibration', font=("Arial", 8)).place(x=130, y=2)
+        self.ScanningPanel = tk.Frame(self.window, width=213, height=100, relief=tk.RAISED, borderwidth=2)
+        tk.Label(self.ScanningPanel, text='Valve Scanning', font=("Arial", 8)).place(x=80, y=2)
 
         self.system_panel.place(x=5, y=5)
         self.M1Panel.place(x=5, y=100)
+        self.M1ValvesPanel.place(x=5, y=25)
+        self.M1RewardsPanel.place(x=5, y=115)
         self.M2Panel.place(x=280, y=100)
-        self.CalibrationPanel.place(x=5, y=390)
-        self.RewardPanel.place(x=330, y=390)
+        self.M2ValvesPanel.place(x=5, y=25)
+        self.M2RewardsPanel.place(x=5, y=115)
+        self.CalibrationPanel.place(x=5, y=440)
+        self.ScanningPanel.place(x=337, y=440)
 
         self.calibrate_button = tk.Button(self.window, text="Calibrate")
-        self.calibrate_button.place(x=240, y=420)
+        self.calibrate_button.place(x=125, y=545)
         self.calibrate_button.config(font=("Arial", 12), state='disabled', command=self.calibrate_callback)
 
-        self.update_button = tk.Button(self.window, text="Set Value")
-        self.update_button.place(x=238, y=475)
-        self.update_button.config(font=("Arial", 12), state='disabled', command=self.set_value_callback)
+        self.abort_button = tk.Button(self.window, text="Abort")
+        self.abort_button.place(x=237, y=545)
+        self.abort_button.config(font=("Arial", 12), state='disabled', command=self.abort_callback)
+
+        self.scan_button = tk.Button(self.window, text="Scan")
+        self.scan_button.place(x=324, y=545)
+        self.scan_button.config(font=("Arial", 12), state='disabled', command=self.scan_callback)
 
         self.save_button = tk.Button(self.window, text="Save")
-        self.save_button.place(x=255, y=530)
+        self.save_button.place(x=410, y=545)
         self.save_button.config(font=("Arial", 12), state='disabled', command=self.save_callback)
 
         # Initialize entry variables
         self.comport_name = tk.StringVar(value=None)
         self.heart_beat_channel = tk.StringVar(value=None)
         self.project_directory_var = tk.StringVar(value=None)
-        self.Valves = {'M1 Coo' : Mouse_Valve('M1 Coo'),
-                       'M1 Cen' : Mouse_Valve('M1 Cen'),
-                       'M1 Def' : Mouse_Valve('M1 Def'),
-                       'M2 Coo' : Mouse_Valve('M2 Coo'),
-                       'M2 Cen' : Mouse_Valve('M2 Cen'),
-                       'M2 Def' : Mouse_Valve('M2 Def')}
-        self.valve_name = tk.StringVar(value=None)
-        self.duration = tk.StringVar(value=None)
+        self.M1_Valves = {'Coo' : tk.StringVar(value=None),
+                          'Cen' : tk.StringVar(value=None),
+                          'Def' : tk.StringVar(value=None)}
+        self.M1_rewards = {'CC': Mouse_Reward(), 'CD': Mouse_Reward(),
+                           'DC': Mouse_Reward(), 'DD': Mouse_Reward(),
+                           'CN': Mouse_Reward()}
+        self.M2_Valves = {'Coo' : tk.StringVar(value=None),
+                          'Cen' : tk.StringVar(value=None),
+                          'Def' : tk.StringVar(value=None)}
+        self.M2_rewards = {'CC': Mouse_Reward(), 'CD': Mouse_Reward(),
+                           'DC': Mouse_Reward(), 'DD': Mouse_Reward(),
+                           'CN': Mouse_Reward()}
+        self.calibration_reward = tk.StringVar(value='CC')
+        self.calibration_mouse = tk.StringVar(value='M1')
         self.iterations = tk.StringVar(value=None)
-        self.volume = tk.StringVar(value=None)
-        self.M1_rewards = {'CC': tk.StringVar(value=None), 'CD': tk.StringVar(value=None),
-                           'DC': tk.StringVar(value=None), 'DD': tk.StringVar(value=None),
-                           'CN': tk.StringVar(value=None)}
-        self.M2_rewards = {'CC': tk.StringVar(value=None), 'CD': tk.StringVar(value=None),
-                           'DC': tk.StringVar(value=None), 'DD': tk.StringVar(value=None),
-                           'CN': tk.StringVar(value=None)}
+        self.expected_volume = tk.StringVar(value=None)
+        self.scan_iterations = tk.StringVar(value=None)
+        self.scan_duration = tk.StringVar(value=None)
 
         # Populate Panels
         self.populate_system_parameters_panel()
-        self.populate_mice_valves(self.M1Panel, self.Valves.get('M1 Coo'), 1)
-        self.populate_mice_valves(self.M1Panel, self.Valves.get('M1 Cen'), 2)
-        self.populate_mice_valves(self.M1Panel, self.Valves.get('M1 Def'), 3)
-        self.populate_mice_valves(self.M2Panel, self.Valves.get('M2 Coo'), 1)
-        self.populate_mice_valves(self.M2Panel, self.Valves.get('M2 Cen'), 2)
-        self.populate_mice_valves(self.M2Panel, self.Valves.get('M2 Def'), 3)
+        self.populate_valves_panel(self.M1ValvesPanel, self.M1_Valves)
+        self.populate_valves_panel(self.M2ValvesPanel, self.M2_Valves)
+        self.populate_reward_panel(self.M1RewardsPanel, self.M1_rewards)
+        self.populate_reward_panel(self.M2RewardsPanel, self.M2_rewards)
         self.populate_calibration_panel()
-        self.populate_reward_panel()
+        self.populate_scanning_panel()
 
-        self.init_window()
+        # control vars
+        self.abort = False
+        self.open_duration = 0
+        self.open_iterations = 0
+        self.valve_control = None
+        self.open_channel = 0
+        self.iterations_count = 0
 
-    def populate_reward_panel(self):
-        tk.Label(self.RewardPanel, text="M1    M2                 M1         M2").place(x=20, y=25)
-        tk.Label(self.RewardPanel, text=" C       C").place(x=20, y=50)
-        tk.Label(self.RewardPanel, text=" C       D").place(x=20, y=75)
-        tk.Label(self.RewardPanel, text=" D       C").place(x=20, y=100)
-        tk.Label(self.RewardPanel, text=" D       D").place(x=20, y=125)
-        tk.Label(self.RewardPanel, text="Cen   Cen").place(x=18, y=150)
-        self.create_reward_entry(self.M1_rewards.get('CC'),1,1)
-        self.create_reward_entry(self.M1_rewards.get('CD'), 1, 2)
-        self.create_reward_entry(self.M1_rewards.get('DC'), 1, 3)
-        self.create_reward_entry(self.M1_rewards.get('DD'), 1, 4)
-        self.create_reward_entry(self.M1_rewards.get('CN'), 1, 5)
-        self.create_reward_entry(self.M2_rewards.get('CC'), 2, 1)
-        self.create_reward_entry(self.M2_rewards.get('CD'), 2, 2)
-        self.create_reward_entry(self.M2_rewards.get('DC'), 2, 3)
-        self.create_reward_entry(self.M2_rewards.get('DD'), 2, 4)
-        self.create_reward_entry(self.M2_rewards.get('CN'), 2, 5)
+        # queue the window init routines
+        self.window.after_idle(self.init_window)
 
-    def create_reward_entry(self, entry, x_ind, y_ind):
-        x_loc = 110 + 45 * (x_ind - 1)
-        y_loc = 50 + 25 * (y_ind - 1)
-        tk.Entry(self.RewardPanel, textvariable=entry, width=5).place(x=x_loc, y=y_loc)
+    def populate_reward_panel(self, panel, rewards):
+        tk.Label(panel, text='Reward      Opening Time       Water Volume').place(x=15, y=25)
+        tk.Label(panel, text=' Type               [mSec]                      [uL]').place(x=15, y=42)
+        tk.Label(panel, text="CC").place(x=20, y=75)
+        tk.Label(panel, text="CD").place(x=20, y=100)
+        tk.Label(panel, text="DC").place(x=20, y=125)
+        tk.Label(panel, text="DD").place(x=20, y=150)
+        tk.Label(panel, text="Cen").place(x=20, y=175)
+        for i, (key, value) in enumerate(rewards.items()):
+            tk.Entry(panel, textvariable=value.opening_time, width = 5).place(x=92, y=75 + (i * 25))
+            tk.Entry(panel, textvariable=value.water_volume, width=5).place(x=188, y=75 + (i * 25))
 
     def populate_calibration_panel(self):
-        tk.Label(self.CalibrationPanel, text="Valve Name:").place(x=5, y=25)
-        valve_list = list(self.Valves.keys())
-        self.valve_name.set('Scan')
-        valve_list.append(self.valve_name.get())
-        tk.OptionMenu(self.CalibrationPanel, self.valve_name, *valve_list).place(x=110, y=23)
-        tk.Label(self.CalibrationPanel, text="Opening Time [mSec]:").place(x=5, y=70)
-        tk.Entry(self.CalibrationPanel, textvariable=self.duration, width=10).place(x=140, y=70)
-        tk.Label(self.CalibrationPanel, text="Num of Iterations:").place(x=5, y=110)
-        tk.Entry(self.CalibrationPanel, textvariable=self.iterations, width=10).place(x=140, y=110)
-        tk.Label(self.CalibrationPanel, text="Water Volume [uLit]:").place(x=5, y=150)
-        tk.Entry(self.CalibrationPanel, textvariable=self.volume, width=10).place(x=140, y=150)
+        tk.Label(self.CalibrationPanel, text="Mouse:").place(x=5, y=28)
+        tk.Label(self.CalibrationPanel, text="Reward:").place(x=5, y=63)
+        tk.OptionMenu(self.CalibrationPanel, self.calibration_mouse, 'M1', 'M2').place(x=60, y=26)
+        tk.OptionMenu(self.CalibrationPanel, self.calibration_reward, *list(self.M1_rewards.keys())).place(x=60, y=60)
+        tk.Label(self.CalibrationPanel, text="Num of Iterations:").place(x=130, y=28)
+        tk.Entry(self.CalibrationPanel, textvariable=self.iterations, width=7).place(x=270, y=28)
+        tk.Label(self.CalibrationPanel, text="Expected Volume [uLit]:").place(x=130, y=63)
+        tk.Entry(self.CalibrationPanel, textvariable=self.expected_volume, width=7, state='readonly').place(x=270, y=63)
 
-    def populate_mice_valves(self, panel, location, position):
-        xBase = 5
-        yBase = 25 + 85 * (position - 1)
-        valve_panel = tk.Frame(panel, width=250, height=80, relief=tk.RAISED, borderwidth=2)
-        valve_panel.place(x=5, y=yBase)
-        tk.Label(valve_panel, text=location.location_id).place(x=xBase + 175, y=2)
-        tk.Entry(valve_panel, textvariable=location.digital_pin_num, width = 10).place(x=xBase+165, y=25)
-        tk.Label(valve_panel, text="Arduino Digital Pin Number:").place(x=xBase + 5, y=25)
-        tk.Entry(valve_panel, textvariable=location.time_unit, width = 10).place(x=xBase+165, y=50)
-        tk.Label(valve_panel, text="Opening Time [mSec/uLit]:").place(x=xBase + 5, y=50)
+    def populate_scanning_panel(self):
+        tk.Label(self.ScanningPanel, text="Num of Iterations:").place(x=12, y=28)
+        tk.Entry(self.ScanningPanel, textvariable=self.scan_iterations, width=8).place(x=145, y=28)
+        tk.Label(self.ScanningPanel, text="Opening time [mSec]:").place(x=12, y=63)
+        tk.Entry(self.ScanningPanel, textvariable=self.scan_duration, width=8).place(x=145, y=63)
+
+    def populate_valves_panel(self, panel, valves):
+        tk.Label(panel, text='Dig. Pin #:').place(x=2, y=50)
+        for i, (key, value) in enumerate(valves.items()):
+            tk.Label(panel, text=key).place(x=85 + (i * 60), y=25)
+            tk.Entry(panel, textvariable=value, width = 5).place(x=80 + (i * 60), y=50)
 
     def init_window(self):
         path = fUtile.get_project_directory()
         if not path == 'Error':
             fUtile.set_project_directory(path)
             self.project_directory_var.set(path)
-            sys_par = fUtile.load_system_configuration('1.0')
-            if not sys_par.get('version') == 'Error':
-                if sys_par.get('version') == 'Init':
-                    sys_par = HWConfGUI.init_system_parameters()
+            sys_conf = fUtile.load_system_configuration('1.0')
+            if not sys_conf.get('version') == 'Error':
+                if sys_conf.get('version') == 'Init':
+                    sys_conf = HWConfGUI.init_system_parameters()
                 self.save_button.config(state='normal')
                 self.calibrate_button.config(state='normal')
-                self.update_button.config(state='normal')
-                self.comport_name.set(sys_par.get('Com Port'))
+                self.scan_button.config(state='normal')
+                self.comport_name.set(sys_conf.get('Com Port'))
+
                 Arduino.openComPort(self.comport_name.get())
-                self.heart_beat_channel.set(sys_par.get('Heart Beat Channel'))
-                for key in self.Valves:
-                    self.Valves[key].digital_pin_num.set(sys_par.get('valves').get(key).get('Channel'))
-                    self.Valves[key].time_unit.set(sys_par.get('valves').get(key).get('flow unit'))
-                self.duration.set(sys_par.get('Cal Open Time'))
-                self.iterations.set(sys_par.get('Cal Open Iteration'))
-                self.volume.set(sys_par.get('Cal Volume'))
+                self.heart_beat_channel.set(sys_conf.get('Heart Beat Channel'))
+                
+                for key in self.M1_Valves:
+                    self.M1_Valves[key].set(sys_conf.get('M1 valves')[key])
+                    self.M2_Valves[key].set(sys_conf.get('M2 valves')[key])
                 for key in self.M1_rewards:
-                    self.M1_rewards[key].set(sys_par.get('M1 Rewards').get(key))
-                    self.M2_rewards[key].set(sys_par.get('M2 Rewards').get(key))
+                    self.M1_rewards[key].opening_time.set(sys_conf.get('M1 Rewards').get(key)['opening time'])
+                    self.M1_rewards[key].water_volume.set(sys_conf.get('M1 Rewards').get(key)['water volume'])
+                    self.M2_rewards[key].opening_time.set(sys_conf.get('M2 Rewards').get(key)['opening time'])
+                    self.M2_rewards[key].water_volume.set(sys_conf.get('M2 Rewards').get(key)['water volume'])
+                self.iterations.set(sys_conf.get('Cal Iterations'))
+                self.scan_iterations.set(sys_conf.get('Scan Iterations'))
+                self.scan_duration.set(sys_conf.get('Scan Duration'))
 
     def is_valid_integer(self, value, entry_name, min, max):
         try:
@@ -167,17 +184,6 @@ class HWConfGUI:
             num = -1
         if num < min or num > max:
             messagebox.showerror('Invalid Input', f'{entry_name} is non integer or out of range')
-            return False
-        else:
-            return True
-
-    def is_valid_float(self, value, entry_name, min, max):
-        try:
-            num = float(value)
-        except ValueError:
-            num = -1
-        if num < min or num > max:
-            messagebox.showerror('Invalid Input', f'{entry_name} is non numeric or out of range')
             return False
         else:
             return True
@@ -198,46 +204,68 @@ class HWConfGUI:
 
         if not self.is_valid_integer(self.heart_beat_channel.get(), 'Heart Beat Channel', 1, 12):
             all_valid = False
-        for key in self.Valves:
-            if not self.is_valid_integer(self.Valves.get(key).digital_pin_num.get(), f'{key} valve dig pin num', 1, 12):
+        for key in self.M1_Valves:
+            if not self.is_valid_integer(self.M1_Valves[key].get(), f'M1 {key} valve dig pin num', 1, 12):
                 all_valid = False
-            if not self.is_valid_float(self.Valves.get(key).time_unit.get(), f'{key} valve flow unit', 1,200):
+            if not self.is_valid_integer(self.M2_Valves[key].get(), f'M2 {key} valve dig pin num', 1, 12):
                 all_valid = False
-        if not self.is_valid_integer(self.duration.get(), 'Opening time', 1,200):
-            all_valid = False
-        if not self.is_valid_integer(self.iterations.get(), 'Num of Iterations', 1,50):
-            all_valid = False
-        if not self.is_valid_integer(self.volume.get(), 'Water Volume', 1, 150):
-            all_valid = False
         for key in self.M1_rewards:
-            if not self.is_valid_integer(self.M1_rewards.get(key).get(), f'M1 {key} Reward', 0, 30):
+            if not self.is_valid_integer(self.M1_rewards[key].opening_time.get(), f'M1 {key} Reward opening time', 0, 200):
                 all_valid = False
-            if not self.is_valid_integer(self.M2_rewards.get(key).get(), f'M2 {key} Reward', 0, 30):
+            if not self.is_valid_integer(self.M1_rewards[key].water_volume.get(), f'M1 {key} Reward water volume', 0, 30):
                 all_valid = False
+            if not self.is_valid_integer(self.M2_rewards[key].opening_time.get(), f'M2 {key} Reward opening time', 0, 200):
+                all_valid = False
+            if not self.is_valid_integer(self.M2_rewards[key].water_volume.get(), f'M2 {key} Reward water volume', 0, 30):
+                all_valid = False
+
+        if not self.is_valid_integer(self.scan_duration.get(), 'Scan opening time', 1,200):
+            all_valid = False
+        if not self.is_valid_integer(self.iterations.get(), 'Calibrate num of Iterations', 1,50):
+            all_valid = False
+        if not self.is_valid_integer(self.scan_iterations.get(), 'Scan iterations', 1, 50):
+            all_valid = False
+
+        if all_valid:   # if all the parameters are valid check for proper relationships
+            for key in self.M1_rewards:
+                if self.M1_rewards[key].opening_time.get() == '0' or self.M1_rewards[key].water_volume.get() == '0':
+                    if not (self.M1_rewards[key].opening_time.get() == '0' and self.M1_rewards[key].water_volume.get() == '0'):
+                        messagebox.showerror('Invalid Input',
+                                             f'M1 {key} reward: if one of the arguments is 0 both must be 0')
+                        all_valid = False
+                if self.M2_rewards[key].opening_time.get() == '0' or self.M2_rewards[key].water_volume.get() == '0':
+                    if not (self.M2_rewards[key].opening_time.get() == '0' and self.M2_rewards[key].water_volume.get() == '0'):
+                        messagebox.showerror('Invalid Input',
+                                             f'M2 {key} reward: if one of the arguments is 0 both must be 0')
+                        all_valid = False
         return all_valid
 
     def save_callback(self):
         if self.validate_configuration():
-            valves = {}
-            for key in self.Valves:
-                valves[key] = {'Channel': self.Valves.get(key).digital_pin_num.get(),
-                               'flow unit': self.Valves.get(key).time_unit.get()}
-            m1 = {}
-            m2 = {}
+            m1_valves = {}
+            m2_valves = {}
+            m1_rewards = {}
+            m2_rewards = {}
+            for key in self.M1_Valves:
+                m1_valves[key] = self.M1_Valves[key].get()
+                m2_valves[key] = self.M2_Valves[key].get()
             for key in self.M1_rewards:
-                m1[key] = self.M1_rewards.get(key).get()
-                m2[key] = self.M2_rewards.get(key).get()
-
+                m1_rewards[key] = {'opening time': self.M1_rewards[key].opening_time.get(),
+                                   'water volume': self.M1_rewards[key].water_volume.get()}
+                m2_rewards[key] = {'opening time': self.M2_rewards[key].opening_time.get(),
+                                   'water volume': self.M2_rewards[key].water_volume.get()}
             sys_par = {
                  'version': '1.0',
                  'Com Port': self.comport_name.get(),
-                 'Heart Beat Channel': self.heart_beat_channel.get(),
-                 'valves': valves,
-                 'Cal Open Time': self.duration.get(),
-                 'Cal Open Iteration': self.iterations.get(),
-                 'Cal Volume': self.volume.get(),
-                 'M1 Rewards': m1,
-                 'M2 Rewards': m2}
+                 'Heart Beat': self.heart_beat_channel.get(),
+                 'M1 valves': m1_valves,
+                 'M2 valves': m2_valves,
+                 'M1 Rewards': m1_rewards,
+                 'M2 Rewards': m1_rewards,
+                 'Cal Iterations': self.iterations.get(),
+                 'Scan Iterations': self.scan_iterations.get(),
+                 'Scan Duration': self.scan_duration.get()
+             }
             fUtile.save_system_configuration(sys_par)
 
     @staticmethod
@@ -245,61 +273,87 @@ class HWConfGUI:
         return {'version': '1.0',
                 'Com Port': 'COM11',
                 'Heart Beat Channel': '4',
-                'valves': {'M1 Coo': {'Channel': '1',
-                                      'flow unit': '1'},
-                           'M1 Cen': {'Channel': '1',
-                                      'flow unit': '1'},
-                           'M1 Def': {'Channel': '1',
-                                      'flow unit': '1'},
-                           'M2 Coo': {'Channel': '1',
-                                      'flow unit': '1'},
-                           'M2 Cen': {'Channel': '1',
-                                      'flow unit': '1'},
-                           'M2 Def': {'Channel': '1',
-                                      'flow unit': '1'}
-                           },
-                'Cal Open Time': '40',
-                'Cal Open Iteration': '25',
-                'Cal Volume': '100',
-                'M1 Rewards': {'CC': '12',
-                               'CD': '0',
-                               'DC': '16',
-                               'DD': '3',
-                               'CN': '2'
+                'M1 valves': {'Coo': '1',
+                              'Cen': '1',
+                              'Def': '1'
+                              },
+                'M2 valves': {'Coo': '1',
+                              'Cen': '1',
+                              'Def': '1'
+                              },
+                'M1 Rewards': {'CC': {'opening time': 1, 'water volume': '12'},
+                               'CD': {'opening time': 1, 'water volume': '0'},
+                               'DC': {'opening time': 1, 'water volume': '16'},
+                               'DD': {'opening time': 1, 'water volume': '3'},
+                               'CN': {'opening time': 1, 'water volume': '2'}
                                },
-                'M2 Rewards': {'CC': '12',
-                               'CD': '0',
-                               'DC': '16',
-                               'DD': '3',
-                               'CN': '2'
-                               }
+                'M2 Rewards': {'CC': {'opening time': 1, 'water volume': '12'},
+                               'CD': {'opening time': 1, 'water volume': '16'},
+                               'DC': {'opening time': 1, 'water volume': '0'},
+                               'DD': {'opening time': 1, 'water volume': '3'},
+                               'CN': {'opening time': 1, 'water volume': '2'}
+                               },
+                'Cal Iterations': '25',
+                'Scan Iterations': '2',
+                'Scan Duration': 10
                 }
 
-    def set_value_callback(self):
+    def scan_callback(self):
+        pass
+        '''
         if not self.valve_name.get() == 'Scan':
             time_unit = float(self.duration.get()) * float(self.iterations.get()) / float(self.volume.get())
             self.Valves[self.valve_name.get()].time_unit.set(time_unit)
         else:
             messagebox.showerror('Invalid Input', 'PLease select a specific valve to Set')
+        '''
 
     def calibrate_callback(self):
-        for key, value in self.Valves.items():
-           if self.valve_name.get() == key or self.valve_name.get() == 'Scan':
-               self.calibrate_valve(self.Valves.get(key))
+        self.save_button.config(state='disabled')
+        self.scan_button.config(state='disabled')
+        self.abort_button.config(state='normal')
+        valve_map = {'CC': ('Coo', 'Coo'),
+                     'CD': ('Coo', 'Def'),
+                     'DC': ('Def', 'Coo'),
+                     'DD': ('Def', 'Def'),
+                     'CN': ('Cen', 'Cen')
+                     }
+        if self.calibration_mouse.get() == 'M1':
+            valve = self.M1_Valves
+            reward = self.M1_rewards
+            valve_index = 0
+        else:
+            valve = self.M2_Valves
+            reward = self.M2_rewards
+            valve_index = 1
+        self.open_channel = int(valve[valve_map[self.calibration_reward.get()][valve_index]].get())
+        self.valve_control = ValveControl(self.open_channel)
+        self.open_duration = int(reward[self.calibration_reward.get()].opening_time.get())
+        self.open_duration = self.open_duration / 1000  # Convert duration from milliseconds to seconds
+        self.open_iterations = int(self.iterations.get())
+        self.iterations_count = 0
+        volume = int(reward[self.calibration_reward.get()].water_volume.get())
+        self.expected_volume.set(str(volume * self.open_iterations))
+        self.open_valve()
 
-    def calibrate_valve(self, valve: Mouse_Valve):
-        pin = int(valve.digital_pin_num.get())
-        valve_control = ValveControl(pin)
-        duration_s = float(self.duration.get())  / 1000  # Convert duration from milliseconds to seconds
-        time.sleep(4)
-        for i in range(int(self.iterations.get())):
-            print(f"Calibrating valve on pin {pin}: Iteration {i + 1}")
-            valve_control.OpenValve(duration_s)  # Open valve for the specified duration in seconds
-            while valve_control.IsValveOpen():
+    def abort_callback(self):
+        self.abort = True
+
+    def open_valve(self):
+        if self.abort or self.iterations_count == self.open_iterations:
+            del self.valve_control
+            self.save_button.config(state='normal')
+            self.scan_button.config(state='normal')
+            self.abort_button.config(state='disabled')
+            self.abort = False
+        else:
+            self.iterations_count += 1
+            print(f'Calibrating valve on pin {self.open_channel}. Iteration #: {self.iterations_count}')
+            self.valve_control.OpenValve(self.open_duration)  # Open valve for the specified duration in seconds
+            while self.valve_control.IsValveOpen():
                 pass
-            print(f"Valve on pin {pin} closed.")
-            time.sleep(1)  # Short delay between iterations
-        del valve_control
+            print(f"Valve on pin {self.open_channel} closed.")
+            self.window.after(2000, self.open_valve)
 
     def populate_system_parameters_panel(self):
         tk.Label(self.system_panel, text="Project Directory:").place(x=5, y=30)

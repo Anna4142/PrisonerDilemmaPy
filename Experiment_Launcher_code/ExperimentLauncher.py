@@ -41,7 +41,6 @@ def main():
             experiment_parameters = experiment_gui.get_experiment_parameters()
             opponent_configuration = experiment_gui.get_opponent_configuration()
 
-
             fUtile.set_file_name(experiment_parameters.get('session_type'), experiment_parameters.get('session_num'), 1)
             fUtile.set_file_name(experiment_parameters.get('session_type'), experiment_parameters.get('session_num'), 2)
             write_configuration_file(experiment_parameters, opponent_configuration, 1)
@@ -57,14 +56,14 @@ def main():
             elif opponent_configuration.get("opponent1_type") == OpponentType.FIXED_STRATEGY:
                 first_opponent = FixedStrategyPrisoner(opponent_configuration.get("opponent1_strategy"), opponent_configuration.get("opponent1_probability"))
             else:
-                pass #first_opponent = Simulated_mouse()
+                first_opponent = None #Simulated_mouse()
 
             if opponent_configuration.get("opponent2_type") == OpponentType.MOUSE:
                 second_opponent = MouseMonitor(2, video_analyzer, reward_manager)
             elif opponent_configuration.get("opponent2_type") == OpponentType.FIXED_STRATEGY:
                 second_opponent = FixedStrategyPrisoner(opponent_configuration.get("opponent2_strategy"), opponent_configuration.get("opponent2_probability"))
             else:
-                pass #second_opponent = Simulated_mouse()
+                second_opponent = None #Simulated_mouse()
 
             # Initialize and start the experiment
             expManager = ExperimentManager(video_analyzer, reward_manager)

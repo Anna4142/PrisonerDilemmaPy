@@ -2,23 +2,23 @@ from Reward_manager.RewardManager import RewardManager
 import datetime
 
 # reward system configuration"
-recipients = [{'Coo': 1,
-               'Cen': 2,
-               'Def': 3},
-              {'Coo': 4,
-               'Cen': 5,
-               'Def': 6}]
+recipients = [{'Coo': '1',
+               'Cen': '2',
+               'Def': '3'},
+              {'Coo': '4',
+               'Cen': '5',
+               'Def': '6'}]
 
-rewards = [{'CC': 120,
-            'CD': 0,
-            'DC': 160,
-            'DD': 30,
-            'CN': 20},
-           {'CC': 100,
-            'CD': 10,
-            'DC': 120,
-            'DD': 40,
-            'CN': 0}]
+rewards = [{'CC': {'opening time': '120', 'water volume': '12'},
+            'CD': {'opening time': '0', 'water volume': '0'},
+            'DC': {'opening time': '160', 'water volume': '16'},
+            'DD': {'opening time': '30', 'water volume': '12'},
+            'CN': {'opening time': '20', 'water volume': '2'}},
+           {'CC': {'opening time': '121', 'water volume': '13'},
+            'CD': {'opening time': '160', 'water volume': '16'},
+            'DC': {'opening time': '0', 'water volume': '0'},
+            'DD': {'opening time': '31', 'water volume': '3'},
+            'CN': {'opening time': '20', 'water volume': '3'}}]
 
 opcode = -1
 comport = input("Comport: ")
@@ -26,7 +26,7 @@ reward_manager = RewardManager(comport, recipients, rewards)
 rewards = []
 
 while opcode != 0:
-    opcodestr = input("opcode [0- exit, 1- set reward, 2- deliver]: ")
+    opcodestr = input("opcode [0- exit, 1- set reward, 2- deliver, 3- get reward]: ")
     opcode = int(opcodestr)
 
     if opcode == 0:
@@ -45,6 +45,11 @@ while opcode != 0:
         ct = datetime.datetime.now().strftime("%M:%S.%f")
         print (f'Rewards delivered. Time Stamp= {ct}')
         rewards = []
+
+    elif opcode == 3:
+        mouse = int(input("Mouse ID (1 or 2): "))
+        scenario = input('Valid scenarios: CC, CD, DC, DD, CN: ')
+        print (f'Rewards volume = {reward_manager.get_reward(mouse, scenario)}')
 
     else:
         print ("illegal opcode")

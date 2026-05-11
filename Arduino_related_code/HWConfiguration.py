@@ -280,17 +280,17 @@ class HWConfGUI:
                               'Cen': '1',
                               'Def': '1'
                               },
-                'M1 Rewards': {'CC': {'opening time': 1, 'water volume': '12'},
-                               'CD': {'opening time': 1, 'water volume': '0'},
-                               'DC': {'opening time': 1, 'water volume': '16'},
-                               'DD': {'opening time': 1, 'water volume': '3'},
-                               'CN': {'opening time': 1, 'water volume': '2'}
+                'M1 Rewards': {'CC': {'opening time': '1', 'water volume': '12'},
+                               'CD': {'opening time': '1', 'water volume': '0'},
+                               'DC': {'opening time': '1', 'water volume': '16'},
+                               'DD': {'opening time': '1', 'water volume': '3'},
+                               'CN': {'opening time': '1', 'water volume': '2'}
                                },
-                'M2 Rewards': {'CC': {'opening time': 1, 'water volume': '12'},
-                               'CD': {'opening time': 1, 'water volume': '16'},
-                               'DC': {'opening time': 1, 'water volume': '0'},
-                               'DD': {'opening time': 1, 'water volume': '3'},
-                               'CN': {'opening time': 1, 'water volume': '2'}
+                'M2 Rewards': {'CC': {'opening time': '1', 'water volume': '12'},
+                               'CD': {'opening time': '1', 'water volume': '16'},
+                               'DC': {'opening time': '1', 'water volume': '0'},
+                               'DD': {'opening time': '1', 'water volume': '3'},
+                               'CN': {'opening time': '1', 'water volume': '2'}
                                },
                 'Cal Iterations': '25',
                 'Scan Iterations': '2',

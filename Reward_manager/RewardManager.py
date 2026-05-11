@@ -8,7 +8,7 @@ else:
 from Arduino_related_code.ValveControl import ValveControl
 
 class RewardManager:
-    def __init__(self, comport, recipients, rewards):
+    def __init__(self, comport, channels, rewards):
         Arduino.openComPort(comport)
         self.rewards = rewards
         self.recipient_key = [{'CC': 'Coo',
@@ -21,15 +21,15 @@ class RewardManager:
                                'DC': 'Coo',
                                'DD': 'Def',
                                'CN': 'Cen'}]
-        self.recipients = [{} for _ in range(len(recipients))]
-        for i in range(len(recipients)):
-            for key in recipients[i]:
-                self.recipients[i][key] = ValveControl(int(recipients[i][key]))
+        self.recipients = [{} for _ in range(len(channels))]
+        for i in range(len(channels)):
+            for key in channels[i]:
+                self.recipients[i][key] = ValveControl(int(channels[i][key]))
 
     def deliver_reward(self, mouse_id, scenario):
         key = self.recipient_key[mouse_id - 1][scenario]
         valve = self.recipients[mouse_id - 1][key]
-        open_time = self.rewards[mouse_id - 1][scenario]
+        open_time = int(self.rewards[mouse_id - 1][scenario]['opening time'])
 
         valve.OpenValve(open_time / 1000)  # time is converted to seconds
 
@@ -41,5 +41,5 @@ class RewardManager:
                     reward_delivered = False
         return reward_delivered
 
-    #def get_reward(self, mouse_id, scenario):
-    #    return self.rewards[mouse_id -1].get(scenario)
+    def get_reward(self, mouse_id, scenario):
+        return self.rewards[mouse_id -1][scenario]['water volume']

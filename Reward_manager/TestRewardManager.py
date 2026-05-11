@@ -2,38 +2,31 @@ from Reward_manager.RewardManager import RewardManager
 import datetime
 
 # reward system configuration"
-valves = {'M1 Coo': {'Channel': '1',
-                     'flow unit': '1'},
-          'M1 Cen': {'Channel': '2',
-                     'flow unit': '3'},
-          'M1 Def': {'Channel': '3',
-                     'flow unit': '5'},
-          'M2 Coo': {'Channel': '4',
-                     'flow unit': '2'},
-          'M2 Cen': {'Channel': '6',
-                     'flow unit': '4'},
-          'M2 Def': {'Channel': '5',
-                     'flow unit': '6'}}
+recipients = [{'Coo': 1,
+               'Cen': 2,
+               'Def': 3},
+              {'Coo': 4,
+               'Cen': 5,
+               'Def': 6}]
 
-m1_rewards = {'CC': '12',
-              'CD': '0',
-              'DC': '16',
-              'DD': '3',
-              'CN': '2'}
-
-m2_rewards = {'CC': '10',
-              'CD': '1',
-              'DC': '12',
-              'DD': '4',
-              'CN': '0'}
+rewards = [{'CC': 120,
+            'CD': 0,
+            'DC': 160,
+            'DD': 30,
+            'CN': 20},
+           {'CC': 100,
+            'CD': 10,
+            'DC': 120,
+            'DD': 40,
+            'CN': 0}]
 
 opcode = -1
 comport = input("Comport: ")
-reward_manager = RewardManager(comport, valves, m1_rewards, m2_rewards)
+reward_manager = RewardManager(comport, recipients, rewards)
 rewards = []
 
 while opcode != 0:
-    opcodestr = input("opcode [0- exit, 1- set reward, 2- deliver, 3- get reward]: ")
+    opcodestr = input("opcode [0- exit, 1- set reward, 2- deliver]: ")
     opcode = int(opcodestr)
 
     if opcode == 0:
@@ -52,13 +45,6 @@ while opcode != 0:
         ct = datetime.datetime.now().strftime("%M:%S.%f")
         print (f'Rewards delivered. Time Stamp= {ct}')
         rewards = []
-
-    elif opcode == 3:
-        if not rewards:
-            print ("set a reward before getting is value")
-        else:
-            print(f' Reward u/L = {reward_manager.get_reward(rewards[0][0], rewards[0][1])}')
-
 
     else:
         print ("illegal opcode")

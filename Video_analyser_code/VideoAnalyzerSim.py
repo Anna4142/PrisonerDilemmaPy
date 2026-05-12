@@ -44,7 +44,7 @@ class Video_Analyzer:
 
     def get_dropped_frames(self):
         frames = random.random()
-        if frames > 0.9:
+        if frames > 0.91:
             frames = int(frames * 100) - 90
             print(f'Frames dropped = {frames}')
             self.dropped_frames += frames

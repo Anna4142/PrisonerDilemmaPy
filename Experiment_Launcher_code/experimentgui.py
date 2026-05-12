@@ -8,24 +8,23 @@ class ExperimentGUI:
     def __init__(self):
         self.window = tk.Tk()
         self.window.title("Prisoner's Dilemma Experiment setup")
-        self.window.geometry("550x640")
+        self.window.geometry("550x610")
 
         # create window layout
-        self.system_panel = tk.Frame(self.window, width = 540, height = 90, relief = tk.RAISED, borderwidth = 2)
-        tk.Label(self.system_panel, text = "System Parameters").place(x = 210, y = 2)
+        self.project_panel = tk.Frame(self.window, width = 540, height = 60, relief = tk.RAISED, borderwidth = 2)
+        tk.Label(self.project_panel, text ="Project Parameters").place(x = 210, y = 2)
         self.experiment_panel = tk.Frame(self.window, width=540, height=152, relief=tk.RAISED, borderwidth=2)
         tk.Label(self.experiment_panel, text ="Experiment Parameters").place(x = 200, y = 2)
         self.first_opponent_panel = tk.Frame(self.window, width=268, height=340, relief=tk.RAISED, borderwidth=2)
         tk.Label(self.first_opponent_panel, text ="First Opponent").place(x = 70, y = 2)
         self.second_opponent_panel = tk.Frame(self.window, width=268, height=340, relief=tk.RAISED, borderwidth=2)
         tk.Label(self.second_opponent_panel, text ="Second Opponent").place(x = 70, y = 2)
-        self.system_panel.place(x = 5, y = 5)
-        self.experiment_panel.place(x = 5, y = 100)
-        self.first_opponent_panel.place(x = 5, y = 257)
-        self.second_opponent_panel.place(x = 277, y = 257)
+        self.project_panel.place(x = 5, y = 5)
+        self.experiment_panel.place(x = 5, y = 70)
+        self.first_opponent_panel.place(x = 5, y = 227)
+        self.second_opponent_panel.place(x = 277, y = 227)
 
         # Initialize entry variables
-        self.comport_name = tk.StringVar(value = "COM11")
         self.project_directory_var = tk.StringVar(value = None)
         self.experiment_name = tk.StringVar(value = "Experiment_4")
         self.session_type = tk.StringVar(value = "Session")
@@ -49,6 +48,7 @@ class ExperimentGUI:
 
         # Control Variables
         self.start_button_clicked = False
+        self.config_button_clicked = False
 
     def setup_gui(self):
         # Entry fields for trials, duration, etc.
@@ -66,19 +66,21 @@ class ExperimentGUI:
 
         # Create a button to start the experiment
         start_button = tk.Button(self.window, text="Start Experiment", command=self.start_experiment)
-        start_button.place(x = 225, y = 605)
+        start_button.place(x = 225, y = 575)
+
+        # Create a button to switch to HW configuration
+        HWConfig_button = tk.Button(self.window, text="HW Configuration", command=self.hw_configuration)
+        HWConfig_button.place(x=430, y=575)
+
         self.project_directory_var.set(fUtile.get_project_directory())
         self.window.mainloop()
 
     def populate_system_parameters_panel(self):
-        tk.Label(self.system_panel, text="COM port name:").place(x = 130, y = 30)
-        comport_name_entry = tk.Entry(self.system_panel, textvariable = self.comport_name)
-        comport_name_entry.place(x = 230, y = 30)
-        tk.Label(self.system_panel, text="Project Directory:").place(x = 5, y = 60)
-        pd_name_entry = tk.Entry(self.system_panel, width = 60, textvariable = self.project_directory_var)
-        pd_name_entry.place(x = 110, y = 60)
+        tk.Label(self.project_panel, text="Project Directory:").place(x = 5, y = 30)
+        pd_name_entry = tk.Entry(self.project_panel, width = 60, textvariable = self.project_directory_var)
+        pd_name_entry.place(x = 110, y = 30)
         pd_button = tk.Button(self.window, text="Browse", command=self.browse_project_directory)
-        pd_button.place(x = 490, y = 60)
+        pd_button.place(x = 490, y = 30)
 
     def get_opponent_type(self,opponent_type_str):
         mapping = {
@@ -163,12 +165,13 @@ class ExperimentGUI:
             messagebox.showinfo("Experiment Starting", "The experiment is now starting with the provided settings.")
             self.window.destroy()
 
-    def validate_inputs(self):
-        # comport name must be defined.
-        if self.comport_name.get() == "":
-            messagebox.showerror("Invalid Input", "COM port name must be defined")
-            return False
+    def hw_configuration(self):
+        # stop GUI and mark hw configuration selected
+        self.config_button_clicked = True
+        messagebox.showinfo("HW Configuration", "Taking you to HW configuration")
+        self.window.destroy()
 
+    def validate_inputs(self):
         # Project directory must exist
         if not fUtile.set_project_directory(self.project_directory_var.get()):
             messagebox.showerror("Invalid Input", "Project Directory Does not Exist")
@@ -267,8 +270,8 @@ class ExperimentGUI:
     def experiment_started(self):
         return self.start_button_clicked
 
-    def get_com_port(self):
-        return self.comport_name.get()
+    def hw_configuration_selected(self):
+        return self.config_button_clicked
 
     def get_experiment_parameters(self):
         settings = {

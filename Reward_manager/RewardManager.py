@@ -1,34 +1,45 @@
 from Experiment_Launcher_code.ModuleConfiguration import __USE_ARDUINO_SIM
+
 if __USE_ARDUINO_SIM:
     import Arduino_related_code.ArduinoDigitalSim as Arduino
 else:
     import Arduino_related_code.ArduinoDigital as Arduino
 
 from Arduino_related_code.ValveControl import ValveControl
-from Video_analyser_code.locations import Locations
-
 
 class RewardManager:
-    def __init__(self, comport):
+    def __init__(self, comport, channels, rewards):
         Arduino.openComPort(comport)
-        self.valves = [ValveControl(channel) for channel in [7, 8, 9, 10, 11, 12]]
-        self.reward_mapping = {
-            'first_prisoner': {Locations.Cooperate : 5, Locations.Center : 4, Locations.Defect : 3},
-            'second_prisoner': {Locations.Cooperate : 2, Locations.Center : 1, Locations.Defect : 0}}
+        self.rewards = rewards
+        self.recipient_key = [{'CC': 'Coo',
+                               'CD': 'Coo',
+                               'DC': 'Def',
+                               'DD': 'Def',
+                               'CN': 'Cen'},
+                              {'CC': 'Coo',
+                               'CD': 'Def',
+                               'DC': 'Coo',
+                               'DD': 'Def',
+                               'CN': 'Cen'}]
+        self.recipients = [{} for _ in range(len(channels))]
+        for i in range(len(channels)):
+            for key in channels[i]:
+                self.recipients[i][key] = ValveControl(int(channels[i][key]))
 
-    def deliver_reward(self, mouse_id, location, reward_time):
-        if mouse_id == 1:
-            valve_map = self.reward_mapping.get('first_prisoner', {})
-        else:
-            valve_map = self.reward_mapping.get('second_prisoner', {})
-        valveindex = valve_map.get(location)
-        #if valveindex is None:
-        #    valveindex=4
-        self.valves[valveindex].OpenValve(reward_time)
+    def deliver_reward(self, mouse_id, scenario):
+        key = self.recipient_key[mouse_id - 1][scenario]
+        valve = self.recipients[mouse_id - 1][key]
+        open_time = int(self.rewards[mouse_id - 1][scenario]['opening time'])
+
+        valve.OpenValve(open_time / 1000)  # time is converted to seconds
 
     def is_reward_delivered(self):
-        rewarDelivered = True
-        for valve in self.valves:
-            if valve.IsValveOpen():
-                rewarDelivered = False
-        return rewarDelivered
+        reward_delivered = True
+        for i in range(len(self.recipients)):
+            for key in self.recipients[i]:
+                if self.recipients[i][key].IsValveOpen():
+                    reward_delivered = False
+        return reward_delivered
+
+    def get_reward(self, mouse_id, scenario):
+        return self.rewards[mouse_id -1][scenario]['water volume']

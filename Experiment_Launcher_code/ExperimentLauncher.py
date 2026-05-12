@@ -11,52 +11,70 @@ from modelling_opponent.FixedStrategyPrisoner import FixedStrategyPrisoner
 from Reward_manager.RewardManager import RewardManager
 from Experiment_Launcher_code.ExperimentManager import ExperimentManager
 from Experiment_Launcher_code.experimentgui import ExperimentGUI, OpponentType
+from Arduino_related_code.HWConfiguration import HWConfGUI
 import Data_analysis.FileUtilities as fUtile
 
 def main():
-    # Create an instance of the ExperimentGUI class
+    gui_terminated = False
     experiment_gui = ExperimentGUI()
-    experiment_gui.setup_gui()
+
+    while not gui_terminated:
+        # Run ExperimentGUI window
+        experiment_gui.setup_gui()
+
+        # After the GUI is closed, check action selected
+        if experiment_gui.hw_configuration_selected():
+            del experiment_gui
+            config = HWConfGUI()
+            config.run_GUI()
+            # after config window closes
+            del config
+            experiment_gui = ExperimentGUI()
+        else:
+            gui_terminated = True
 
     # After the GUI is closed, get the settings using the appropriate methods
     if experiment_gui.experiment_started():
-        comport_name = experiment_gui.get_com_port()
-        experiment_parameters = experiment_gui.get_experiment_parameters()
-        opponent_configuration = experiment_gui.get_opponent_configuration()
-        write_configuration_file(experiment_parameters, opponent_configuration)
+        sys_param = fUtile.load_system_configuration('1.0')
+        if sys_param.get('version') == '1.0':
+            comport_name = sys_param.get('Com Port')
+            experiment_parameters = experiment_gui.get_experiment_parameters()
+            opponent_configuration = experiment_gui.get_opponent_configuration()
+            write_configuration_file(experiment_parameters, opponent_configuration)
 
-        # Instantiate software components
-        reward_manager = RewardManager(comport_name)
-        video_analyzer = Video_Analyzer()
+            # Instantiate software components
+            video_analyzer = Video_Analyzer()
+            valve_channels = [sys_param['M1 valves'], sys_param['M2 valves']]
+            rewards = [sys_param['M1 Rewards'], sys_param['M2 Rewards']]
+            reward_manager = RewardManager(comport_name, valve_channels, rewards)
 
-        # Configure Opponents
-        if opponent_configuration.get("opponent1_type") == OpponentType.MOUSE:
-            first_opponent = MouseMonitor(1, video_analyzer, reward_manager)
-        elif opponent_configuration.get("opponent1_type") == OpponentType.FIXED_STRATEGY:
-            first_opponent = FixedStrategyPrisoner(opponent_configuration.get("opponent1_strategy"), opponent_configuration.get("opponent1_probability"))
+            # Configure Opponents
+            if opponent_configuration.get("opponent1_type") == OpponentType.MOUSE:
+                first_opponent = MouseMonitor(1, video_analyzer, reward_manager)
+            elif opponent_configuration.get("opponent1_type") == OpponentType.FIXED_STRATEGY:
+                first_opponent = FixedStrategyPrisoner(opponent_configuration.get("opponent1_strategy"), opponent_configuration.get("opponent1_probability"))
+            else:
+                first_opponent = None #Simulated_mouse()
+
+            if opponent_configuration.get("opponent2_type") == OpponentType.MOUSE:
+                second_opponent = MouseMonitor(2, video_analyzer, reward_manager)
+            elif opponent_configuration.get("opponent2_type") == OpponentType.FIXED_STRATEGY:
+                second_opponent = FixedStrategyPrisoner(opponent_configuration.get("opponent2_strategy"), opponent_configuration.get("opponent2_probability"))
+            else:
+                second_opponent = None #Simulated_mouse()
+
+            # Initialize and start the experiment
+            expManager = ExperimentManager(video_analyzer, reward_manager)
+            print("Experiment manager now running")
+            expManager.start_streaming_exp(experiment_parameters, first_opponent, second_opponent)
+
+            # experiment manager terminated.
+            del expManager
+
         else:
-            pass #first_opponent = Simulated_mouse()
-
-        if opponent_configuration.get("opponent2_type") == OpponentType.MOUSE:
-            second_opponent = MouseMonitor(2, video_analyzer, reward_manager)
-        elif opponent_configuration.get("opponent2_type") == OpponentType.FIXED_STRATEGY:
-            second_opponent = FixedStrategyPrisoner(opponent_configuration.get("opponent2_strategy"), opponent_configuration.get("opponent2_probability"))
-        else:
-            pass #second_opponent = Simulated_mouse()
-
-        # Initialize and start the experiment
-        expManager = ExperimentManager(video_analyzer, reward_manager)
-        print("Experiment manager now running")
-        expManager.start_streaming_exp(experiment_parameters, first_opponent, second_opponent)
-
-        # experiment terminated.
-        del experiment_gui
-        del expManager
-        video_analyzer.close_resources()
-        del video_analyzer
-        del reward_manager
+            print('Wrong version of system parameter file. Plausibly a SW error. Call Micky :-)')
     else:
-        print("No valid settings were provided.")
+        print('Experiment was not started')
 
 
 def write_configuration_file(experiment_parameters, opponent_configuration):

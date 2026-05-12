@@ -40,15 +40,13 @@ def main():
             comport_name = sys_param.get('Com Port')
             experiment_parameters = experiment_gui.get_experiment_parameters()
             opponent_configuration = experiment_gui.get_opponent_configuration()
-
-            fUtile.set_file_name(experiment_parameters.get('session_type'), experiment_parameters.get('session_num'), 1)
-            fUtile.set_file_name(experiment_parameters.get('session_type'), experiment_parameters.get('session_num'), 2)
-            write_configuration_file(experiment_parameters, opponent_configuration, 1)
-            write_configuration_file(experiment_parameters, opponent_configuration, 2)
+            write_configuration_file(experiment_parameters, opponent_configuration)
 
             # Instantiate software components
             video_analyzer = Video_Analyzer()
-            reward_manager = RewardManager(comport_name, sys_param.get('valves'), sys_param.get('M1 Rewards'), sys_param.get('M1 Rewards'))
+            valve_channels = [sys_param['M1 valves'], sys_param['M2 valves']]
+            rewards = [sys_param['M1 Rewards'], sys_param['M2 Rewards']]
+            reward_manager = RewardManager(comport_name, valve_channels, rewards)
 
             # Configure Opponents
             if opponent_configuration.get("opponent1_type") == OpponentType.MOUSE:

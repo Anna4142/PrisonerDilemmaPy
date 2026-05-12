@@ -30,8 +30,8 @@ class MouseMonitor(Prisoner):
     def DecisionAbort(self):
         pass
 
-    def DeliverReward(self, opponent_decision, reward_time):
-        self.reward_manager.deliver_reward(self.mouse_id, self.mouse_location, reward_time)
+    def DeliverReward(self, opponent_decision, scenario):
+        self.reward_manager.deliver_reward(self.mouse_id, scenario)
 
 
 

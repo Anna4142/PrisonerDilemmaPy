@@ -1,5 +1,5 @@
 import tkinter as tk
-import time
+from tkinter import filedialog
 import random
 from Experiment_Launcher_code.ModuleConfiguration import __USE_ARDUINO_SIM
 if __USE_ARDUINO_SIM:
@@ -23,7 +23,15 @@ def start_test():
 
     cycle_count=duration1_count=duration2_count= 0
     valve_control = ValveControl(int(pin_entry.get()))
-    video_writer = VideoWriter(output_file=fUtile.get_project_directory() + '/WaterFlowMonitor.avi', fps=50)
+
+
+
+    # Force file selection
+    filename = ''
+    while filename == '' :
+        filename = filedialog.asksaveasfilename(initialdir=fUtile.get_project_directory(),
+                                 defaultextension=".avi", filetypes=[("AVI video", "*.avi")])
+    video_writer = VideoWriter(output_file=filename, fps=50)
     cam = VimbaCameraController(50)
     cam.start_video()
     monitor_flow()
